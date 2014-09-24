@@ -1,0 +1,3 @@
+﻿Adaptação do jogo Space Invaders [1], da Taito (1978).
+
+[1] http://pt.wikipedia.org/wiki/Space_Invaders

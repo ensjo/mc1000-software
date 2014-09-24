@@ -1,0 +1,11 @@
+CURSO DE BASIC
+
+Esta fita possui um curso de Basic dividido em 4 programas; sendo que as partes 1 e 2 estão no lado A e as 3 e 4 lado B da fita cassete.
+
+Para executar estes programas, siga as instruções abaixo:
+
+1. Posicione a fita
+2. Ajuste o volume do gravador
+3. Digite Load ou (Shift)(W) no MC-1000
+4. Pressione a tecla (Return) no MC-1000
+5. Pressione a tecla (Play) do gravador.

@@ -1,0 +1,26 @@
+﻿QUEBRA-CABEÇAS
+
+Este jogo é um quebra-cabeças que você tem que montar para reproduzir um desenho dado. É um desafio ao seu poder de observação.
+
+INSTRUÇÕES
+
+1. Há 3 desenhos diferentes que estão cortados em 4, 9, 16 ou 36 pedaços de igual tamanho.
+
+2. Após pressionar a tecla (S), você poderá começar a reunir os pedaços.
+
+3. ▭ - Este sinal intermitente é a sua posição. Usando o joystick, movimente-o para o lugar desejado e pressione o botão "fogo". Assim foi estabelecida uma localização que denominaremos A1.
+
+4. Em seguida, mova o sinal ▭ da posição A1, para outra, A2 e pressione o botão fogo. Assim os dois lugares A1 e A2 serão trocados entre si.
+
+5. Enquanto monta o quebra-cabeças, você poderá pressionar a tecla (S) para a qualquer momento, compará-lo com o desenho original.
+
+6. Na parte superior da tela há um cronômetro e o placar. Este placar demonstrará o quanto você é bom observador.
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.
+5. Para mudar de nível digite <CTRL> + <H>.

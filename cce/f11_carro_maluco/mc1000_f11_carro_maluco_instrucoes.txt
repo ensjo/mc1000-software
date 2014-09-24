@@ -1,0 +1,25 @@
+﻿Você conseguirá, em alta velocidade, ultrapassar todos os carros, sem bater nem sair da estrada?
+
+INSTRUÇÕES
+
+1. Use apenas seu joystick.
+
+2. A primeira tela apresenta os 4 níveis de jogo, com velocidades crescentes em cada nível.
+
+3. Selecione um nível com seu joystick.
+
+4. O botão fogo aumenta a velocidade do seu carro.
+
+5. Puxando a alavanca, o carro volta à sua velocidade original.
+
+6. Você deve evitar os carros que se aproximam e não sair da estrada.
+
+7. Os pontos que conseguir em cada nível estarão marcados no placar que surge à esquerda, na parte inferior da tela.
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.

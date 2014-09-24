@@ -1,0 +1,15 @@
+﻿PERSEGUIÇÃO POLICIAL
+
+Digite TLOAD e tecle <RETURN>
+
+1. Use seu joystick para controlar o carro
+
+2. Há 48 níveis neste jogo. Os níveis 1 até 24 são para um jogador. Os níveis 25 até 48 são para dois jogadores, denominados P1 e P2.
+
+3. Há 5 carros amarelos em cada nível. O jogador tem que controlar o carro amarelo de forma a "comer" o máximo possível de pontos brancos e fugir do carro vermelho.
+
+4. O placar está no alto da tela á direita, marcando o número de pontos brancos "comidos". Você vencerá o jogo se "comer" todos eles.
+
+5. O nível final é uma tela (placar) com soma total dos pontos.
+
+Para mudar de nível, tecle <CTRL> + <H>

@@ -1,0 +1,49 @@
+﻿SENHA
+
+Este jogo, por aliar o fator sorte com raciocínio lógico e concentração, torna-se muito atraente para crianças e adultos.
+O computador escolhe um número de 4 a 6 algarismos e você terá que descobri-lo.
+
+INSTRUÇÕES
+
+1. O jogo tem 40 níveis onde, em cada nível, 1 número será escolhido pelo computador. Para você descobrir qual é o número escolhido, digite um número qualquer que será comparado com o do micro. Ele poderá ser de 4, 5 ou 6 algarismos, conforme a tabela abaixo.
+
+   NÍVEL   — ALGARISMOS
+    1 a 16 — 4
+   17 a 28 — 5
+   29 a 30 — 6
+
+2. No início de cada nível, aparecerão vários algarismos percorrendo a tela.
+
+   Atenção, você só poderá usar estes algarismos para tentar adivinhar o número.
+
+3. Você poderá fazer 16 tentativas para cada número escolhido pelo micro. Terá para isso um tempo de alguns níveis não são cronometrados que será cronometrado no alto da tela à direita, em contagem regressiva.
+
+4. Depois de cada tentativa, aparecem na tela, à esquerda do número que você escolheu um ou vários sinais como abaixo:
+
+   ╩ (vermelho) - existe um algarismo correto no lugar correto.
+   ╦ (azul) - existe um algarismo correto no lugar errado.
+
+   Por exemplo:
+
+   ╩ ╩ ╦ ╦ - significa que dois algarismos do número que você escolheu estão corretos na posição correta e dois estão corretos, mas na posição errada.
+
+   NOTAS:
+
+   * A ordem em que surgem os símbolos ╩ e ╦ na tela não implica correspondência com a sequência de números(algarismos que você forneceu).
+
+   * Um número pode começar por zero (0). Os números escolhidos pelo computador não têm algarismos repetidos
+
+5. Se depois de 16 tentativas você não acertar o número do computador, ou seu tempo estiver esgotado, a resposta surgirá no alto da tela.
+
+6. O número de pontos que você conseguir em cada jogada estará escrito logo acima da resposta.
+
+7. O nível final mostra a soma dos pontos que você conseguiu.
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.
+5. Para mudar de nível digite <CTRL> + <H>.

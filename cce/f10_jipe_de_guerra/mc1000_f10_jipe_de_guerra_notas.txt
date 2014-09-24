@@ -1,0 +1,3 @@
+﻿Adaptação do jogo Pac-Man [1], da Namco (1980).
+
+[1] http://pt.wikipedia.org/wiki/Pac-Man

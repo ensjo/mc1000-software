@@ -1,0 +1,46 @@
+﻿GUERRA DOS ROBÔS
+
+Robôs, vindos de outro planeta, invadem a Terra e tentarão destruir a fonte de energia.
+
+Você terá que protegê-la contra os invasores, atacando-os com sua arma mais poderosa: o canhão Laser.
+
+INSTRUÇÕES
+
+ 1. O jogo tem 8 níveis.
+
+ 2. Com seu joystick, você poderá mover seu canhão Laser para frente, para trás, esquerda ou direita, seja para fugir ou para atacar o inimigo, enquanto protege a fonte de energia.
+
+ 3. A barreira de defesa poderá ser derrubada pelos tiros do canhão Laser, para abrir caminho em direção ao inimigo. Mas cuidado, porque os robôs também poderão fazê-lo.
+
+ 4. Aperte o botão "fogo" para atirar no robô.
+
+ 5. A cada robô que você destruir, poderá fazer de 3 a 9 pontos, dependendo da distância que ele estiver do canhão Laser.
+
+   Quanto mais próximo você atirar, mais pontos fará. O número de pontos que fizer surgirá na tela, no lugar do robô destruído.
+
+ 6. Os outros números que surgem na tela são da esquerda para a direita: número do nível, número de canhões que ainda restam nesse nível e número de robôs que ainda restam.
+
+ 7. A batalha termina quando uma das três opções abaixo acontecer:
+
+   a) todos os canhões Laser são destruídos.
+   b) todos os robôs são destruídos.
+   c) o inimigo explode a fonte de energia.
+
+ 8. O placar será exibido numa tela especial no fim de cada batalha.
+
+ 9. Nos níveis 2, 4 e 6 os robôs são mais velozes, portanto cuidado!
+
+10. No nível 3 os pontos que você faz a cada robô destruído variam de 3 a 15, conforme a distância.
+
+11. Nos nívels 5 e 6 não há barreiras de defesa.
+
+12. Níveis 7 e 8 são para 2 jogadores (um contra o outro).
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.
+5. Para mudar de nível digite <CTRL> + <H>.

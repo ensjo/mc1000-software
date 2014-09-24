@@ -1,0 +1,65 @@
+﻿OTHELLO (GO)
+
+Dois exércitos de samurais se defrontam na frente de batalha. Os prisioneiros são incorporados ao exército vencedor. Quem vencerá esta luta de vida ou morte?
+
+Este jogo está baseado no tradicional "GO" japonês, de origem milenar.
+
+O objetivo do jogo é ocupar o máximo de território com suas peças. Uma vez que cada jogada influi decisivamente nos movimentos posteriores, o jogador é obrigado a utilizar-se de táticas de ataque.
+
+Há mudanças súbitas de placar, o que torna o jogo movimentado e divertido.
+
+INSTRUÇÕES
+
+ 1. Há 4 níveis nesse jogo. O nível 1 é para 2 jogadores. Os níveis 2 até 4 são para 1 jogador (o computador joga com você), mais o nível de pontuação.
+
+ 2. O jogo utiliza um tabuleiro de damas convencional, com 64 posições (8×8).
+
+ 3. Cada jogador escolhe uma cor. A vez de jogar é mostrada à direita, no alto da tela, através de uma peça da cor correspondente que "pisca".
+
+ 4. O jogo começa com 4 peças, duas de cada cor, já colocadas no centro do tabuleiro.
+
+ 5. O objetivo do jogo é "comer" o máximo possível de peças do adversário, conquistando consequentemente um maior terreno ocupado.
+
+ 6. Pode-se "comer" uma ou mais peças de cada vez, desde que elas estejam dispostas em linha reta contínua à peça adversária.
+
+    |○|●|●|●|X|
+
+    Figura 1 - O jogador que está com as brancas está fazendo um movimento para a posição X, capturando as peças adversárias.
+
+ 7. Você pode "comer" as peças adversárias nas linhas horizontais, verticais e diagonais (nos 2 sentidos).
+
+ 8. Cada peça que você "comer" se tornará sua, mudando de cor.
+
+ 9. Escolha o lugar onde quer ir e digite o número correspondente horizontal e em seguida o vertical.
+
+    _|1|2|3|4|5|6|7|8|
+    1|_|_|_|X|_|_|_|_|
+    2|_|_|●|_|_|_|_|_|
+    3|_|●|_|_|_|_|_|_|
+    4|○|_|_|_|_|_|_|_|
+    5|_|_|_|_|_|_|_|_|
+
+    Figura 2 - Para ir até a posição X com as brancas, digita 4 e 1.
+
+10. Quando uma ou mais linhas de peças estiverem com uma peça adversária em cada extremo, mudarão de cor.
+
+    |_|X|●|●|○|_|   |_|○|○|○|○|_|
+    |_|●|●|●|●|_|   |_|○|○|●|●|_|
+    |_|●|●|○|●|_| → |_|○|●|○|●|_|
+    |_|●|○|○|_|_|   |_|○|○|○|_|_|
+    |_|○|_|_|_|_|   |_|○|_|_|_|_|
+
+    Figura 3 - As brancas jogam, ocupando a posição X e capturando 6 pretas o mesmo tempo: 2 na primeira linha horizontal, 3 na vertical e 1 na diagonal.
+
+11. O jogo termina quando um dos jogadores não puder mais fazer um movimento ou as 64 posições estarem ocupadas.
+
+12. Vence o jogo quem tiver conquistado mais posições, ou seja, tiver maior número de peças no tabuleiro. O placar é exibido na tela à direita mostrando qual samurai venceu a batalha.
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.
+5. Para mudar de nível digite <CTRL> + <H>.

@@ -1,0 +1,34 @@
+JOGO DE MEMÓRIA
+
+Este jogo é um desafio à sua capacidade de observação e memorização. Você terá que lembrar em que posição está um número dado para encontrá-lo novamente.
+
+INSTRUÇÕES
+
+1. Um quadrado 4×4 ou 6×6 e uma seta surgem na tela.
+
+2. Com seu joystick, leve a seta até a posição que deseja e aperte o botão. Surgirá nesta posição um número.
+
+3. Vá agora, para outra posição e tente:
+   a) níveis 1–6 → encontrar o mesmo número
+   b) níveis 7–14 → encontrar o número antecedente ou subsequente.
+
+4. Há 14 níveis diferentes neste jogo.
+   a) os níveis 1–7 são para 2 jogadores
+   b) os níveis 8–14 são para 1 jogador.
+
+5. Nos níveis 3, 4, 10 e 11 um número já está descoberto.
+
+6. Nos níveis 5, 6, 12 e 13 os dois números já foram escolhidos pelo computador. Agora é só uma questão de sorte.
+
+7. Nos níveis 4 e 6 após 10 jogadas as posições de todos os números são mostradas durante alguns segundos. Nos níveis 10 e 13 após 9 jogadas acontece o mesmo.
+
+8. O placar localiza-se no alto da tela, onde você poderá ver os pontos que conseguiu, confirmando sua capacidade de memorização.
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.
+5. Para mudar de nível digite <CTRL> + <H>.

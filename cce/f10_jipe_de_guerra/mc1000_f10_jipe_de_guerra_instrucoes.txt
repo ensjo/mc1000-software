@@ -1,0 +1,26 @@
+﻿JIPE DE GUERRA
+
+Esse é um dos mais populares jogos do mundo. Você nunca poderá prever qual é o caminho mais seguro para o seu jipe. Você deverá entrar na cidade inimiga e pegar a maior quantidade de munição possível.
+
+INSTRUÇÕES
+
+1. Há 12 níveis diferentes nesse jogo e 3 cidades diferentes.
+
+2. Com seu joystick faça o jipe percorrer as ruas da cidade, recolhendo as caixas de munição (brancas) e armas (pretas).
+
+3. Se ele se chocar com os carros do inimigo será destruído.
+
+4. Toda vez que o jipe pegar uma caixa de armas, o inimigo mudará de cor e, estando armado, você poderá persegui-lo e destruí-lo.
+
+5. Quando terminar sua missão o jogo mudará de nível, colocando-o em novas cidades com novas aventuras.
+
+6. Os pontos que você conseguir em cada nível estarão marcados no placar à direita.
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.
+5. Para mudar de nível digite <CTRL> + <H>.
