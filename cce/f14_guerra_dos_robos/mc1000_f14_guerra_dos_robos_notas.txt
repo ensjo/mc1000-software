@@ -1,0 +1,3 @@
+﻿Adaptação do jogo Tank Battalion [1], da Namco (1980), precursor de Battle City (1985) e Tank Force (1991).
+
+[1] http://en.wikipedia.org/wiki/Tank_Battalion

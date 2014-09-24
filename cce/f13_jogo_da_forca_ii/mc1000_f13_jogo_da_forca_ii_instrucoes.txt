@@ -1,0 +1,39 @@
+﻿JOGO DA FORCA II
+
+Esse jogo é um desafio à sua inteligência, raciocínio rápido e conhecimentos da língua. Pode ser jogado por crianças ou adultos, sendo um auxiliar valioso e divertido no aprendizado da língua portuguesa.
+
+INSTRUÇÕES
+
+1. O computador escolhe uma palavra e você terá que adivinhá-la.
+
+2. O número de letras da palavra a ser descoberta está escrito no alto da tela.
+
+3. Para adivinhar a palavra digite as letras, as quais poderão, ou não, fazer parte desta.
+
+4. Você poderá fazer 28 tentativas. Caso não descubra a palavra escondida, a resposta virá escrita no alto da tela.
+
+5. A cada tentativa que fizer, poderão surgir os símbolos seguintes:
+
+   ♦ - letra correta no lugar correto
+   / - letra correta no lugar errado
+
+   Por exemplo:
+
+   // - significa que há duas letras corretas na posição errada.
+
+6. A ordem com que esses símbolos aparecem na tela não tem relação com a ordem das letras na palavra.
+
+7. O jogo tem 14 níveis. Todos os níveis são cronometrados à direita da tela.
+
+8. Níveis de 1 até 7, 1 jogador e de 8 até 14, 2 jogadores.
+
+9. O número de pontos que você conseguir surgirá no alto da tela. Há uma tela especial no fim do jogo que dá a soma dos pontos conseguidos por cada jogador.
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.
+5. Para mudar de nível digite <CTRL> + <H>.

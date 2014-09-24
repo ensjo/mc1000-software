@@ -1,0 +1,4 @@
+﻿City Bomber parece ser uma adaptação do jogo Blitz [1], para VIC-20, da Creative (1982), que por sua vez é uma adaptação do Air Attack [2], para PET 2001, da SuperSoft (1979).
+
+[1] http://en.wikipedia.org/wiki/Blitz_(video_game)
+[2] http://de.wikipedia.org/wiki/City_Bomber

@@ -1,0 +1,27 @@
+﻿RESTA UM
+
+Este jogo é um desafio à sua capacidade de raciocínio e agilidade mental. Você será capaz de "limpar" o tabuleiro?
+
+1. A finalidade deste jogo é "comer" todas as peças no tabuleiro até restar apenas uma.
+
+2. Há 4 níveis nesse jogo. O nível 1 é para você praticar. Nos níveis 2 e 3, as peças já estão no tabuleiro. No nível 4, você dispõe inicialmente as peças no tabuleiro, para depois jogar.
+
+3. Você verá um ponto piscando na tela. Coloque-o com o auxílio do joystick na posição que desejar, movendo-o para a esquerda, direita, para baixo ou para cima.
+
+4. Para comer uma pedra, leve o ponto luminoso até a pedra que vai jogar. Pressione o botão do joystick e, mantendo-o pressionado, vá até a casa desejada.
+
+5. Cada peça que você "comer" desaparecerá do tabuleiro. Cuidado para não deixar uma peça isolada!
+
+6. Se você não quiser música, pressione a tecla (N). Pressione (M) para a música voltar.
+
+7. Os números que surgem na tela são, da esquerda para a direita: o número do nível, o número de peças no tabuleiro, o placar e o cronômetro.
+
+8. O nível final apresenta as somas dos pontos que você conseguiu, confirmando a sua capacidade de raciocínio.
+
+Obs.: Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressiona <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.

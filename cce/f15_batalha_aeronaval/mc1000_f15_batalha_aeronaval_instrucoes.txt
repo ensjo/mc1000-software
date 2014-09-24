@@ -1,0 +1,26 @@
+﻿BATALHA AERONAVAL
+
+Dois artilheiros têm a missão de destruir navios e aviões. Mas o inimigo está alerta, atirando bombas mortíferas. Serão eles capazes de, sozinhos, vencer as batalhas aérea e naval?
+
+INSTRUÇÕES
+
+1. O jogo é para 2 jogadores, cada um com seu joystick.
+
+2. O jogo tem 4 níveis. Nos níveis 1 e 2, os inimigos são navios e nos níveis 3 e 4 são aviões.
+
+3. Cada um dos jogadores deverá, apertando o botão "fogo", atirar no inimigo, podendo mover-se para a esquerda ou direita.
+
+4. Existem ao todo 4 baterias à disposição dos jogadores, uma em cada plano horizontal na tela. Com seus joysticks, vocês poderão se movimentar para baixo ou para cima para acionar cada uma dessas barreiras. Mas cuidado, porque poderão se chocar com o inimigo ou serem atingidos por suas bombas mortíferas.
+
+5. O jogo termina quando todos os navios ou aviões são destruídos ou as 4 baterias são destruídas.
+
+6. Cada nível exibe o placar com os pontos obtidos por cada jogador na parte superior da tela. No final, há uma tela especial para exibir a soma dos pontos conseguidos por cada um.
+
+Obs. Este programa está gravado nos dois lados da fita.
+
+Instruções
+1. Ajuste o volume do seu gravador para 2/3 do total.
+2. Digite TLOAD ou <SHIFT> + <T>.
+3. Pressione <RETURN> e ligue o gravador. A tela mudará de cor durante o carregamento e o programa aparecerá em seguida.
+4. Para carregar outro programa digite <SHIFT> + <RESET> e repita as instruções acima.
+5. Para mudar de nível digite <CTRL> + <H>.

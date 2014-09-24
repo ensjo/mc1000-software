@@ -1,0 +1,4 @@
+﻿Mars Lander parece ser uma adaptação do jogo Jupiter Lander [1], da HAL Laboratory (1982), que por sua vez é uma adaptação do Lunar Lander [2], da Atari (1979).
+
+[1] http://www.c64-wiki.com/index.php/Jupiter_Lander
+[2] http://en.wikipedia.org/wiki/Lunar_Lander_(arcade_game)
