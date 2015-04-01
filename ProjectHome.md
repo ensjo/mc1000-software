@@ -1,0 +1,1 @@
+Documentação do software existente para o microcomputador de 8 bits MC1000 da CCE: ROM, fitas, programas para digitar, etc.
