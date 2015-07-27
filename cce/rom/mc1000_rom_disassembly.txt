@@ -5925,7 +5925,7 @@ E0B4  C437E7    CALL    NZ,#E737 ; [PRS1]
 E0B7  E1        POP     HL
 E0B8  C369E0    JP      #E069
  
-; {CRWDY} <NewLine>
+; CRLFPOSNZ {CRWDY} <NewLine>
 ; Imprime CR+LF se POS() diferente de zero.
 E0BB  3A8E03    LD      A,(#038E) ; {CURPOS}
 E0BE  B7        OR      A
