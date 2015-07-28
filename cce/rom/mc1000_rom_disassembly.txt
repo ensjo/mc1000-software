@@ -150,7 +150,7 @@ C0F0  C0        RET     NZ
 ; Efetua intermitência do cursor e registra
 ; seu estado atual.
 ; (Cursor aceso: FSHCNT (#012F) é par.)
-C0F1  CD55CB    CALL    #CB55
+C0F1  CD55CB    CALL    #CB55 ; CALLUPDBM
 C0F4  3A2F01    LD      A,(#012F) ; FSHCNT
 C0F7  3C        INC     A
 C0F8  322F01    LD      (#012F),A ; FSHCNT
@@ -1756,7 +1756,7 @@ C922  CC42C9    CALL    Z,#C942
 ; Armazena posição atualizada do cursor na VRAM.
 C925  225B01    LD      (#015B),HL ; SNPTR
 ;
-C928  CD55CB    CALL    #CB55
+C928  CD55CB    CALL    #CB55 ; CALLUPDBM
 C92B  AF        XOR     A
 C92C  322F01    LD      (#012F),A ; FSHCNT
 ; Anula seqüência de ESCape (se houver).
@@ -1842,7 +1842,7 @@ C998  1C        INC     E
 C999  3A1301    LD      A,(#0113) ; DLNG
 C99C  4F        LD      C,A
 C99D  0600      LD      B,#00
-C99F  CD5BCB    CALL    #CB5B
+C99F  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 C9A2  2A6301    LD      HL,(#0163) ; DSNAM
 C9A5  1D        DEC     E
 C9A6  CAADC9    JP      Z,#C9AD
@@ -1852,7 +1852,7 @@ C9AD  225901    LD      (#0159),HL ; LNHD
 C9B0  4A        LD      C,D
 C9B1  09        ADD     HL,BC
 C9B2  225B01    LD      (#015B),HL ; SNPTR
-C9B5  CD55CB    CALL    #CB55
+C9B5  CD55CB    CALL    #CB55 ; CALLUPDBM
 C9B8  7A        LD      A,D
 C9B9  325D01    LD      (#015D),A ; LCNT
 C9BC  C32FC9    JP      #C92F
@@ -1875,7 +1875,7 @@ C9CE  DA2FC9    JP      C,#C92F
 C9D1  C397C9    JP      #C997
  
 ; Põe o cursor no início da tela.
-C9D4  CD5BCB    CALL    #CB5B
+C9D4  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 C9D7  2A6301    LD      HL,(#0163) ; DSNAM
 C9DA  3A0F00    LD      A,(#000F) ; C40?80
 C9DD  B7        OR      A
@@ -1936,11 +1936,11 @@ CA43  2A5B01    LD      HL,(#015B) ; SNPTR
 CA46  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
 CA49  CCFCC0    CALL    Z,#C0FC ; BEEP
 CA4C  CA2FC9    JP      Z,#C92F
-CA4F  CD5BCB    CALL    #CB5B
+CA4F  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 CA52  2A5B01    LD      HL,(#015B) ; SNPTR
 CA55  2B        DEC     HL
 CA56  225B01    LD      (#015B),HL ; SNPTR
-CA59  CD5BCB    CALL    #CB5B
+CA59  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 CA5C  CD11CB    CALL    #CB11
 CA5F  C32FC9    JP      #C92F
  
@@ -1953,21 +1953,21 @@ CA69  2B        DEC     HL
 CA6A  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
 CA6D  CCFCC0    CALL    Z,#C0FC ; BEEP
 CA70  CA2FC9    JP      Z,#C92F
-CA73  CD5BCB    CALL    #CB5B
+CA73  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 CA76  C300C9    JP      #C900
  
 ; Impressão de caracter de controle #0D (CR).
 ; Move o cursor para o início da linha.
-CA79  CD5BCB    CALL    #CB5B
+CA79  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 CA7C  2A5901    LD      HL,(#0159) ; LNHD
 CA7F  225B01    LD      (#015B),HL ; SNPTR
-CA82  CD55CB    CALL    #CB55
+CA82  CD55CB    CALL    #CB55 ; CALLUPDBM
 CA85  AF        XOR     A
 CA86  325D01    LD      (#015D),A ; LCNT
 CA89  C32FC9    JP      #C92F
  
 ; Impressão de caracter de controle #0A (LF).
-CA8C  CD5BCB    CALL    #CB5B
+CA8C  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 ; Incrementa a posição do cursor na VRAM com
 ; a quantidade de caracteres de uma linha.
 CA8F  2A5B01    LD      HL,(#015B) ; SNPTR
@@ -2009,7 +2009,7 @@ CACA  2A5901    LD      HL,(#0159) ; LNHD
 CACD  AF        XOR     A
 CACE  ED52      SBC     HL,DE
 CAD0  225901    LD      (#0159),HL ; LNHD
-CAD3  CD5BCB    CALL    #CB5B
+CAD3  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 CAD6  AF        XOR     A
 ; Incrementa a posição do cursor na VRAM com
 ; a quantidade de caracteres de uma linha.
@@ -2027,7 +2027,7 @@ CAEF  2A5B01    LD      HL,(#015B) ; SNPTR
 CAF2  3620      LD      (HL),#20
 CAF4  2B        DEC     HL
 CAF5  3620      LD      (HL),#20
-CAF7  CD55CB    CALL    #CB55
+CAF7  CD55CB    CALL    #CB55 ; CALLUPDBM
 CAFA  225B01    LD      (#015B),HL ; SNPTR
 CAFD  C32FC9    JP      #C92F
  
@@ -2086,13 +2086,15 @@ CB50  7D        LD      A,L
 CB51  D311      OUT     (#11),A ; DPORT1
 CB53  E1        POP     HL
 CB54  C9        RET
- 
+
+; CALLUPDBM:
 ; Salta para endereço armazenado em UPDBM (#00F7): #CB1D ou #CB3F.
 CB55  E5        PUSH    HL
 CB56  2AF700    LD      HL,(#00F7) ; UPDBM
 CB59  E3        EX      (SP),HL
 CB5A  C9        RET
- 
+
+; CALLUPDBCM:
 ; Salta para endereço armazenado em UPDBCM (#00F9): #CB2D ou #CB3F.
 CB5B  E5        PUSH    HL
 CB5C  2AF900    LD      HL,(#00F9) ; UPDBCM
@@ -4399,7 +4401,7 @@ D854  1E22      LD      E,#22 ; erro "FI"
 ; {ERROO} <Error> [ERROR]
 D856  CDC7D9    CALL    #D9C7 ; {INITR} <ResetStack> [CLREG]
 D859  324403    LD      (#0344),A ; {OUTFLG} [CTLOFG]; Habilita impressão.
-D85C  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine>
+D85C  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 D85F  216CD7    LD      HL,#D76C ; TABERRCOD {ERRTAB} <ERROR_CODES>
 D862  57        LD      D,A
 ; Imprime "?"
@@ -4433,13 +4435,13 @@ D88C  C1        POP     BC
 D88D  AF        XOR     A
 D88E  324403    LD      (#0344),A ; {OUTFLG} [CTLOFG]
 D891  325D03    LD      (#035D),A ; {AUTOFG}
-D894  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine>
+D894  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 ; Faz PR# 0, para não mandar a mensagem
 ; de erro à impressora.
 D897  AF        XOR     A
 D898  CD93D4    CALL    #D493 ; DOPR#
 ; Imprime "OK"
-D89B  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine>
+D89B  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 D89E  21EAD7    LD      HL,#D7EA ; "OK" {OK}
 D8A1  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} [PRS]
  
@@ -5514,7 +5516,7 @@ DE46  327D01    LD      (#017D),A
 DE49  010600    LD      BC,#0006 ; 6ms
 DE4C  CD0EC3    CALL    #C30E ; DELAYB
 DE4F  CDC7CE    CALL    #CEC7
-DE52  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine>
+DE52  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 ; Se foi STOP ou Ctrl+C, imprime mensagem
 ; "PAUSA (EM...)".
 DE55  F1        POP     AF
@@ -5892,26 +5894,26 @@ E06A  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 ;
 ; BPRINT
 E06D  CAC7E0    JP      Z,#E0C7 ; PRINTCRLF [PRNTCR]
-;
+; {PRINT2} [PRNTLP]
 E070  C8        RET     Z
 E071  FEB6      CP      #B6 ; token "TAB("
-E073  CAF5E0    JP      Z,#E0F5
+E073  CAF5E0    JP      Z,#E0F5 ; {TAB} [DOTAB]
 E076  FEB9      CP      #B9 ; token "SPC("
-E078  CAF5E0    JP      Z,#E0F5
+E078  CAF5E0    JP      Z,#E0F5 ; {TAB} [DOTAB]
 E07B  FEBD      CP      #BD ; token "VTAB("
-E07D  CAF5E0    JP      Z,#E0F5
+E07D  CAF5E0    JP      Z,#E0F5 ; {TAB} [DOTAB]
 E080  E5        PUSH    HL
 E081  FE2C      CP      ','
-E083  CAE1E0    JP      Z,#E0E1
+E083  CAE1E0    JP      Z,#E0E1 ; {FORMAT} [DOCOM]
 E086  FE3B      CP      ';'
-E088  CA20E1    JP      Z,#E120
+E088  CA20E1    JP      Z,#E120 ; {TAB4} [NEXITM]
 E08B  CDD0E2    CALL    #E2D0 ; EVAL {SNALY} <EvalExpression> [EVAL]
 E08E  C1        POP     BC
 E08F  E5        PUSH    HL
 E090  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
 E093  B7        OR      A
 E094  201E      JR      NZ,#E0B4        ; (30)
-E096  CD96EE    CALL    #EE96 ; STRFLOAT
+E096  CD96EE    CALL    #EE96 ; STRFLOAT {NUMKON} [NUMASC]
 E099  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST]
 E09C  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
 E09F  3A4203    LD      A,(#0342) ; {LINLEN} [LWIDTH]
@@ -5928,7 +5930,7 @@ E0B4  C437E7    CALL    NZ,#E737 ; {TEXTO1} [PRS1]
 E0B7  E1        POP     HL
 E0B8  C369E0    JP      #E069
  
-; CRLFPOSNZ {CRWDY} <NewLine>
+; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 ; Imprime CR+LF se POS() diferente de zero.
 E0BB  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
 E0BE  B7        OR      A
@@ -5939,20 +5941,20 @@ E0C0  1805      JR      #E0C7 ; PRINTCRLF {CRWDY2} [PRNTCR]
 ; {CRWDY1}
 E0C2  3600      LD      (HL),#00
 ; {CRWDY6}
-E0C4  21FF01    LD      HL,#01FF ; {INPBUF}
+E0C4  21FF01    LD      HL,#01FF ; {INPBUF} <LINE_BUFFER> [BUFFER-1]
 ; PRINTCRLF: Imprime CR+LF, atualizando POS().
 ; {CRWDY2} [PRNTCR]
-E0C7  3E0D      LD      A,#0D
+E0C7  3E0D      LD      A,#0D ; CR
 E0C9  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 ; {CRWDY5} [DONULL]
-E0CC  3E0A      LD      A,#0A
+E0CC  3E0A      LD      A,#0A ; LF
 E0CE  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 ; POSZERO: Zera POS().
 ; Imprime a quantidade de characteres ASCII NULL
 ; indicada em {DUMMY} [NULLS].
 ; {CRWDY3}
 E0D1  3A4103    LD      A,(#0341) ; {DUMMY} <TERMINAL_Y> [NULLS]
-; {CRWDY4}
+; {CRWDY4} [NULLP]
 E0D4  3D        DEC     A
 E0D5  328E03    LD      (#038E),A ; {CURPOS} [CURPOS]
 E0D8  C8        RET     Z
@@ -5960,32 +5962,35 @@ E0D9  F5        PUSH    AF
 E0DA  AF        XOR     A
 E0DB  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 E0DE  F1        POP     AF
-E0DF  18F3      JR      #E0D4 ; {CRWDY4} ; (-13)
+E0DF  18F3      JR      #E0D4 ; {CRWDY4} [NULLP]
 ;
 ; Trata "," no comando PRINT.
+; {FORMAT} [DOCOM]
 E0E1  3A4303    LD      A,(#0343) ; {PRLISI} [COMMAN]
 E0E4  47        LD      B,A
 E0E5  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
 E0E8  B8        CP      B
 E0E9  D4C7E0    CALL    NC,#E0C7 ; PRINTCRLF [PRNTCR]
-E0EC  3032      JR      NC,#E120        ; (50)
-E0EE  D60F      SUB     #0F
-E0F0  30FC      JR      NC,#E0EE        ; (-4)
+E0EC  3032      JR      NC,#E120 ; {TAB4} [NEXITM]
+; {FORM1} [ZONELP]
+E0EE  D60F      SUB     #0F ; Próxima zona de 15 caracteres.
+E0F0  30FC      JR      NC,#E0EE ; {FORM1} [ZONELP]
 E0F2  2F        CPL
-E0F3  1821      JR      #E116           ; (33)
-;
+E0F3  1821      JR      #E116 ; {TAB2} [ASPCS]
+
 ; Trata cláusulas do PRINT: TAB, SPC e VTAB.
-E0F5  F5        PUSH    AF
+; {TAB} [DOTAB]
+E0F5  F5        PUSH    AF ; Salva token.
 E0F6  CD96E9    CALL    #E996 ; {ARGVAL} <GetSubscript> [FNDNUM]
 E0F9  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E0FC  29        DB      ')'
 E0FD  2B        DEC     HL
-E0FE  F1        POP     AF
+E0FE  F1        POP     AF ; Recupera token.
 E0FF  D6B9      SUB     #B9 ; token "SPC("
 E101  E5        PUSH    HL
-E102  280E      JR      Z,#E112         ; (14)
+E102  280E      JR      Z,#E112 ; {TAB1} [DOSPC]
 E104  FE04      CP      #04
-E106  CA3AE1    JP      Z,#E13A
+E106  CA3AE1    JP      Z,#E13A ; Trata VTAB.
  
 ; Trata TAB.
 E109  7B        LD      A,E
@@ -5994,20 +5999,24 @@ E10C  DAF6DE    JP      C,#DEF6 ; PIERRO
 E10F  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
  
 ; Trata SPC.
+; {TAB1} [DOSPC]
 E112  2F        CPL
 E113  83        ADD     A,E
-E114  300A      JR      NC,#E120        ; (10)
+E114  300A      JR      NC,#E120 ; {TAB4} [NEXITM]
+; {TAB2} [ASPCS]
 E116  3C        INC     A
 E117  47        LD      B,A
-E118  3E20      LD      A,#20
+E118  3E20      LD      A,' ' ; Espaço.
+; {TAB3} [SPCLP]
 E11A  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 E11D  05        DEC     B
-E11E  20FA      JR      NZ,#E11A        ; (-6)
+E11E  20FA      JR      NZ,#E11A; {TAB3} [SPCLP]
  
-; Trata ";" no comando PRINT
+; Trata ";" no comando PRINT.
+; {TAB4} [NEXITM]
 E120  E1        POP     HL
 E121  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
-E124  C370E0    JP      #E070
+E124  C370E0    JP      #E070 ; {PRINT2} [PRNTLP]
  
 ; Verifica parâmetro de VTAB.
 ; Se o modo de texto é de 32 colunas...
@@ -6027,27 +6036,54 @@ E137  C331E1    JP      #E131
  
 ; Trata VTAB.
 E13A  43        LD      B,E
-E13B  CD27E1    CALL    #E127
-E13E  CD5BCB    CALL    #CB5B
-E141  210080    LD      HL,#8000
+E13B  CD27E1    CALL    #E127 ; Verifica parâmetro segundo 32/80 colunas.
+E13E  CD5BCB    CALL    #CB5B ; CALLUPDBCM ; Apaga cursor se estiver aceso.
+
+; BUG! O código adiante tem vários erros de lógica
+; que impedem a cláusula VTAB( de funcionar.
+
+; BUG! A linha abaixo não deveria usar o valor constante
+; $8000, mas deveria ler a variável DSNAM, que contém o
+; valor do início da VRAM para a largura de vídeo atual.
+; No modo de 80 colunas, o valor é $2000.
+
+E141  210080    LD      HL,#8000 ; Início da VRAM.
+
+; BUG! Faltou carregar em DE o valor da variável DLNG,
+; que contém a largura da tela (32/80).
+
 E144  ED52      SBC     HL,DE
 E146  13        INC     DE
+
+; BUG! O registrador A é usado como contador do laço
+; abaixo, mas faltou inicializar A com o parâmetro
+; de VTAB.
+
 ; A instrução abaixo:
 E147  017B3D    LD      BC,#3D7B
 ; oculta a instrução:
 ; E149  3D        DEC     A
-E14A  2803      JR      Z,#E14F         ; (3)
+E14A  2803      JR      Z,#E14F
+
+; BUG! A soma abaixo deveria ser feita com DE
+; (contendo a largura da tela) e não com BC
+; (que recebeu lixo acima).
+
 E14C  09        ADD     HL,BC
-E14D  18FA      JR      #E149           ; (-6)
-;
+E14D  18FA      JR      #E149
+
+; Neste ponto HL DEVERIA conter o valor de
+; DSNAM + <parâmetro de VTAB> * DLNG,
+; mas os bugs acima impediram isso.
+
 E14F  225901    LD      (#0159),HL ; LNHD
 E152  3A5D01    LD      A,(#015D) ; LCNT
 E155  4F        LD      C,A
 E156  0600      LD      B,#00
 E158  09        ADD     HL,BC
 E159  225B01    LD      (#015B),HL ; SNPTR
-E15C  CD55CB    CALL    #CB55
-E15F  C320E1    JP      #E120
+E15C  CD55CB    CALL    #CB55 ; CALLUPDBM
+E15F  C320E1    JP      #E120 ; {TAB4} [NEXITM]
 
 ; [REDO]
 E162  3F524545  DB      '?REE'
@@ -6522,7 +6558,7 @@ E421  CA4DED    JP      Z,#ED4D ; CPFLOATBCDE {VORZ1} <FCompare>
 E424  AF        XOR     A
 E425  329003    LD      (#0390),A ; {DATYPE} [TYPE]
 E428  D5        PUSH    DE
-E429  CD6FE8    CALL    #E86F; POPTMPSTR {STRZS1}
+E429  CD6FE8    CALL    #E86F; POPTMPSTR {STRZS1} [GSTRCU]
 E42C  7E        LD      A,(HL)
 E42D  23        INC     HL
 E42E  23        INC     HL
@@ -6908,7 +6944,7 @@ E60D  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
 E610  B7        OR      A
 E611  280D      JR      Z,#E620         ; (13)
 ; Não: Compacta área de strings(?).
-E613  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1}
+E613  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
 E616  CD75E7    CALL    #E775
 ; DE = ...
 E619  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC]
@@ -7037,9 +7073,9 @@ E6BE  C3BFE2    JP      #E2BF ; STR?TI {SNALY3} [TSTNUM]
  
 ; BSTR$
 E6C1  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
-E6C4  CD96EE    CALL    #EE96 ; STRFLOAT
+E6C4  CD96EE    CALL    #EE96 ; STRFLOAT {NUMKON} [NUMASC]
 E6C7  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST]
-E6CA  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1}
+E6CA  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
 E6CD  01C9E8    LD      BC,#E8C9
 E6D0  C5        PUSH    BC
 E6D1  7E        LD      A,(HL)
@@ -7151,7 +7187,7 @@ E733  23        INC     HL
 ; {TEXTO} [PRS]
 E734  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST]
 ; {TEXTO1} [PRS1]
-E737  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1}
+E737  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
 E73A  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
 E73D  1C        INC     E
 ; {TEXTO2} [PRSLP]
@@ -7365,7 +7401,7 @@ E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR]
 ; Se FLOAT aponta para o registro no topo da
 ; pilha de registros de strings temporários,
 ; desempilha-o.
-; {STRZS1}
+; {STRZS1} [GSTRCU]
 E86F  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
 E872  EB        EX      DE,HL
 E873  CD8CE8    CALL    #E88C
@@ -7558,17 +7594,20 @@ E956  C5        PUSH    BC
 E957  43        LD      B,E
 E958  C9        RET
 ;
-; BINP
+; BINP:
+; {INP} [INP]
 E959  CD9CE9    CALL    #E99C ; {ARGVL2} [MAKINT]
-E95C  323F03    LD      (#033F),A
-E95F  CD3E03    CALL    #033E
-E962  C33FE6    JP      #E63F ; FLOATA
+E95C  323F03    LD      (#033F),A ; [INPORT]
+E95F  CD3E03    CALL    #033E ; [INPSUB]
+E962  C33FE6    JP      #E63F ; FLOATA {POS1} [PASSA]
 ;
-; BOUT
+; BOUT:
+; {OUT} [POUT]
 E965  CD87E9    CALL    #E987 ; [SETIO]
-E968  C30603    JP      #0306
+E968  C30603    JP      #0306 ; [OUTSUB]
 ;
-; BWAIT
+; BWAIT:
+; {WAIT} [WAIT]
 ; WAIT A,B espera até que (INP(A) AND B) <> 0.
 ; WAIT A,B,C espera até que ((INP(A) XOR C) AND B) <> 0.
 E96B  CD87E9    CALL    #E987 ; [SETIO]
@@ -7576,11 +7615,13 @@ E96E  F5        PUSH    AF
 E96F  1E00      LD      E,#00
 E971  2B        DEC     HL
 E972  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
-E975  2807      JR      Z,#E97E         ; (7)
+E975  2807      JR      Z,#E97E ; {WAIT1} [NOXOR]
 E977  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E97A  2C        DB      ','
 E97B  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
+; {WAIT1} [NOXOR]
 E97E  C1        POP     BC
+; {WAIT2} [WAITLP]
 E97F  CD3E03    CALL    #033E
 E982  AB        XOR     E
 E983  A0        AND     B
@@ -7589,8 +7630,8 @@ E986  C9        RET
 
 ; [SETIO]
 E987  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
-E98A  323F03    LD      (#033F),A
-E98D  320703    LD      (#0307),A
+E98A  323F03    LD      (#033F),A ; [INPORT]
+E98D  320703    LD      (#0307),A ; [OUTPORT]
 E990  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E993  2C        DB      ','
 E994  1803      JR      #E999 ; {ARGVL1} [GETINT]
@@ -8830,6 +8871,7 @@ EE92  2133E7    LD      HL,#E733 ; {TEXTO0} [PRNUMS]
 EE95  E5        PUSH    HL
 ; STRFLOAT: Monta em #03C4 a representação
 ; string de FLOAT.
+; {NUMKON} [NUMASC]
 EE96  21C403    LD      HL,#03C4 ; {INTPRB} [PBUFF]
 EE99  E5        PUSH    HL
 ; Verifica o sinal.
