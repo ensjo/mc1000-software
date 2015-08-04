@@ -5887,12 +5887,13 @@ E05D  CAC4DF    JP      Z,#DFC4
 E060  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E063  DA80DF    JP      C,#DF80
 E066  C384DD    JP      #DD84
-;
-;
+
+; {PRINT0} [MRPRNT]
 E069  2B        DEC     HL
 E06A  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 ;
 ; BPRINT
+; {PRINT} [PRINT]
 E06D  CAC7E0    JP      Z,#E0C7 ; PRINTCRLF [PRNTCR]
 ; {PRINT2} [PRNTLP]
 E070  C8        RET     Z
@@ -5902,34 +5903,35 @@ E076  FEB9      CP      #B9 ; token "SPC("
 E078  CAF5E0    JP      Z,#E0F5 ; {TAB} [DOTAB]
 E07B  FEBD      CP      #BD ; token "VTAB("
 E07D  CAF5E0    JP      Z,#E0F5 ; {TAB} [DOTAB]
-E080  E5        PUSH    HL
+E080  E5        PUSH    HL ; Salva ponto de interpretação.
 E081  FE2C      CP      ','
 E083  CAE1E0    JP      Z,#E0E1 ; {FORMAT} [DOCOM]
 E086  FE3B      CP      ';'
 E088  CA20E1    JP      Z,#E120 ; {TAB4} [NEXITM]
 E08B  CDD0E2    CALL    #E2D0 ; EVAL {SNALY} <EvalExpression> [EVAL]
-E08E  C1        POP     BC
-E08F  E5        PUSH    HL
-E090  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
+E08E  C1        POP     BC ; Descarta ponto de interpretação salvo anteriormente.
+E08F  E5        PUSH    HL ; Salva ponto de interpretação atual (após expressão).
+E090  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE] ; Desvia se for string.
 E093  B7        OR      A
-E094  201E      JR      NZ,#E0B4        ; (30)
-E096  CD96EE    CALL    #EE96 ; STRFLOAT {NUMKON} [NUMASC]
-E099  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST]
-E09C  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
+E094  201E      JR      NZ,#E0B4 ; {PRINT4} [PRNTST]
+E096  CD96EE    CALL    #EE96 ; STRFLOAT {NUMKON} [NUMASC] ; Converte número em texto.
+E099  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST] ; Cria string temporária.
+E09C  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] ; Quebra linha se string não couber no resto da linha (WIDTH).
 E09F  3A4203    LD      A,(#0342) ; {LINLEN} [LWIDTH]
 E0A2  47        LD      B,A
 E0A3  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
 E0A6  86        ADD     A,(HL)
 E0A7  B8        CP      B
 E0A8  D4C7E0    CALL    NC,#E0C7 ; PRINTCRLF [PRNTCR]
-E0AB  CD37E7    CALL    #E737 ; {TEXTO1} [PRS1]
-E0AE  3E20      LD      A,#20
+E0AB  CD37E7    CALL    #E737 ; {TEXTO1} [PRS1] ; Imprime string com o número.
+E0AE  3E20      LD      A,' ' ; Imprime espaço.
 E0B0  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
-E0B3  AF        XOR     A
-E0B4  C437E7    CALL    NZ,#E737 ; {TEXTO1} [PRS1]
-E0B7  E1        POP     HL
-E0B8  C369E0    JP      #E069
- 
+E0B3  AF        XOR     A ; Pula o CALL seguinte.
+; {PRINT4} [PRNTST]
+E0B4  C437E7    CALL    NZ,#E737 ; {TEXTO1} [PRS1] ; Imprime string.
+E0B7  E1        POP     HL ; Recupera ponto de interpretação.
+E0B8  C369E0    JP      #E069 ; {PRINT0} [MRPRNT] ; Continua interpretação de PRINT.
+
 ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 ; Imprime CR+LF se POS() diferente de zero.
 E0BB  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
