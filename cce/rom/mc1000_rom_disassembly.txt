@@ -5836,10 +5836,10 @@ E00D  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND]
 E010  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
 E013  3009      JR      NC,#E01E        ; (9)
 E015  3ED1      LD      A,#D1
-E017  CD8CE8    CALL    #E88C
+E017  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP]
 E01A  EB        EX      DE,HL
-E01B  CDD1E6    CALL    #E6D1
-E01E  CD8CE8    CALL    #E88C
+E01B  CDD1E6    CALL    #E6D1 ; {STR_1} [SAVSTR]
+E01E  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP]
 E021  E1        POP     HL
 E022  CD2EED    CALL    #ED2E ; LD4HLDE {OPTRN1}
 E025  E1        POP     HL
@@ -6666,7 +6666,7 @@ E4B1  0F        RRCA
 E4B2  81        ADD     A,C
 E4B3  4F        LD      C,A
 E4B4  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
-; Desvia se LOAD*/SAVE*
+; Desvia se matriz ($03AC contém 1).
 E4B7  3AAC03    LD      A,(#03AC) ; {FORFLG} [FORFLG]
 E4BA  3D        DEC     A
 E4BB  CA4FE5    JP      Z,#E54F
@@ -6943,13 +6943,13 @@ E60C  39        ADD     HL,SP
 E60D  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
 E610  B7        OR      A
 E611  280D      JR      Z,#E620         ; (13)
-; Não: Compacta área de strings(?).
+; Não: Compacta área de strings.
 E613  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
-E616  CD75E7    CALL    #E775
-; DE = ...
+E616  CD75E7    CALL    #E775 ; {STROP4} [GARBGE] ; Coleta de lixo.
+; DE = base da área de strings - 1.
 E619  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC]
 E61C  EB        EX      DE,HL
-; HL = início da área de strings
+; HL = ponto atual da área de strings.
 E61D  2AA603    LD      HL,(#03A6) ; {SWAPTR} [STRBOT]
 ; FLOAT = HL - DE e retorna.
 E620  7D        LD      A,L
@@ -7072,33 +7072,36 @@ E6BB  CD89E4    CALL    #E489
 E6BE  C3BFE2    JP      #E2BF ; STR?TI {SNALY3} [TSTNUM]
  
 ; BSTR$
+; {STR_} [STR]
 E6C1  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E6C4  CD96EE    CALL    #EE96 ; STRFLOAT {NUMKON} [NUMASC]
 E6C7  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST]
 E6CA  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
-E6CD  01C9E8    LD      BC,#E8C9
+E6CD  01C9E8    LD      BC,#E8C9 ; {CHR_1} [TOPOOL] ; Forja retorno.
 E6D0  C5        PUSH    BC
-E6D1  7E        LD      A,(HL)
+; {STR_1} [SAVSTR]
+E6D1  7E        LD      A,(HL) ; A = Tamanho da string.
 E6D2  23        INC     HL
 E6D3  23        INC     HL
 E6D4  E5        PUSH    HL
-E6D5  CD4CE7    CALL    #E74C
+E6D5  CD4CE7    CALL    #E74C ; ALOCA {STROP} [TESTR] ; Há espaço suficiente?
 E6D8  E1        POP     HL
-E6D9  4E        LD      C,(HL)
+E6D9  4E        LD      C,(HL) ; BC = Endereço da string.
 E6DA  23        INC     HL
 E6DB  46        LD      B,(HL)
-E6DC  CDE9E6    CALL    #E6E9
+E6DC  CDE9E6    CALL    #E6E9 ; {SADTB1} [CRTMST]
 E6DF  E5        PUSH    HL
 E6E0  6F        LD      L,A
-E6E1  CD63E8    CALL    #E863
+E6E1  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA] ; Move para área de strings.
 E6E4  D1        POP     DE
 E6E5  C9        RET
  
-;
-E6E6  CD4CE7    CALL    #E74C
-; Cria em #03A2 um registro de string para a
+; {STADTB} [MKTMST]
+E6E6  CD4CE7    CALL    #E74C ; ALOCA {STROP} [TESTR]
+; Cria em #03A2 {STRDAT} [TMPSTR] um registro de string para a
 ; string de comprimento A apontada por DE.
-E6E9  21A203    LD      HL,#03A2
+; {SADTB1} [CRTMST]
+E6E9  21A203    LD      HL,#03A2 ; {STRDAT} [TMPSTR]
 E6EC  E5        PUSH    HL
 E6ED  77        LD      (HL),A
 E6EE  23        INC     HL
@@ -7109,27 +7112,44 @@ E6F2  72        LD      (HL),D
 E6F3  E1        POP     HL
 E6F4  C9        RET
  
-; NEWSTRREC: Cria um novo registro de strings
-; temporário para a string apontada por HL,
-; colocando-o na pilha de registros de strings
-; temporários.
+; NEWSTRREC: Cria em $03A2 {STRDAT} [TMPSTR]
+; um novo registro de string temporário para
+; a string apontada por HL, transferindo-o
+; depois para a pilha de registros de strings
+; temporários (3 registros de 4 bytes a partir
+; de $0396 {LSPTBG} [TMSTPL]).
+; Se a pilha estiver cheia emite "?CC ERRO".
 ; A string apontada por HL termina em aspas
 ; ou #00.
-; Ao final, HL aponta para a posição seguinte
-; ao fim da string. Se tiver terminado em
-; aspas, pula também caracteres de espaço que
-; porventura houver na sequência.
+; Ao final:
+; * $0390 {DATYPE} [TYPE] recebe 1, indicando
+; tipo string.
+; * Os dois primeiros bytes de $3BF FLOAT
+; {WRA1} <FACCUM> [FPREG] apontam para o
+; registro temporário de string recém
+; inserido na pilha.
+; * HL (ponteiro de interpretação do BASIC)
+; aponta para a posição seguinte ao fim da
+; string. Se tiver terminado em aspas, pula
+; também caracteres de espaço que porventura
+; houver na sequência.
+; * A contém o caracter sob o ponteiro de
+; interpretação do BASIC.
 ; {SLEN0} [CRTST]
 E6F5  2B        DEC     HL
  
-; Avalia literal string terminada com 0 ou aspas a partir de HL + 1.
+; Avalia literal string terminada com 0
+; ou aspas a partir de HL + 1.
 ; {SOPRND} [QTSTR]: 
 ; B e D: Delimitadores.
 E6F6  0622      LD      B,'"'
-; Avalia literal string terminada com 0 ou caracter em B a partir de HL + 1.
+; Avalia literal string terminada com 0
+; ou caracter em B a partir de HL + 1.
 E6F8  50        LD      D,B
 
-; Obtém string terminada por 0 ou pelos caracteres em B ou D.
+; Avalia literal string terminada com 0
+; ou pelos caracteres em B ou D
+; a partir de HL + 1.
 ; {STRLEN} [DTSTR]
 E6F9  E5        PUSH    HL ; Empilha endereço inicial da string - 1.
 E6FA  0EFF      LD      C,-1 ; Contador do tamanho da string.
@@ -7149,16 +7169,16 @@ E706  20F4      JR      NZ,#E6FC ; {SLEN} [QTSTLP]
 ; {SLEN2} [CRTSTE]
 E708  FE22      CP      '"'
 E70A  CCA0DD    CALL    Z,#DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
-; Cria descritor em #03A2.
+; Cria descritor em #03A2 {STRDAT} [TMPSTR].
 E70D  E3        EX      (SP),HL ; Empilha ponteiro de interpretação e restaura endereço inicial da string - 1 em HL.
 E70E  23        INC     HL
 E70F  EB        EX      DE,HL ; DE = endereço inicial da string.
 E710  79        LD      A,C ; A = tamanho da string.
-E711  CDE9E6    CALL    #E6E9 ; Cria registro temporário em #03A2.
+E711  CDE9E6    CALL    #E6E9 ; {SADTB1} [CRTMST]; Cria registro temporário em #03A2 {STRDAT} [TMPSTR].
 ; {SLEN3} [TSTOPL]
-E714  11A203    LD      DE,#03A2 ; DE = registro temporário recém criado.
+E714  11A203    LD      DE,#03A2 ; {STRDAT} [TMPSTR] ; DE = registro temporário recém criado.
 E717  2A9403    LD      HL,(#0394) ; {SPTPTR} [TMSTPT] ; HL = end. próximo espaço livre para registro de string.
-E71A  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG] ; Reserva.
+E71A  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG] ; Será o ponteiro para o novo registro. Reserva.
 ; Assume tipo string.
 E71D  3E01      LD      A,#01
 E71F  329003    LD      (#0390),A ; {DATYPE} [TYPE]
@@ -7201,16 +7221,19 @@ E749  03        INC     BC
 E74A  18F2      JR      #E73E ; {TEXTO2} [PRSLP]
  
 ; ALOCA: Aloca A bytes na área de strings.
-E74C  B7        OR      A
+; O endereço da área alocada retorna em DE.
+; {STROP} [TESTR]
+E74C  B7        OR      A ; Testa se há espaço suficiente.
 ; A instrução abaixo oculta a instrução
-; E74E  POP       AF
+; ; {STROP1} [GRBDON]
+; E74E  POP       AF ; Coleta de lixo feita.
 ; que só pode ser atingida por jump.
-E74D  0EF1      LD      C,#F1
+E74D  0EF1      LD      C,#F1 ; Coleta de lixo não feita.
 E74F  F5        PUSH    AF
 ; DE = base da área de strings - 1.
 E750  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC]
 E753  EB        EX      DE,HL
-; HL = ponto atual da área de strings - A + 1.
+; HL = ponto atual da área de strings - A.
 E754  2AA603    LD      HL,(#03A6) ; {SWAPTR} [STRBOT]
 E757  2F        CPL
 E758  4F        LD      C,A
@@ -7219,23 +7242,25 @@ E75B  09        ADD     HL,BC
 E75C  23        INC     HL
 ; Desvia se HL < DE.
 E75D  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
-E760  3807      JR      C,#E769         ; (7)
+E760  3807      JR      C,#E769 ; {STROP3} [TESTOS] ; Faz coleta de lixo se ainda não tiver sido feita, senão ?FC ERRO.
 ; Atualiza ponto atual da área de strings.
 E762  22A603    LD      (#03A6),HL ; {SWAPTR} [STRBOT]
 E765  23        INC     HL
-E766  EB        EX      DE,HL
-;
+E766  EB        EX      DE,HL ; Endereço da área alocada em DE.
+; {STROP2} [POPAF]
 E767  F1        POP     AF
 E768  C9        RET
-;
-E769  F1        POP     AF
-E76A  1E1A      LD      E,#1A ; erro "FC"
+; {STROP3} [TESTOS]
+E769  F1        POP     AF ; Coleta de lixo já foi feita?
+E76A  1E1A      LD      E,#1A ; Sim, não há mais espaço: erro "FC".
 E76C  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR]
-E76F  BF        CP      A
+E76F  BF        CP      A ; Indica que a coleta de lixo terá sido feita.
 E770  F5        PUSH    AF
-E771  014EE7    LD      BC,#E74E
+E771  014EE7    LD      BC,#E74E ; {STROP1} [GRBDON] ; Forja retorno para nova tentativa de alocação após a coleta de lixo.
 E774  C5        PUSH    BC
-;
+
+; Coleta de lixo.
+; {STROP4} [GARBGE]
 E775  2A9203    LD      HL,(#0392) ; {MEMSIZ} [LSTRAM]
 E778  22A603    LD      (#03A6),HL ; {SWAPTR} [STRBOT]
 E77B  210000    LD      HL,#0000
@@ -7364,7 +7389,7 @@ E835  E5        PUSH    HL
 E836  86        ADD     A,(HL)
 E837  1E1C      LD      E,#1C ; erro "CL"
 E839  DA56D8    JP      C,#D856 ; ERROE {ERROO} <Error> [ERROR]
-E83C  CDE6E6    CALL    #E6E6
+E83C  CDE6E6    CALL    #E6E6 ; {STADTB} [MKTMST]
 E83F  D1        POP     DE
 E840  CD73E8    CALL    #E873
 E843  E3        EX      (SP),HL
@@ -7387,6 +7412,7 @@ E85F  4E        LD      C,(HL)
 E860  23        INC     HL
 E861  46        LD      B,(HL)
 E862  6F        LD      L,A
+; {STRMV1} [TOSTRA]
 E863  2C        INC     L
 E864  2D        DEC     L
 E865  C8        RET     Z
@@ -7394,19 +7420,24 @@ E866  0A        LD      A,(BC)
 E867  12        LD      (DE),A
 E868  03        INC     BC
 E869  13        INC     DE
-E86A  18F8      JR      #E864           ; (-8)
+E86A  18F8      JR      #E864
+
 ;
-E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR]
+E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] ; Assegura que seja string.
 ; POPTMPSTR:
-; Se FLOAT aponta para o registro no topo da
-; pilha de registros de strings temporários,
+; Faz HL apontar para o último registro
+; na pilha de registros de string temporários.
+; Se os dois primeiros bytes de FLOAT
+; estiverem apontando para esse mesmo registro,
 ; desempilha-o.
 ; {STRZS1} [GSTRCU]
-E86F  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
-E872  EB        EX      DE,HL
-E873  CD8CE8    CALL    #E88C
-E876  EB        EX      DE,HL
-E877  C0        RET     NZ
+E86F  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] ; HL aponta para registro de string temporário "atual" (apontado pelos dois primeiros bytes de FLOAT).
+; {STRZS2} [GSTRHL]
+E872  EB        EX      DE,HL ; DE aponta para registro de string temporário "atual".
+; {STRZS3} [GSTRDE]
+E873  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; HL aponta para o último registro de string temporária; obtém em BC o endereço do conteúdo dessa string; se DE = HL, desempilha essa string.
+E876  EB        EX      DE,HL ; DE aponta para o último registro de string temporária (tenha sido desempilhado ou não); HL aponta para registro de string temporário "atual". 
+E877  C0        RET     NZ ; Se não foi desempilhado, retorna.
 ; Se a string desempilhada foi a última a ter
 ; área alocada, libera a área correspondente.
 E878  D5        PUSH    DE
@@ -7416,28 +7447,35 @@ E87B  1B        DEC     DE
 E87C  4E        LD      C,(HL)
 E87D  2AA603    LD      HL,(#03A6) ; {SWAPTR} [STRBOT]
 E880  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
-E883  2005      JR      NZ,#E88A        ; (5)
+E883  2005      JR      NZ,#E88A ; {STRZS4} [POPHL]
 E885  47        LD      B,A
 E886  09        ADD     HL,BC
 E887  22A603    LD      (#03A6),HL ; {SWAPTR} [STRBOT]
+; {STRZS4} [POPHL]
 E88A  E1        POP     HL
 E88B  C9        RET
-; Recupera em BC o endereço do registro no topo
-; da pilha de registros de strings temporários.
-; Se DE aponta para esse registro,
-; desempilha-o (e retorna com flag Z).
-E88C  2A9403    LD      HL,(#0394) ; {SPTPTR} [TMSTPT]
-E88F  2B        DEC     HL
-E890  46        LD      B,(HL)
+
+; Faz HL apontar para o último registro
+; na pilha de registros de strings temporários.
+; BC recebe o endereço do conteúdo dessa
+; string.
+; Se DE estiver apontando para esse
+; mesmo registro, desempilha-o
+; (e retorna com flag Z).
+; {SPTSRH} [BAKTMP]
+E88C  2A9403    LD      HL,(#0394) ; {SPTPTR} [TMSTPT] ; HL aponta para o próximo espaço livre na pilha de registros de string temporários.
+E88F  2B        DEC     HL ; Decrementa para acessar o último registro.
+E890  46        LD      B,(HL) ; BC = Endereço do conteúdo da última string temporária.
 E891  2B        DEC     HL
 E892  4E        LD      C,(HL)
 E893  2B        DEC     HL
-E894  2B        DEC     HL
-E895  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
-E898  C0        RET     NZ
+E894  2B        DEC     HL ; 
+E895  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> ; DE aponta para este último registro?
+E898  C0        RET     NZ ; Sim
 E899  229403    LD      (#0394),HL ; {SPTPTR} [TMSTPT]
 E89C  C9        RET
-;
+
+
 ; BLEN
 ; Forja retorno para FLOATA.
 E89D  013FE6    LD      BC,#E63F ; FLOATA
@@ -7477,11 +7515,12 @@ E8BC  C9        RET
 ;
 ; BCHR$
 E8BD  3E01      LD      A,#01
-E8BF  CDE6E6    CALL    #E6E6
+E8BF  CDE6E6    CALL    #E6E6 ; {STADTB} [MKTMST]
 E8C2  CD9CE9    CALL    #E99C ; {ARGVL2} [MAKINT]
 E8C5  2AA403    LD      HL,(#03A4)
 ;
 E8C8  73        LD      (HL),E
+;  {CHR_1} [TOPOOL]
 E8C9  C1        POP     BC
 E8CA  C314E7    JP      #E714 ; {SLEN3} [TSTOPL]
 ;
@@ -7497,7 +7536,7 @@ E8D6  3802      JR      C,#E8DA         ; (2)
 E8D8  78        LD      A,B
 E8D9  110E00    LD      DE,#000E
 E8DC  C5        PUSH    BC
-E8DD  CD4CE7    CALL    #E74C
+E8DD  CD4CE7    CALL    #E74C ; ALOCA {STROP} [TESTR]
 E8E0  C1        POP     BC
 E8E1  E1        POP     HL
 E8E2  E5        PUSH    HL
@@ -7511,9 +7550,9 @@ E8E9  0600      LD      B,#00
 E8EB  09        ADD     HL,BC
 E8EC  44        LD      B,H
 E8ED  4D        LD      C,L
-E8EE  CDE9E6    CALL    #E6E9
+E8EE  CDE9E6    CALL    #E6E9 ; {SADTB1} [CRTMST]
 E8F1  6F        LD      L,A
-E8F2  CD63E8    CALL    #E863
+E8F2  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA]
 E8F5  D1        POP     DE
 E8F6  CD73E8    CALL    #E873
 E8F9  C314E7    JP      #E714 ; {SLEN3} [TSTOPL]
