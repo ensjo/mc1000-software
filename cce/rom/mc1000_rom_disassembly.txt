@@ -6568,7 +6568,7 @@ E431  46        LD      B,(HL)
 E432  D1        POP     DE
 E433  C5        PUSH    BC
 E434  F5        PUSH    AF
-E435  CD73E8    CALL    #E873
+E435  CD73E8    CALL    #E873 ; {STRZS3} [GSTRDE]
 E438  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
 E43B  F1        POP     AF
 E43C  57        LD      D,A
@@ -7095,8 +7095,11 @@ E6E0  6F        LD      L,A
 E6E1  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA] ; Move para área de strings.
 E6E4  D1        POP     DE
 E6E5  C9        RET
- 
+
 ; {STADTB} [MKTMST]
+; Aloca A bytes e cria em #03A2 {STRDAT} [TMPSTR]
+; um registro de string para essa área.
+; No final HL = #03A2, DE = endereço do conteúdo da string.
 E6E6  CD4CE7    CALL    #E74C ; ALOCA {STROP} [TESTR]
 ; Cria em #03A2 {STRDAT} [TMPSTR] um registro de string para a
 ; string de comprimento A apontada por DE.
@@ -7391,7 +7394,7 @@ E837  1E1C      LD      E,#1C ; erro "CL"
 E839  DA56D8    JP      C,#D856 ; ERROE {ERROO} <Error> [ERROR]
 E83C  CDE6E6    CALL    #E6E6 ; {STADTB} [MKTMST]
 E83F  D1        POP     DE
-E840  CD73E8    CALL    #E873
+E840  CD73E8    CALL    #E873 ; {STRZS3} [GSTRDE]
 E843  E3        EX      (SP),HL
 E844  CD72E8    CALL    #E872
 E847  E5        PUSH    HL
@@ -7512,8 +7515,9 @@ E8B9  23        INC     HL
 E8BA  56        LD      D,(HL)
 E8BB  1A        LD      A,(DE)
 E8BC  C9        RET
-;
+
 ; BCHR$
+; {CHR_} [CHR]
 E8BD  3E01      LD      A,#01
 E8BF  CDE6E6    CALL    #E6E6 ; {STADTB} [MKTMST]
 E8C2  CD9CE9    CALL    #E99C ; {ARGVL2} [MAKINT]
@@ -7523,81 +7527,91 @@ E8C8  73        LD      (HL),E
 ;  {CHR_1} [TOPOOL]
 E8C9  C1        POP     BC
 E8CA  C314E7    JP      #E714 ; {SLEN3} [TSTOPL]
-;
+
 ; BLEFT$
-E8CD  CD4FE9    CALL    #E94F
-E8D0  AF        XOR     A
-E8D1  E3        EX      (SP),HL
-E8D2  4F        LD      C,A
+; {LEFT_} [LEFT]
+E8CD  CD4FE9    CALL    #E94F ; {STREND} [LFRGNM] ; Obtém número e ')'.
+E8D0  AF        XOR     A ; Começa do primeiro byte da string.
+; {LEFT_1} [RIGHT1]
+E8D1  E3        EX      (SP),HL ; Salva ponto de interpretação, obtém endereço do registro de string.
+E8D2  4F        LD      C,A ; Posição inicial.
+; {LEFT_2} [MID1]
 E8D3  E5        PUSH    HL
-E8D4  7E        LD      A,(HL)
-E8D5  B8        CP      B
-E8D6  3802      JR      C,#E8DA         ; (2)
-E8D8  78        LD      A,B
+E8D4  7E        LD      A,(HL) ; Tamanho da string.
+E8D5  B8        CP      B ; Se for menor do que B...
+E8D6  3802      JR      C,#E8DA ; {LEFT_3} [ALLFOL] ; Pega todos os caracteres seguintes.
+E8D8  78        LD      A,B ; Novo comprimento.
+; A instrução abaixo oculta a instrução
+; ; {LEFT_3} [ALLFOL]
+; E8DA LD C,0 ; Primeiro byte da string.
+; que só pode ser atingida por jump.
 E8D9  110E00    LD      DE,#000E
-E8DC  C5        PUSH    BC
-E8DD  CD4CE7    CALL    #E74C ; ALOCA {STROP} [TESTR]
-E8E0  C1        POP     BC
-E8E1  E1        POP     HL
-E8E2  E5        PUSH    HL
+E8DC  C5        PUSH    BC ; Salva posição na string.
+E8DD  CD4CE7    CALL    #E74C ; ALOCA {STROP} [TESTR] ; Aloca espaço.
+E8E0  C1        POP     BC ; Posição na string.
+E8E1  E1        POP     HL ; Endereço do registro de string.
+E8E2  E5        PUSH    HL ; Salva de novo.
 E8E3  23        INC     HL
 E8E4  23        INC     HL
 E8E5  46        LD      B,(HL)
 E8E6  23        INC     HL
-E8E7  66        LD      H,(HL)
+E8E7  66        LD      H,(HL) ; HL = endereço do conteúdo da string.
 E8E8  68        LD      L,B
-E8E9  0600      LD      B,#00
-E8EB  09        ADD     HL,BC
-E8EC  44        LD      B,H
+E8E9  0600      LD      B,#00 ; BC = deslocamento do primeiro caracter.
+E8EB  09        ADD     HL,BC ; HL = endereço do primeiro caracter.
+E8EC  44        LD      B,H ; BC = HL.
 E8ED  4D        LD      C,L
-E8EE  CDE9E6    CALL    #E6E9 ; {SADTB1} [CRTMST]
-E8F1  6F        LD      L,A
-E8F2  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA]
-E8F5  D1        POP     DE
-E8F6  CD73E8    CALL    #E873
-E8F9  C314E7    JP      #E714 ; {SLEN3} [TSTOPL]
-;
+E8EE  CDE9E6    CALL    #E6E9 ; {SADTB1} [CRTMST] ; Cria registro temporário.
+E8F1  6F        LD      L,A ; Comprimento da nova string.
+E8F2  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA] ; [Move string to string area.]
+E8F5  D1        POP     DE ; Limpa pilha.
+E8F6  CD73E8    CALL    #E873 ; {STRZS3} [GSTRDE] ; [Move to string pool if needed.]
+E8F9  C314E7    JP      #E714 ; {SLEN3} [TSTOPL] ; [Temporary string to pool.]
+
 ; BRIGHT$
-E8FC  CD4FE9    CALL    #E94F
-E8FF  D1        POP     DE
-E900  D5        PUSH    DE
-E901  1A        LD      A,(DE)
-E902  90        SUB     B
-E903  18CC      JR      #E8D1           ; (-52)
-;
+; {RGHT_} [RIGHT]
+E8FC  CD4FE9    CALL    #E94F ; {STREND} [LFRGNM] ; Obtém número e ')'.
+E8FF  D1        POP     DE ; [Get string length.]
+E900  D5        PUSH    DE ; [And re-save.]
+E901  1A        LD      A,(DE) ; Obtém comprimento.
+E902  90        SUB     B ; Recua B bytes.
+E903  18CC      JR      #E8D1; {LEFT_1} [RIGHT1] ; Obtém substring.
+
 ; BMID$
-E905  EB        EX      DE,HL
-E906  7E        LD      A,(HL)
-E907  CD54E9    CALL    #E954
-E90A  04        INC     B
+; {MID_} [MID]
+E905  EB        EX      DE,HL ; Obtém ponto de interpretação.
+E906  7E        LD      A,(HL) ; Obtém próximo byte "," ou ")".
+E907  CD54E9    CALL    #E954 ; {STRED1} [MIDNUM] ; Obtém número fornecido.
+E90A  04        INC     B ; [Is it character zero?]
 E90B  05        DEC     B
-E90C  CAF6DE    JP      Z,#DEF6 ; PIERRO
-E90F  C5        PUSH    BC
-E910  1EFF      LD      E,#FF
-E912  FE29      CP      ')'
-E914  2807      JR      Z,#E91D         ; (7)
+E90C  CAF6DE    JP      Z,#DEF6 ; PIERRO ; Sim, erro.
+E90F  C5        PUSH    BC ; Salva posição inicial.
+E910  1EFF      LD      E,#FF ; Toda a string.
+E912  FE29      CP      ')' ; Foi fornecido comprimento?
+E914  2807      JR      Z,#E91D ; {MID_1} [RSTSTR] ; Não: resto da string.
 E916  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E919  2C        DB      ','
-E91A  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
+E91A  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] ; Obtém inteiro 0-255.
+; {MID_1} [RSTSTR]
 E91D  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E920  29        DB      ')'
-E921  F1        POP     AF
-E922  E3        EX      (SP),HL
-E923  01D3E8    LD      BC,#E8D3
+E921  F1        POP     AF ; Restaura posição inicial.
+E922  E3        EX      (SP),HL ; Obtém string, salva ponto de interpretação.
+E923  01D3E8    LD      BC,#E8D3 ; {LEFT_2} [MID1] ; Forja retorno para continuação da rotina MID$.
 E926  C5        PUSH    BC
-E927  3D        DEC     A
-E928  BE        CP      (HL)
-E929  0600      LD      B,#00
-E92B  D0        RET     NC
-E92C  4F        LD      C,A
-E92D  7E        LD      A,(HL)
-E92E  91        SUB     C
-E92F  BB        CP      E
+E927  3D        DEC     A ; Posição inicial - 1.
+E928  BE        CP      (HL) ; Compara com o tamanho.
+E929  0600      LD      B,#00 ; 0 bytes de comprimento.
+E92B  D0        RET     NC ; String nula se posição inicial for maior que o tamanho.
+E92C  4F        LD      C,A ; Salva posição inicial - 1.
+E92D  7E        LD      A,(HL) ; Obtém tamanho da string.
+E92E  91        SUB     C ; Subtrai a posição inicial.
+E92F  BB        CP      E ; Determina o tamanho da string resultante e cria a string.
 E930  47        LD      B,A
 E931  D8        RET     C
 E932  43        LD      B,E
 E933  C9        RET
-;
+
 ; BVAL
 ; Se a string for nula retorna zero.
 E934  CDA1E8    CALL    #E8A1 ; ALEN
@@ -7622,7 +7636,8 @@ E94B  C1        POP     BC
 E94C  E1        POP     HL
 E94D  70        LD      (HL),B
 E94E  C9        RET
-;
+
+; {STREND} [LFRGNM]
 E94F  EB        EX      DE,HL
 E950  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E953  29        DB      ')'
@@ -7632,7 +7647,7 @@ E955  D1        POP     DE
 E956  C5        PUSH    BC
 E957  43        LD      B,E
 E958  C9        RET
-;
+
 ; BINP:
 ; {INP} [INP]
 E959  CD9CE9    CALL    #E99C ; {ARGVL2} [MAKINT]
