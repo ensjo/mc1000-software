@@ -2822,12 +2822,12 @@ CF1A  ED52      SBC     HL,DE
 CF1C  E5        PUSH    HL
 ; Imprime mensagem de abertura ("MC-1000"...)
 CF1D  2142D5    LD      HL,#D542 ; {MEMO} [SIGNON]
-CF20  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} [PRS]
+CF20  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 ; Imprime memória livre e "BYTES".
 CF23  E1        POP     HL
-CF24  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} [PRNTHL]
+CF24  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} <PrintInt> [PRNTHL]
 CF27  2138D5    LD      HL,#D538 ; {BYT} [BFREE]
-CF2A  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} [PRS]
+CF2A  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 ; [WARMST]:
 CF2D  315103    LD      SP,#0351 ; {INPBUF+6} [STACK] ; Pilha temporária.
 ; [BRKRET]:
@@ -2897,9 +2897,9 @@ CF88 2C DB ','
 CF89 CD99E9 CALL #E999 ; {ARGVL1} [GETINT]
 ; Checa valor do canal (1~3).
 CF8C FE01 CP #01
-CF8E DAF6DE JP C,#DEF6 ; PIERRO
+CF8E DAF6DE JP C,#DEF6 ; PIERRO {FCER} [FCERR]
 CF91 FE04 CP #04
-CF93 D2F6DE JP NC,#DEF6 ; PIERRO
+CF93 D2F6DE JP NC,#DEF6 ; PIERRO {FCER} [FCERR]
 CF96 FE02 CP #02
 CF98 C1 POP BC
 CF99 C9 RET
@@ -2912,9 +2912,9 @@ CF9B CD76CF CALL #CF76
 CF9E F5 PUSH AF
 CF9F 79 LD A,C
 CFA0 FE00 CP #00
-CFA2 DAF6DE JP C,#DEF6 ; PIERRO
+CFA2 DAF6DE JP C,#DEF6 ; PIERRO {FCER} [FCERR]
 CFA5 FE04 CP #04
-CFA7 D2F6DE JP NC,#DEF6 ; PIERRO
+CFA7 D2F6DE JP NC,#DEF6 ; PIERRO {FCER} [FCERR]
 CFAA F1 POP AF
 ; Forja retorno.
 CFAB 11BACE LD DE,#CEBA
@@ -3161,7 +3161,7 @@ D0EC  18D6      JR      #D0C4           ; (-42)
 D0EE  77        LD      (HL),A
 D0EF  E1        POP     HL
 D0F0  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
-D0F3  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} [PRNTHL]
+D0F3  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} <PrintInt> [PRNTHL]
 D0F6  3E20      LD      A,#20
 D0F8  CDA6F1    CALL    #F1A6
 D0FB  2A8E01    LD      HL,(#018E) ; FILNAM+1
@@ -3591,7 +3591,7 @@ D364  280E      JR      Z,#D374         ; (14)
 D366  2B        DEC     HL
 D367  3E5B      LD      A,#5B ; '['
 D369  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
-D36C  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} [PRNTHL]
+D36C  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} <PrintInt> [PRNTHL]
 D36F  3E5D      LD      A,#5D ; ']'
 D371  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 D374  F1        POP     AF
@@ -3614,10 +3614,10 @@ D386  FE01      CP      #01
 D388  78        LD      A,B
 D389  C2A1D3    JP      NZ,#D3A1
 D38C  FE40      CP      #40 ; 64
-D38E  D2F6DE    JP      NC,#DEF6 ; PIERRO
+D38E  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
 D391  F1        POP     AF
 D392  FE80      CP      #80 ; 128
-D394  D2F6DE    JP      NC,#DEF6 ; PIERRO
+D394  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
 ; SETAB: Define o último ponto plotado
 ; como (A,B).
 D397  325A03    LD      (#035A),A
@@ -3629,7 +3629,7 @@ D3A0  C9        RET
 ; Se modo gráfico = HGR, checa limite
 ; y < 192.
 D3A1  FEC0      CP      #C0 ; 192
-D3A3  D2F6DE    JP      NC,#DEF6 ; PIERRO
+D3A3  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
 D3A6  F1        POP     AF
 D3A7  C397D3    JP      #D397 ; SETAB
 ; TIERRO
@@ -3807,7 +3807,7 @@ D492  C9        RET
 
 ; DOPR#
 D493  FE03      CP      #03
-D495  D2F6DE    JP      NC,#DEF6 ; PIERRO
+D495  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
 D498  322801    LD      (#0128),A ; PNTR
 D49B  C9        RET
 
@@ -3872,7 +3872,7 @@ D4FA  FE20      CP      #20
 D4FC  2818      JR      Z,#D516         ; (24)
 ; PI ERRO se não for 80.
 D4FE  FE50      CP      #50
-D500  C2F6DE    JP      NZ,#DEF6 ; PIERRO
+D500  C2F6DE    JP      NZ,#DEF6 ; PIERRO {FCER} [FCERR]
 ; 80 colunas: TI ERRO se monitor de 80
 ; colunas estiver ausente.
 D503  3A2D01    LD      A,(#012D) ; COSW
@@ -3907,9 +3907,9 @@ D525  C399E9    JP      #E999 ; {ARGVL1} [GETINT]
 D528  CD1DD5    CALL    #D51D
 ; PI ERRO se não válido (0 a 3).
 D52B  B7        OR      A
-D52C  FAF6DE    JP      M,#DEF6 ; PIERRO
+D52C  FAF6DE    JP      M,#DEF6 ; PIERRO {FCER} [FCERR]
 D52F  FE04      CP      #04
-D531  D2F6DE    JP      NC,#DEF6 ; PIERRO
+D531  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
 D534  32F600    LD      (#00F6),A
 D537  C9        RET
  
@@ -3932,16 +3932,16 @@ D560  00        DB      #00
 ; {ADRTB2} <KW_INLINE_FNS>
 ; Endereços das funções.
 D561  E2EC      DW      #ECE2 ; BSGN {SGN} <Sgn>
-D563  A5ED      DW      #EDA5 ; BINT {INT} <Int>
+D563  A5ED      DW      #EDA5 ; BINT {INT} <Int> [INT]
 D565  F8EC      DW      #ECF8 ; BABS {ABS} <Abs>
 D567  0303      DW      #0303 ; BUSR {USRLOC} <Usr>
 D569  05E6      DW      #E605 ; BFRE {FRE}
 D56B  59E9      DW      #E959 ; BINP {INP}
 D56D  3CE6      DW      #E63C ; BPOS {POS}
-D56F  81EF      DW      #EF81 ; BSQR {SQR} <Sqr>
-D571  5EF0      DW      #F05E ; BRND {RND} <Rnd>
-D573  8EEB      DW      #EB8E ; BLOG {LOG}
-D575  CEEF      DW      #EFCE ; BEXP {EXP}
+D56F  81EF      DW      #EF81 ; BSQR {SQR} <Sqr> [SQR]
+D571  5EF0      DW      #F05E ; BRND {RND} <Rnd> [RND]
+D573  8EEB      DW      #EB8E ; BLOG {LOG} [LOG]
+D575  CEEF      DW      #EFCE ; BEXP {EXP} [EXP]
 D577  D2F0      DW      #F0D2 ; BCOS {COS}
 D579  D8F0      DW      #F0D8 ; BSIN {SIN} <Sin>
 D57B  39F1      DW      #F139 ; BTAN {TAN}
@@ -4143,15 +4143,15 @@ D755  F4F1      DW      #F1F4 ; BDEBUG
 ; {ADRTB3} <KW_ARITH_OP_FNS>
 ; Precedência e endereço do operador.
 D757  79        DB      #79
-D758  72EE      DW      #EE72 ; BADD {PLUS} <FAdd>
+D758  72EE      DW      #EE72 ; BADD {PLUS} <FAdd> [PADD]
 D75A  79        DB      #79
 D75B  95EA      DW      #EA95 ; BSUB {MINUS} <FSub>
 D75D  7C        DB      #7C
-D75E  CDEB      DW      #EBCD ; BMUL {MUL} <FMul>
+D75E  CDEB      DW      #EBCD ; BMUL {MUL} <FMul> [MULT]
 D760  7C        DB      #7C
 D761  2BEC      DW      #EC2B ; BDIV {DIV} <FDiv>
 D763  7F        DB      #7F
-D764  8AEF      DW      #EF8A ; BPOW {EXPO}
+D764  8AEF      DW      #EF8A ; BPOW {EXPO1} [POWER]
 D766  50        DB      #50
 D767  DAE3      DW      #E3DA ; BAND {AND}
 D769  46        DB      #46
@@ -4188,7 +4188,7 @@ D792  C32DCF    JP      #CF2D
  
 ; Ponto de entrada da função USR.
 ; #0303:BUSR {USRLOC} [USR]
-D795  C3F6DE    JP      #DEF6 ; PIERRO
+D795  C3F6DE    JP      #DEF6 ; PIERRO {FCER} [FCERR]
  
 ; Rotina auxiliar para OUT.
 ; #0306:OUTAUX {PORTAD} [OUTSUB]
@@ -4211,8 +4211,8 @@ D7A8  C9        RET
  
 ; Dados auxiliares para RND().
 D7A9  00        DB      #00 ; #0317:{RNDVR1} [SEED]
-D7AA  00        DB      #00 ; #0318:{RNDVR2}
-D7AB  00        DB      #00 ; #0319:{RNDVR3}
+D7AA  00        DB      #00 ; #0318:{RNDVR2} [SEED+1]
+D7AB  00        DB      #00 ; #0319:{RNDVR3} [SEED+2]
 D7AC  354ACA99  DB      #35,#4A,#CA,#99 ; -2.65145E+7
 D7B0  391C7698  DB      #39,#1C,#76,#98 ; +1.61291E+7
 D7B4  2295B398  DB      #22,#95,#B3,#98 ; -1.17691E+7
@@ -4387,7 +4387,8 @@ D845  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
 ; {SNER} <SyntaxError>
 D848  1E02      LD      E,#02 ; erro "SN"
 D84A  01        DB      #01 ; Oculta a instrução seguinte.
-; {DIVER} <DivideByZero>
+; DZERRO:
+; {DIVER} <DivideByZero> [DZERR]
 D84B  1E14      LD      E,#14 ; erro "DZ"
 D84D  01        DB      #01 ; Oculta a instrução seguinte.
 ; {NFER}
@@ -4418,7 +4419,7 @@ D86D  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 D870  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 ; Imprime " ERRO"
 D873  21DDD7    LD      HL,#D7DD ; {ERR} <szError> [ERRMSG]
-D876  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} [PRS] <PrintString>
+D876  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 ; Se {CULINO} <CURRENT_LINE> contém 65534, reinicia BASIC.(?)
 ; Pula se erro ao entrar na área de RAM durante a partida fria.(?)
 D879  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
@@ -4428,7 +4429,7 @@ D882  CA95CE    JP      Z,#CE95 ; {PRIST1}
 D885  7C        LD      A,H
 D886  A5        AND     L
 D887  3C        INC     A
-D888  C483EE    CALL    NZ,#EE83 ; {INOUT} <PrintIN> ; Imprime " EM " + HL.
+D888  C483EE    CALL    NZ,#EE83 ; {INOUT} <PrintIN> [LINEIN] ; Imprime " EM " + HL.
 D88B  3E        DB      #3E ; Oculta a instrução seguinte. ; "Salta Stop e cai em Main."
 ; Rotina de edição/Nível de comando.
 ; {EDIT0} <Stop+1> [POPNOK]
@@ -4445,7 +4446,7 @@ D898  CD93D4    CALL    #D493 ; DOPR#
 ; Imprime "OK"
 D89B  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 D89E  21EAD7    LD      HL,#D7EA ; "OK" {OK} <szOK> [OKMSG]
-D8A1  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} [PRS]
+D8A1  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 
 ; {LININP} <GetNonBlankLine> [GETCMD]
 ; Seta {CURLINO} para #ffff, para indicar modo imediato.
@@ -4488,7 +4489,7 @@ D8D5  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
 D8D8  381C      JR      C,#D8F6 ; {LIN2} ; (28)
 ; Imprime o número de linha.
 D8DA  EB        EX      DE,HL
-D8DB  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} [PRNTHL]
+D8DB  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} <PrintInt> [PRNTHL]
 ; Obtém linha digitada pelo usuário sem
 ; perder o número de linha já armazenado.
 D8DE  210202    LD      HL,#0202
@@ -5235,7 +5236,7 @@ DC9C  C38DD8    JP      #D88D ; {EDIT} [PRNTOK]
 DC9F  23        INC     HL
 DCA0  E5        PUSH    HL
 DCA1  EB        EX      DE,HL
-DCA2  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} [PRNTHL]
+DCA2  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} <PrintInt> [PRNTHL]
 DCA5  3E20      LD      A,#20
 DCA7  E1        POP     HL
 DCA8  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
@@ -5308,7 +5309,7 @@ DD19  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 DD1C  B7        DB      #B7 ; token "TO"
 DD1D  CDBCE2    CALL    #E2BC ; {SNALY2} [GETNUM]
 DD20  E5        PUSH    HL
-DD21  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE>
+DD21  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
 DD24  E1        POP     HL
 DD25  C5        PUSH    BC
 DD26  D5        PUSH    DE
@@ -5322,7 +5323,7 @@ DD31  200E      JR      NZ,#DD41        ; (14)
 DD33  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 DD36  CDBCE2    CALL    #E2BC ; {SNALY2} [GETNUM]
 DD39  E5        PUSH    HL
-DD3A  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE>
+DD3A  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
 DD3D  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 DD40  E1        POP     HL
 DD41  C5        PUSH    BC
@@ -5643,11 +5644,13 @@ DEE7  CDBCE2    CALL    #E2BC ; {SNALY2} [GETNUM]
 ; Converte ponto flutuante positivo em inteiro 0~32767 (DE).
 ; {EPRVL2} [DEPINT]
 DEEA  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
-DEED  FAF6DE    JP      M,#DEF6 ; PIERRO
+DEED  FAF6DE    JP      M,#DEF6 ; PIERRO {FCER} [FCERR]
+; {EPRVL3} [DEINT]
 DEF0  3AC203    LD      A,(#03C2) ; {WRA1+3} <FACCUM+3> [FPEXP]
 DEF3  C37AED    JP      #ED7A ; {INTMOV} <FAsInteger> [FPINT]
 
-; PIERRO
+; PIERRO:
+; {FCER} [FCERR]
 DEF6  1E08      LD      E,#08 ; erro "PI"
 DEF8  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
 
@@ -6021,7 +6024,7 @@ E106  CA3AE1    JP      Z,#E13A ; Trata VTAB.
 ; Trata TAB.
 E109  7B        LD      A,E
 E10A  FE01      CP      #01
-E10C  DAF6DE    JP      C,#DEF6 ; PIERRO
+E10C  DAF6DE    JP      C,#DEF6 ; PIERRO {FCER} [FCERR]
 E10F  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
  
 ; Trata SPC.
@@ -6053,7 +6056,7 @@ E12C  C235E1    JP      NZ,#E135
 ; O parâmetro de VTAB deve ser 0~15.
 E12F  FE10      CP      #10
 ;
-E131  D2F6DE    JP      NC,#DEF6 ; PIERRO
+E131  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
 E134  C9        RET
 ; Se o modo de texto é de 80 colunas,
 ; O parâmetro de VTAB deve ser 0~23.
@@ -6127,7 +6130,7 @@ E17C  C1        POP     BC
 E17D  2162E1    LD      HL,#E162 ; [REDO] ; "REENTRE DADOS"
 E180  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E183  2C        DB      ','
-E184  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} [PRS]
+E184  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 E187  C3DDD9    JP      #D9DD ; [DOAGN] ; Repita último INPUT.
  
 ; BINPUT:
@@ -6253,7 +6256,7 @@ E232  C2C4DD    JP      NZ,#DDC4 ; [UPDATA] ; Atualiza ponteiro de dados se READ
 E235  D5        PUSH    DE ; Ponto de interpretação.
 E236  B6        OR      (HL) ; Mais entradas fornecidas?
 E237  213FE2    LD      HL,#E23F ; [EXTIG] ; "IGNOROU EXTRA"
-E23A  C434E7    CALL    NZ,#E734 ; PRINTSTRHL {TEXTO} [PRS]
+E23A  C434E7    CALL    NZ,#E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 E23D  E1        POP     HL ; Ponto de interpretação.
 E23E  C9        RET
 
@@ -6301,20 +6304,20 @@ E283  7E        LD      A,(HL)
 E284  23        INC     HL
 E285  F5        PUSH    AF
 E286  D5        PUSH    DE
-E287  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem>
+E287  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
 E28A  E3        EX      (SP),HL
 E28B  E5        PUSH    HL
-E28C  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT
+E28C  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL]
 E28F  E1        POP     HL
 E290  CD2BED    CALL    #ED2B ; HLFLOAT {OPTRAN} <FCopyToMem> [FPTHL]
 E293  E1        POP     HL
-E294  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
+E294  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E297  E5        PUSH    HL
-E298  CD4DED    CALL    #ED4D ; CPFLOATBCDE {VORZ1} <FCompare>
+E298  CD4DED    CALL    #ED4D ; CPFLOATBCDE {VORZ1} <FCompare> [CMPNUM]
 E29B  E1        POP     HL
 E29C  C1        POP     BC
 E29D  90        SUB     B
-E29E  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
+E29E  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E2A1  2809      JR      Z,#E2AC         ; (9)
 E2A3  EB        EX      DE,HL
 E2A4  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
@@ -6421,7 +6424,7 @@ E32E  01DFE2    LD      BC,#E2DF ; {SNALY9} [EVAL3]
 E331  C5        PUSH    BC
 E332  43        LD      B,E
 E333  4A        LD      C,D
-E334  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
+E334  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 E337  58        LD      E,B
 E338  51        LD      D,C
 E339  4E        LD      C,(HL)
@@ -6468,7 +6471,7 @@ E381  167D      LD      D,#7D
 E383  CDD3E2    CALL    #E2D3
 E386  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR]
 E389  E5        PUSH    HL
-E38A  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate>
+E38A  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 ;
 E38D  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E390  E1        POP     HL
@@ -6481,7 +6484,7 @@ E396  EB        EX      DE,HL
 E397  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG]
 E39A  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
 E39D  B7        OR      A
-E39E  CC11ED    CALL    Z,#ED11 ; FLOATHL {OPKOP} <FLoadFromMem>
+E39E  CC11ED    CALL    Z,#ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
 E3A1  E1        POP     HL
 E3A2  C9        RET
 ;
@@ -6533,15 +6536,15 @@ E3D8  E9        JP      (HL)
 E3D9  F6AF      OR      #AF
 E3DB  F5        PUSH    AF
 E3DC  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
-E3DF  CDF0DE    CALL    #DEF0
+E3DF  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT]
 E3E2  F1        POP     AF
 E3E3  EB        EX      DE,HL
 E3E4  C1        POP     BC
 E3E5  E3        EX      (SP),HL
 E3E6  EB        EX      DE,HL
-E3E7  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE>
+E3E7  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 E3EA  F5        PUSH    AF
-E3EB  CDF0DE    CALL    #DEF0
+E3EB  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT]
 E3EE  F1        POP     AF
 E3EF  C1        POP     BC
 E3F0  79        LD      A,C
@@ -6580,7 +6583,7 @@ E419  F5        PUSH    AF
 E41A  CDC1E2    CALL    #E2C1 ; {SNALY5} [CHKTYP]
 E41D  2155E4    LD      HL,#E455
 E420  E5        PUSH    HL
-E421  CA4DED    JP      Z,#ED4D ; CPFLOATBCDE {VORZ1} <FCompare>
+E421  CA4DED    JP      Z,#ED4D ; CPFLOATBCDE {VORZ1} <FCompare> [CMPNUM]
 E424  AF        XOR     A
 E425  329003    LD      (#0390),A ; {DATYPE} [TYPE]
 E428  D5        PUSH    DE
@@ -6595,7 +6598,7 @@ E432  D1        POP     DE
 E433  C5        PUSH    BC
 E434  F5        PUSH    AF
 E435  CD73E8    CALL    #E873 ; {STRZS3} [GSTRDE]
-E438  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
+E438  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E43B  F1        POP     AF
 E43C  57        LD      D,A
 E43D  E1        POP     HL
@@ -6625,13 +6628,13 @@ E457  C1        POP     BC
 E458  A0        AND     B
 E459  C6FF      ADD     A,#FF
 E45B  9F        SBC     A,A
-E45C  C3E5EC    JP      #ECE5
+E45C  C3E5EC    JP      #ECE5 ; {SGN0} <FCharToFloat> [FLGREL]
 ;
 ; Avalia NOT.
 E45F  165A      LD      D,#5A
 E461  CDD3E2    CALL    #E2D3
 E464  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
-E467  CDF0DE    CALL    #DEF0
+E467  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT]
 E46A  7B        LD      A,E
 E46B  2F        CPL
 E46C  4F        LD      C,A
@@ -6867,7 +6870,7 @@ E581  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
 ;
 E584  110400    LD      DE,#0004
 E587  F1        POP     AF
-E588  CAF6DE    JP      Z,#DEF6 ; PIERRO
+E588  CAF6DE    JP      Z,#DEF6 ; PIERRO {FCER} [FCERR]
 E58B  71        LD      (HL),C
 E58C  23        INC     HL
 E58D  70        LD      (HL),B
@@ -6986,8 +6989,8 @@ E624  9A        SBC     A,D
 E625  57        LD      D,A
 E626  AF        XOR     A
 E627  329003    LD      (#0390),A ; {DATYPE} [TYPE]
-E62A  0698      LD      B,#98
-E62C  C3EAEC    JP      #ECEA ; FLOATBADE {SGN1}
+E62A  0698      LD      B,#80+24 ; 24 bits.
+E62C  C3EAEC    JP      #ECEA ; FLOATBADE {SGN1} <FCharToFloat+5> [RETINT]
  
 ; FLOATAC
 E62F  41        LD      B,C
@@ -6996,8 +6999,8 @@ E630  50        LD      D,B
 E631  1E00      LD      E,#00
 E633  219003    LD      HL,#0390 ; {DATYPE} [TYPE]
 E636  73        LD      (HL),E
-E637  0690      LD      B,#90
-E639  C3EAEC    JP      #ECEA ; FLOATBADE {SGN1}
+E637  0690      LD      B,#80+16 ; 16 bits.
+E639  C3EAEC    JP      #ECEA ; FLOATBADE {SGN1} <FCharToFloat+5> [RETINT]
  
 ; BPOS
 E63C  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
@@ -7228,16 +7231,16 @@ E72E  1E1E      LD      E,#1E ; erro "CC"
 ; {STER1}
 E730  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
 
-; {TEXTO0} [PRNUMS]
+; {TEXTO0} <PrintString-1> [PRNUMS]
 E733  23        INC     HL
 ; PRINTSTRHL: Imprime a string apontada por HL,
 ; criando primeiramente um registro de string
 ; para ela.
-; {TEXTO} [PRS]
+; {TEXTO} <PrintString> [PRS]
 E734  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST]
 ; {TEXTO1} [PRS1]
 E737  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
-E73A  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
+E73A  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E73D  1C        INC     E
 ; {TEXTO2} [PRSLP]
 E73E  1D        DEC     E
@@ -7321,7 +7324,7 @@ E7AB  2ABB03    LD      HL,(#03BB) ; {FSLPTR} <VAR_TOP> [ARREND]
 E7AE  EB        EX      DE,HL
 E7AF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
 E7B2  284A      JR      Z,#E7FE         ; (74)
-E7B4  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
+E7B4  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E7B7  7B        LD      A,E
 E7B8  E5        PUSH    HL
 E7B9  09        ADD     HL,BC
@@ -7533,7 +7536,7 @@ E8AF  C5        PUSH    BC
 ; da string. Se a string for vazia, produz
 ; "PI ERRO".
 E8B0  CDA1E8    CALL    #E8A1 ; ALEN
-E8B3  CAF6DE    JP      Z,#DEF6 ; PIERRO
+E8B3  CAF6DE    JP      Z,#DEF6 ; PIERRO {FCER} [FCERR]
 E8B6  23        INC     HL
 E8B7  23        INC     HL
 E8B8  5E        LD      E,(HL)
@@ -7610,7 +7613,7 @@ E906  7E        LD      A,(HL) ; Obtém próximo byte "," ou ")".
 E907  CD54E9    CALL    #E954 ; {STRED1} [MIDNUM] ; Obtém número fornecido.
 E90A  04        INC     B ; [Is it character zero?]
 E90B  05        DEC     B
-E90C  CAF6DE    JP      Z,#DEF6 ; PIERRO ; Sim, erro.
+E90C  CAF6DE    JP      Z,#DEF6 ; PIERRO {FCER} [FCERR] ; Sim, erro.
 E90F  C5        PUSH    BC ; Salva posição inicial.
 E910  1EFF      LD      E,#FF ; Toda a string.
 E912  FE29      CP      ')' ; Foi fornecido comprimento?
@@ -7638,10 +7641,10 @@ E931  D8        RET     C
 E932  43        LD      B,E
 E933  C9        RET
 
-; BVAL
+; BVAL:
 ; Se a string for nula retorna zero.
 E934  CDA1E8    CALL    #E8A1 ; ALEN
-E937  CAFDEA    JP      Z,#EAFD ; FLOAT0 {ADD12} <FZero>
+E937  CAFDEA    JP      Z,#EAFD ; FLOAT0 {ADD12} <FZero> [RESZER]
 ;
 E93A  5F        LD      E,A
 E93B  23        INC     HL
@@ -7727,7 +7730,7 @@ E999  CDBCE2    CALL    #E2BC ; {SNALY2} [GETNUM] ; Avalia expressão numérica.
 E99C  CDEADE    CALL    #DEEA ; {EPRVL2} [DEPINT] ; Converte ponto flutuante positivo em inteiro (CDE).
 E99F  7A        LD      A,D ; Obtém MSB do número.
 E9A0  B7        OR      A ; Se não zero, emite PI ERRO.
-E9A1  C2F6DE    JP      NZ,#DEF6 ; PIERRO
+E9A1  C2F6DE    JP      NZ,#DEF6 ; PIERRO {FCER} [FCERR]
 E9A4  2B        DEC     HL
 E9A5  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E9A8  7B        LD      A,E
@@ -7870,7 +7873,7 @@ EA4E  22B703    LD      (#03B7),HL ; {SVARPT} <VAR_BASE> [PROGND]
 ; IMPRIME "OK".
 EA51  CDC7E0    CALL    #E0C7 ; PRINTCRLF [PRNTCR]
 EA54  21EAD7    LD      HL,#D7EA ; {OK} <szOK> [OKMSG]
-EA57  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} [PRS]
+EA57  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 ; Se foi informado nome de arquivo no comando
 ; LOAD, terminar.
 EA5A  3A8D01    LD      A,(#018D) ; FILNAM
@@ -7902,13 +7905,18 @@ EA85  C1        POP     BC
 EA86  D1        POP     DE
 EA87  E1        POP     HL
 EA88  C9        RET
+
 ; FLOATPLUSHALF : FLOAT = 1/2 + FLOAT.
-EA89  2166EF    LD      HL,#EF66 ; 1/2
+; {ADD1} <FAddOneHalf> [ROUND]
+EA89  2166EF    LD      HL,#EF66 ; {SQRL} <ONE_HALF> [HALF] ; 1/2
+
 ; HLPLUSFLOAT : FLOAT = float@HL + FLOAT.
-EA8C  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
-EA8F  1809      JR      #EA9A           ; (9) ; BCDEPLUSFLOAT
+; {ADD2} [ADDPHL]
+EA8C  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
+EA8F  1809      JR      #EA9A ; BCDEPLUSFLOAT {ADD5} [FPADD]
 ; HLMINUSFLOAT : FLOAT = float@HL - FLOAT.
-EA91  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
+; {ADD3} [SUBPHL]
+EA91  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 EA94  21        DB      #21
 ; O byte acima inicia uma instrução de 3 bytes,
 ; EA94  21C1D1    LD      HL,#D1C1
@@ -7917,23 +7925,25 @@ EA94  21        DB      #21
 EA95  C1        POP     BC
 EA96  D1        POP     DE
  
-; BCDEMINUSFLOAT : FLOAT = BCDE - FLOAT.
-EA97  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate>
-; BCDEPLUSFLOAT : FLOAT = BCDE + FLOAT.
+; BCDEMINUSFLOAT: FLOAT = BCDE - FLOAT.
+; {ADD4} [SUBCDE]
+EA97  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
+; BCDEPLUSFLOAT: FLOAT = BCDE + FLOAT.
+; {ADD5} [FPADD]
 EA9A  78        LD      A,B ; Se BCDE = 0...
 EA9B  B7        OR      A
 EA9C  C8        RET     Z ; retorna FLOAT.
 EA9D  3AC203    LD      A,(#03C2) ; Se FLOAT = 0… {WRA1+3} <FACCUM+3> [FPEXP]
 EAA0  B7        OR      A
-EAA1  CA14ED    JP      Z,#ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> ; retorna BCDE.
+EAA1  CA14ED    JP      Z,#ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE] ; retorna BCDE.
 EAA4  90        SUB     B ; Se expoente de FLOAT < BCDE, swap FLOAT,BCDE.
 EAA5  300C      JR      NC,#EAB3        ; (12)
 EAA7  2F        CPL
 EAA8  3C        INC     A
 EAA9  EB        EX      DE,HL
-EAAA  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
+EAAA  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 EAAD  EB        EX      DE,HL
-EAAE  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE>
+EAAE  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 EAB1  C1        POP     BC
 EAB2  D1        POP     DE
 ;
@@ -7947,7 +7957,7 @@ EABC  CD5CEB    CALL    #EB5C
 EABF  B4        OR      H
 EAC0  21BF03    LD      HL,#03BF ; {WRA1} <FACCUM> [FPREG]
 EAC3  F2D9EA    JP      P,#EAD9
-EAC6  CD3CEB    CALL    #EB3C
+EAC6  CD3CEB    CALL    #EB3C ; {ADD19} [PLUCDE]
 EAC9  D21BEB    JP      NC,#EB1B
 EACC  23        INC     HL
 EACD  34        INC     (HL)
@@ -7974,7 +7984,7 @@ EAE6  4F        LD      C,A
 ; {ADD9} <FNormalise>
 ; Passa de CDE,B para CDH,L*2^B.
 EAE7  DC48EB    CALL    C,#EB48 ; {ADD20} <FNegateInt>
-;
+; {ADD10} [BNORM]
 EAEA  68        LD      L,B
 EAEB  63        LD      H,E
 EAEC  AF        XOR     A
@@ -7995,9 +8005,10 @@ EAFB  20F0      JR      NZ,#EAED        ; (-16)
 ; Se B = -32 (já deslocou CDHL quatro vezes),
 ; é zero.
  
-; FLOAT0: {ADD12} <FZero>
+; FLOAT0: {ADD12} <FZero> [RESZER]
 ; Carrega 0 em FLOAT.
 EAFD  AF        XOR     A
+; {ADD13} [SAVEXP]
 EAFE  32C203    LD      (#03C2),A ; {WRA1+3} <FACCUM+3> [FPEXP]
 EB01  C9        RET
  
@@ -8025,7 +8036,7 @@ EB11  2808      JR      Z,#EB1B         ; (8)
 EB13  21C203    LD      HL,#03C2 ; {WRA1+3} <FACCUM+3> [FPEXP]
 EB16  86        ADD     A,(HL)
 EB17  77        LD      (HL),A
-EB18  30E3      JR      NC,#EAFD ; FLOAT0 {ADD12} <FZero>
+EB18  30E3      JR      NC,#EAFD ; FLOAT0 {ADD12} <FZero> [RESZER]
 EB1A  C8        RET     Z
 ; Agora trabalhamos com (1,C)DEB*2^((#03C2)-129).
 ; Se o 7º bit de B está ligado, arredonda
@@ -8043,7 +8054,7 @@ EB25  7E        LD      A,(HL)
 EB26  E680      AND     #80
 EB28  A9        XOR     C
 EB29  4F        LD      C,A
-EB2A  C314ED    JP      #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE>
+EB2A  C314ED    JP      #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
  
 ; {ADD18} <FMantissaInc>
 ; Incrementa (1,C)DE (arredonda para mais).
@@ -8060,6 +8071,8 @@ EB36  C0        RET     NZ
 ; Gera erro "SE".
 EB37  1E0A      LD      E,#0A ; erro "SE"
 EB39  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+
+; {ADD19} [PLUCDE]
 EB3C  7E        LD      A,(HL)
 EB3D  83        ADD     A,E
 EB3E  5F        LD      E,A
@@ -8121,53 +8134,60 @@ EB78  78        LD      A,B
 EB79  1F        RRA
 EB7A  47        LD      B,A
 EB7B  18EF      JR      #EB6C           ; (-17)
-;
+
+; {LOGL} [UNITY]
 EB7D  00000081  DB      #00,#00,#00,#81 ; 1
+
+; {LOGL1} [LOGTAB]
 EB81  03        DB      #03
 EB82  AA561980  DB      #AA,#56,#19,#80 ; 0,598979
 EB86  F1227680  DB      #F1,#22,#76,#80 ; 0,961471
 EB8A  45AA3882  DB      #45,#AA,#38,#82 ; 2,88539
-; BLOG
+
+; BLOG:
 ; ln (1+x) = (x - x^2/2 + x^3/3 - x^4/4 + ...), |x| < 1
+; {LOG} [LOG]
 EB8E  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 EB91  B7        OR      A
-EB92  EAF6DE    JP      PE,#DEF6 ; PIERRO
+EB92  EAF6DE    JP      PE,#DEF6 ; PIERRO {FCER} [FCERR]
 EB95  21C203    LD      HL,#03C2 ; {WRA1+3} <FACCUM+3> [FPEXP]
 EB98  7E        LD      A,(HL)
-EB99  013580    LD      BC,#8035 ; SQR(2)/2 (0,707107)
+EB99  013580    LD      BC,#8035 ; SQR(1/2) (0,707107)
 EB9C  11F304    LD      DE,#04F3
 EB9F  90        SUB     B
 EBA0  F5        PUSH    AF
 EBA1  70        LD      (HL),B
 EBA2  D5        PUSH    DE
 EBA3  C5        PUSH    BC
-EBA4  CD9AEA    CALL    #EA9A ; BCDEPLUSFLOAT
+EBA4  CD9AEA    CALL    #EA9A ; BCDEPLUSFLOAT {ADD5} [FPADD]
 EBA7  C1        POP     BC
 EBA8  D1        POP     DE
-EBA9  04        INC     B
-EBAA  CD2DEC    CALL    #EC2D ; DIVBCDEFLOAT
-EBAD  217DEB    LD      HL,#EB7D
-EBB0  CD91EA    CALL    #EA91 ; HLMINUSFLOAT
-EBB3  2181EB    LD      HL,#EB81
-EBB6  CD2FF0    CALL    #F02F
+EBA9  04        INC     B ; SQR(2)
+EBAA  CD2DEC    CALL    #EC2D ; DIVBCDEFLOAT {DIV1} [DVBCDE]
+EBAD  217DEB    LD      HL,#EB7D ; {LOGL} [UNITY] ; 1
+EBB0  CD91EA    CALL    #EA91 ; HLMINUSFLOAT {ADD3} [SUBPHL]
+EBB3  2181EB    LD      HL,#EB81 ; {LOGL1} [LOGTAB]
+EBB6  CD2FF0    CALL    #F02F ; {REIHE} [SUMSER]
 EBB9  018080    LD      BC,#8080 ; -1/2 (-0,5)
 EBBC  110000    LD      DE,#0000
-EBBF  CD9AEA    CALL    #EA9A ; BCDEPLUSFLOAT
+EBBF  CD9AEA    CALL    #EA9A ; BCDEPLUSFLOAT {ADD5} [FPADD]
 EBC2  F1        POP     AF
-EBC3  CD6CEE    CALL    #EE6C
-EBC6  013180    LD      BC,#8031 ; 0,693147
+EBC3  CD6CEE    CALL    #EE6C ; {PLUS0} [RSCALE]
+; {LOG1} [MULLN2]
+EBC6  013180    LD      BC,#8031 ; 0,693147 = Ln(2)
 EBC9  111872    LD      DE,#7218
 EBCC  21        DB      #21
 ; O byte acima inicia uma instrução de 3 bytes,
 ; EBCC  21C1D1    LD      HL,#D1C1
 ; ocultando as duas instruções subsequentes.
-; BMUL
+; BMUL:
+; {MUL} <FMul> [MULT]
 EBCD  C1        POP     BC
 EBCE  D1        POP     DE
-;
+; {MUL1} [FPMULT]
 EBCF  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 EBD2  C8        RET     Z
- 
+
 ; MULBCDEFLOAT: Multiplica BCDE por FLOAT.
 EBD3  2E00      LD      L,#00
 EBD5  CD92EC    CALL    #EC92
@@ -8178,7 +8198,7 @@ EBDD  22D203    LD      (#03D2),HL
 EBE0  010000    LD      BC,#0000
 EBE3  50        LD      D,B
 EBE4  58        LD      E,B
-EBE5  21EAEA    LD      HL,#EAEA
+EBE5  21EAEA    LD      HL,#EAEA ; {ADD10} [BNORM]
 EBE8  E5        PUSH    HL
 EBE9  21F1EB    LD      HL,#EBF1
 EBEC  E5        PUSH    HL
@@ -8226,23 +8246,24 @@ EC1B  5A        LD      E,D
 EC1C  51        LD      D,C
 EC1D  4F        LD      C,A
 EC1E  C9        RET
- 
-; DIVFLOAT10: {DIV0} <FDivByTen>
+
+; DIVFLOAT10: {DIV0} <FDivByTen> [DIV10]
 ; Divide FLOAT por 10.
- 
+
 ; PUSH FLOAT
-EC1F  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
+EC1F  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 ; FLOAT <-- 10.
 EC22  012084    LD      BC,#8420
 EC25  110000    LD      DE,#0000
-EC28  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE>
+EC28  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 ; BDIV
 EC2B  C1        POP     BC
 EC2C  D1        POP     DE
 ; DIVBCDEFLOAT: Divide BDCE por FLOAT.
+; {DIV1} [DVBCDE]
 ; Se FLOAT = 0, "DZ ERRO".
 EC2D  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
-EC30  CA4BD8    JP      Z,#D84B ; DZERRO
+EC30  CA4BD8    JP      Z,#D84B ; DZERRO {DIVER} <DivideByZero> [DZERR]
 ; Prepara divisão.
 EC33  2EFF      LD      L,#FF
 EC35  CD92EC    CALL    #EC92
@@ -8363,6 +8384,8 @@ ECAC  77        LD      (HL),A
 ; HL termina apontando para #03c2.
 ECAD  2B        DEC     HL
 ECAE  C9        RET
+
+; {HIROU2} [OVTST1]
 ECAF  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 ECB2  2F        CPL
 ECB3  E1        POP     HL
@@ -8370,23 +8393,23 @@ ECB3  E1        POP     HL
 ECB4  B7        OR      A
 ;
 ECB5  E1        POP     HL
-ECB6  F2FDEA    JP      P,#EAFD ; FLOAT0 {ADD12} <FZero>
+ECB6  F2FDEA    JP      P,#EAFD ; FLOAT0 {ADD12} <FZero> [RESZER]
 ECB9  C337EB    JP      #EB37 ; SEERRO
- 
-; {HIROU5} <FMulByTen>
-ECBC  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE>
+
+; {HIROU5} <FMulByTen> [MLSP10]
+ECBC  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
 ECBF  78        LD      A,B
 ECC0  B7        OR      A
 ECC1  C8        RET     Z
 ECC2  C602      ADD     A,#02
 ECC4  DA37EB    JP      C,#EB37 ; SEERRO
 ECC7  47        LD      B,A
-ECC8  CD9AEA    CALL    #EA9A ; BCDEPLUSFLOAT
+ECC8  CD9AEA    CALL    #EA9A ; BCDEPLUSFLOAT {ADD5} [FPADD]
 ECCB  21C203    LD      HL,#03C2 ; {WRA1+3} <FACCUM+3> [FPEXP]
 ECCE  34        INC     (HL)
 ECCF  C0        RET     NZ
 ECD0  C337EB    JP      #EB37 ; SEERRO
- 
+
 ; SGNFLOAT: Retorna em A o sinal do número
 ; de ponto flutuante armazenado em FLOAT:
 ; 0, 1 ou -1 (#FF).
@@ -8394,7 +8417,7 @@ ECD0  C337EB    JP      #EB37 ; SEERRO
 ECD3  3AC203    LD      A,(#03C2) ; {WRA1+3} <FACCUM+3> [FPEXP]
 ECD6  B7        OR      A
 ECD7  C8        RET     Z
-ECD8  3AC103    LD      A,(#03C1) ; {WRA1+2} <FACCUM+2>
+ECD8  3AC103    LD      A,(#03C1) ; {WRA1+2} <FACCUM+2> [FPREG+2]
 ECDB  FE        DB      #FE ; "CP ..." ; Oculta a instrução seguinte.
 ; {TSGNM1} <InvSignToInt>
 ECDC  2F        CPL
@@ -8405,22 +8428,22 @@ ECDE  9F        SBC     A,A
 ECDF  C0        RET     NZ
 ECE0  3C        INC     A
 ECE1  C9        RET
- 
+
 ; BSGN:
 ; {SGN} <Sgn>
 ECE2  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
-; {SGN0} <FCharToFloat>
+; {SGN0} <FCharToFloat> [FLGREL]
 ; "Converte o byte com sinal A em um número de ponto flutuante
 ; em FACCUM."
 ; "Obtém o valor char em A como um número de ponto flutuante
 ; não normalizado."
 ECE5  0688      LD      B,#88 ; "i.e. 2^8"
 ECE7  110000    LD      DE,#0000
- 
+
 ; FLOATBADE: Normaliza o número de ponto
 ; flutuante em BADE e o carrega em FLOAT.
 ; (#03C2) <-- B, CDEB <-- ADE0
-; {SGN1}
+; {SGN1} <FCharToFloat+5> [RETINT]
 ECEA  21C203    LD      HL,#03C2 ; {WRA1+3} <FACCUM+3> [FPEXP]
 ECED  4F        LD      C,A
 ; "Põe o expoente de FACCUM em 2^8, em preparação para um
@@ -8434,25 +8457,25 @@ ECF2  3680      LD      (HL),#80
 ; "Põe o sinal no carry flag e salta para FNormalise."
 ECF4  17        RLA
 ECF5  C3E7EA    JP      #EAE7 ; {ADD9} <FNormalise>
- 
+
 ; BABS:
 ; {ABS} <Abs>
 ; "Retorna se FACCUM já é positivo, senão cai em FNegate
 ; para fazê-lo positivo."
 ECF8  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 ECFB  F0        RET     P
- 
+
 ; NEGFLOAT: Inverte o sinal de FLOAT.
-; {ABS1} <FNegate>
-ECFC  21C103    LD      HL,#03C1 ; {WRA1+2} <FACCUM+2>
+; {ABS1} <FNegate> [INVSGN]
+ECFC  21C103    LD      HL,#03C1 ; {WRA1+2} <FACCUM+2> [FPREG+2]
 ECFF  7E        LD      A,(HL)
 ED00  EE80      XOR     #80
 ED02  77        LD      (HL),A
 ED03  C9        RET
- 
+
 ; PUSHFLOAT: Empilha o número de ponto
 ; flutuante FLOAT na pilha do processador.
-; {OPARST} <FPush>
+; {OPARST} <FPush> [STAKFP]
 ED04  EB        EX      DE,HL
 ED05  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
 ED08  E3        EX      (SP),HL
@@ -8462,15 +8485,15 @@ ED0D  E3        EX      (SP),HL
 ED0E  E5        PUSH    HL
 ED0F  EB        EX      DE,HL
 ED10  C9        RET
- 
+
 ; FLOATHL: Carrega em FLOAT o número
 ; de ponto flutuante apontado por HL.
-; {OPKOP} <FLoadFromMem>
-ED11  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
- 
+; {OPKOP} <FLoadFromMem> [PHLTFP]
+ED11  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
+
 ; FLOATBCDE: Copia o número de ponto
 ; flutuante em BCDE em FLOAT.
-; {OPKOP1} <FLoadFromBCDE>
+; {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 ED14  EB        EX      DE,HL
 ED15  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG]
 ED18  60        LD      H,B
@@ -8478,15 +8501,15 @@ ED19  69        LD      L,C
 ED1A  22C103    LD      (#03C1),HL ; {WRA1+2} <FACCUM+2> [FPREG+2]
 ED1D  EB        EX      DE,HL
 ED1E  C9        RET
- 
+
 ; BCDEFLOAT: Copia o número de ponto
 ; flutuante em FLOAT para BCDE.
-; {OPLAD0} <FCopyToBCDE>
+; {OPLAD0} <FCopyToBCDE> [BCDEFP]
 ED1F  21BF03    LD      HL,#03BF ; {WRA1} <FACCUM> [FPREG]
- 
+
 ; BCDEHL: Copia para BCDE o número de
 ; ponto flutuante apontado por HL.
-; {OPLAD} <FLoadBCDEFromMem>
+; {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 ED22  5E        LD      E,(HL)
 ED23  23        INC     HL
 ED24  56        LD      D,(HL)
@@ -8494,10 +8517,10 @@ ED25  23        INC     HL
 ED26  4E        LD      C,(HL)
 ED27  23        INC     HL
 ED28  46        LD      B,(HL)
-; {OPLAD1} <IncHL+Return>
+; {OPLAD1} <IncHL+Return> [INCHL]
 ED29  23        INC     HL
 ED2A  C9        RET
- 
+
 ; HLFLOAT: Copia para o endereço apontado
 ; por HL o número de ponto flutuante
 ; armazenado em FLOAT.
@@ -8516,13 +8539,13 @@ ED33  23        INC     HL
 ED34  05        DEC     B
 ED35  20F9      JR      NZ,#ED30 ; {OPTRN2} <FCopyLoop>
 ED37  C9        RET
- 
+
 ; {VORZ} <FUnpackMantissas>
 ; Restaura os 1,... das mantissas de FLOAT
 ; e BCDE. Guarda em (#03C3) o sinal original
 ; de FLOAT. A fica com o sinal (invertido?)
 ; do resultado da multiplicação/divisão.
- 
+
 ; "Desempacota as mantissas de FACCUM e BCDE. Isto é
 ; simples - apenas restauramos o bit mais significante
 ; ausente, invariavelmente um 1 (vide nota técnica).
@@ -8543,7 +8566,7 @@ ED37  C9        RET
 ; |  -   |   +    |  +   |     +     |
 ; |  -   |   +    |  -   |     -     |
 ; +------+--------+------+-----------+"
-ED38  21C103    LD      HL,#03C1 ; {WRA1+2} <FACCUM+2>
+ED38  21C103    LD      HL,#03C1 ; {WRA1+2} <FACCUM+2> [FPREG+2]
 ED3B  7E        LD      A,(HL)
 ED3C  07        RLCA    ; "Move o sinal de FACCUM ao bit 0."
 ED3D  37        SCF     ; "Seta o MSB da mantissa de FACCUM,"
@@ -8562,15 +8585,15 @@ ED49  4F        LD      C,A
 ED4A  1F        RRA     ; "O bit 7 de A agora é o sinal de BCDE"
 ED4B  AE        XOR     (HL) ; "XOR-ado com FTEMP_SIGN."
 ED4C  C9        RET
- 
+
 ; CPFLOATBCDE: Compara o número de ponto
 ; flutuante em FLOAT com o número de ponto
 ; flutuante em BCDE:
 ; Se FLOAT > BCDE, retorna 1 em A.
 ; Se FLOAT = BCDE, retorna 0 em A.
 ; Se FLOAT < BCDE, retorna -1 em A.
-; {VORZ1} <FCompare>
- 
+; {VORZ1} <FCompare> [CMPNUM]
+
 ; Se BCDE = 0, retorna o sinal de FLOAT.
 ED4D  78        LD      A,B
 ED4E  B7        OR      A
@@ -8585,7 +8608,7 @@ ED59  79        LD      A,C
 ED5A  C8        RET     Z
 ; Se FLOAT e BCDE têm sinais diferentes,
 ; retorna o sinal de BCDE invertido.
-ED5B  21C103    LD      HL,#03C1 ; {WRA1+2} <FACCUM+2>
+ED5B  21C103    LD      HL,#03C1 ; {WRA1+2} <FACCUM+2> [FPREG+2]
 ED5E  AE        XOR     (HL)
 ED5F  79        LD      A,C
 ED60  F8        RET     M
@@ -8626,10 +8649,10 @@ ED76  C0        RET     NZ
 ED77  E1        POP     HL ; "Perde [#ED61]"
 ED78  E1        POP     HL ; "Perde [#ECDC]"
 ED79  C9        RET     ; "Retorna ao chamador."
- 
+
 ; {INTMOV} <FAsInteger> [FPINT]
 ; "Retorna a parte inteira de FACCUM em CDE."
- 
+
 ; "Retorna com BCDE=0 se A=0."
 ED7A  47        LD      B,A
 ED7B  4F        LD      C,A
@@ -8639,7 +8662,7 @@ ED7E  B7        OR      A
 ED7F  C8        RET     Z
 ; "Preserva HL e copia FACCUM para BCDE."
 ED80  E5        PUSH    HL
-ED81  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE>
+ED81  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
 ; "Desempacota a mantissa de FACCUM para obter o
 ; bit mais significativo oculto e obter o sinal
 ; de volta via um XOR para desfazer o que
@@ -8671,7 +8694,7 @@ ED99  DC48EB    CALL    C,#EB48 ; {ADD20} <FNegateInt>
 ; inteiro em CDE."
 ED9C  E1        POP     HL
 ED9D  C9        RET
- 
+
 ; {DEZERO} <FMantissaDec>
 ; "Decrementa a mantissa em CDE."
 ED9E  1B        DEC     DE
@@ -8681,13 +8704,13 @@ EDA1  3C        INC     A
 EDA2  C0        RET     NZ
 EDA3  0B        DEC     BC
 EDA4  C9        RET
- 
+
 ; BINT: Remove a parte fracional de FLOAT
 ; e retorna em A o byte menos significativo
 ; do valor inteiro.
-; {INT} <Int>
+; {INT} <Int> [INT]
 ; "Remove a parte fracional de FACCUM."
- 
+
 ; Se o expoente for maior ou igual a 2^24,
 ; o número já é inteiro.
 EDA5  21C203    LD      HL,#03C2 ; {WRA1+3} <FACCUM+3> [FPEXP]
@@ -8712,7 +8735,7 @@ EDB8  17        RLA
 EDB9  CDE7EA    CALL    #EAE7 ; {ADD9} <FNormalise>
 EDBC  F1        POP     AF
 EDBD  C9        RET
- 
+
 ; {FESRCH}
 EDBE  210000    LD      HL,#0000
 EDC1  78        LD      A,B
@@ -8733,15 +8756,15 @@ EDD0  DA7FE5    JP      C,#E57F ; IIERRO {BSER}
 EDD3  3D        DEC     A
 EDD4  20F0      JR      NZ,#EDC6 ; {FESRH1}
 EDD6  C9        RET
- 
-; BPEEK:
-EDD7  CDF0DE    CALL    #DEF0
-EDDA  1A        LD      A,(DE)
-EDDB  C33FE6    JP      #E63F ; FLOATA
 
-; BPOKE
-EDDE  CDBCE2    CALL    #E2BC; {SNALY2} [GETNUM]
-EDE1  CDF0DE    CALL    #DEF0
+; BPEEK:
+EDD7  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT] 
+EDDA  1A        LD      A,(DE)
+EDDB  C33FE6    JP      #E63F ; FLOATA {INP1} [PASSA]
+
+; BPOKE:
+EDDE  CDBCE2    CALL    #E2BC ; {SNALY2} [GETNUM]
+EDE1  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT]
 EDE4  D5        PUSH    DE
 EDE5  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 EDE8  2C        DB      ','
@@ -8749,25 +8772,25 @@ EDE9  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
 EDEC  D1        POP     DE
 EDED  12        LD      (DE),A
 EDEE  C9        RET
- 
+
 ; Interpreta literal numérico.
 ; {VALNRM} <FIn> [ASCTFP]
 EDEF  FE2D      CP      '-'
 EDF1  F5        PUSH    AF
-EDF2  2805      JR      Z,#EDF9 ; {VALNR1}
+EDF2  2805      JR      Z,#EDF9 ; {VALNR1} [CNVNUM]
 EDF4  FE2B      CP      '+'
-EDF6  2801      JR      Z,#EDF9 ; {VALNR1}
+EDF6  2801      JR      Z,#EDF9 ; {VALNR1} [CNVNUM]
 EDF8  2B        DEC     HL
-; {VALNR1}
-EDF9  CDFDEA    CALL    #EAFD ; FLOAT0 {ADD12} <FZero>
+; {VALNR1} [CNVNUM]
+EDF9  CDFDEA    CALL    #EAFD ; FLOAT0 {ADD12} <FZero> [RESZER]
 ; "Seta B, D, E em 0 e C em 255."
 EDFC  47        LD      B,A ; "B=contagem de casas fracionais."
 EDFD  57        LD      D,A ; "D=sinal do expoente."
-EDFE  5F        LD      E,A ; "E=expoente."
+EDFE  5F        LD      E,A ; "E=expoente" de 10.
 EDFF  2F        CPL
 EE00  4F        LD      C,A ; "decimal_point_done ($ff=não, $00=sim)"
- 
-; {VALNR2} <FInLoop>
+
+; {VALNR2} <FInLoop> [MANLP]
 ; "Este é o início do laço que processa um
 ; caracter ASCII de cada vez."
  
@@ -8775,33 +8798,34 @@ EE00  4F        LD      C,A ; "decimal_point_done ($ff=não, $00=sim)"
 ; dígito (o que é determinado pelo carry flag)
 ; então salta para ProcessDigit."
 EE01  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
-EE04  384F      JR      C,#EE55 ; {VALN10} <ProcessDigit>
+EE04  384F      JR      C,#EE55 ; {VALN10} <ProcessDigit> [ADDIG]
 ; "Se temos um ponto decimal então salta para
 ; incrementar C e voltar para cá (a menos que
 ; já tenhamos encontrado um ponto decimal)."
 EE06  FE2E      CP      '.'
-EE08  2828      JR      Z,#EE32 ; {VALNR4}
+EE08  2828      JR      Z,#EE32 ; {VALNR4} [DPOINT]
 ; "Se não for um 'E' indicando expoente então
 ; assume que atingimos o fim do número e salta
 ; para ScaleResult."
 EE0A  FE45      CP      'E'
-EE0C  2027      JR      NZ,#EE35 ; {VALNR5} <ScaleResult>
- 
+EE0C  2027      JR      NZ,#EE35 ; {VALNR5} <ScaleResult> [CONEXP]
+
 ; <GetExponent>
 ; "Um expoente decimal foi dado (p.ex. 'E+23').
 ; Aqui lemos esse valor de expoente (com sinal)
 ; em E. Neste bloco usamos D para conter o sinal
 ; do expoente ($FF para menos e $01 para positivo)
 ; enquanto iteramos lendo os dígitos."
- 
+
 ; "Obtém o primeiro caracter do expoente (após
 ; o 'E')."
 EE0E  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 ; Checa se é '+' ou '-' (ASCII ou token) ou
 ; nenhum, e ajusta o sinal do expoente em D.
 EE11  E5        PUSH    HL
-EE12  2126EE    LD      HL,#EE26 ; {VALNR3} <NextExponentDigit>
+EE12  2126EE    LD      HL,#EE26 ; {VALNR3} <NextExponentDigit> [EXPLP]
 EE15  E3        EX      (SP),HL
+; {SNLY22} [SGNEXP]
 EE16  15        DEC     D
 EE17  FEBF      CP      #BF ; token "-"
 EE19  C8        RET     Z
@@ -8818,13 +8842,13 @@ EE24  F1        POP     AF
 ; Decrementamos HL para obter o mesmo caracter
 ; de novo, sem saltar."
 EE25  2B        DEC     HL
-; {VALNR3} <NextExponentDigit>
+; {VALNR3} <NextExponentDigit> [EXPLP]
 ; "Se o próximo caracter for um dígito (do
 ; expoente), salta para lidar com ele."
 EE26  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
-EE29  384C      JR      C,#EE77 ; {VALN11} <DoExponentDigit>
+EE29  384C      JR      C,#EE77 ; {VALN11} <DoExponentDigit> [EDIGIT]
 EE2B  14        INC     D
-EE2C  2007      JR      NZ,#EE35 ; {VALNR5} <ScaleResult>
+EE2C  2007      JR      NZ,#EE35 ; {VALNR5} <ScaleResult> [CONEXP]
 ; "D era $FF (i.e. expoente negativo) portanto
 ; E = 0 - E."
 EE2E  AF        XOR     A
@@ -8832,11 +8856,11 @@ EE2F  93        SUB     E
 EE30  5F        LD      E,A
 ; "C era $FF, então aqui ele se torna $01."
 EE31  0C        INC     C
-; {VALNR4}
+; {VALNR4} [DPOINT]
 EE32  0C        INC     C
-EE33  28CC      JR      Z,#EE01 ; {VALNR2} <FInLoop> ; "Se C agora é zero"
+EE33  28CC      JR      Z,#EE01 ; {VALNR2} <FInLoop> [MANLP] ; "Se C agora é zero"
  
-; {VALNR5} <ScaleResult>
+; {VALNR5} <ScaleResult> [CONEXP]
 ; "Acreditamos que já lemos todos os caracteres
 ; que compõem o número. Só falta escalar decimalmente
 ; nosso número em FACCUM com respeito à posição do
@@ -8849,47 +8873,47 @@ EE35  E5        PUSH    HL
 ; Ele é preservado no laço seguinte."
 EE36  7B        LD      A,E
 EE37  90        SUB     B
-; {VALNR6} <DecimalLoop>
+; {VALNR6} <DecimalLoop> [SCALMI]
 ; "Se estamos deslocando para cima (i.e., multiplicando
 ; por 10) então chamamos a função para fazer isso e
 ; saltamos para o fim do laço."
-EE38  F44DEE    CALL    P,#EE4D ; {VALNR8} <DecimalShiftUp>
-EE3B  F244EE    JP      P,#EE44 ; {VALNR7} <DecimalLoopEnd>
+EE38  F44DEE    CALL    P,#EE4D ; {VALNR8} <DecimalShiftUp> [SCALPL]
+EE3B  F244EE    JP      P,#EE44 ; {VALNR7} <DecimalLoopEnd> [ENDCON]
 ; "Se estamos deslocando para baixo (i.e., o flag de sinal
 ; está ativo) então chamamos a função para fazer isso e
 ; incrementamos A."
 EE3E  F5        PUSH    AF
-EE3F  CD1FEC    CALL    #EC1F ; DIVFLOAT10 {DIV0} <FDivByTen>
+EE3F  CD1FEC    CALL    #EC1F ; DIVFLOAT10 {DIV0} <FDivByTen> [DIV10]
 EE42  F1        POP     AF
 EE43  3C        INC     A
-; {VALNR7} <DecimalLoopEnd>
+; {VALNR7} <DecimalLoopEnd> [ENDCON]
 ; "Se A ainda não for zero então ainda há deslocamentos
 ; a fazer e iteramos. Senão restauramos o ponteiro do
 ; programa e retornamos."
-EE44  20F2      JR      NZ,#EE38 ; {VALNR6} <DecimalLoop>
+EE44  20F2      JR      NZ,#EE38 ; {VALNR6} <DecimalLoop> [SCALMI]
 EE46  D1        POP     DE
 EE47  F1        POP     AF
-EE48  CCFCEC    CALL    Z,#ECFC ; NEGFLOAT {ABS1} <FNegate>
+EE48  CCFCEC    CALL    Z,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 EE4B  EB        EX      DE,HL
 EE4C  C9        RET
- 
-; {VALNR8} <DecimalShiftUp>
+
+; {VALNR8} <DecimalShiftUp> [SCALPL]
 ; "Função auxiliar para deslocar o resultado decimalmente
 ; uma casa acima. Só fazemos isso se A<>0, e no final
 ; decrementamos A antes de retornar."
 EE4D  C8        RET     Z
-; {VALNR9}
+; {VALNR9} <DecimalShiftUp> [MULTEN]
 EE4E  F5        PUSH    AF
-EE4F  CDBCEC    CALL    #ECBC ; {HIROU5} <FMulByTen>
+EE4F  CDBCEC    CALL    #ECBC ; {HIROU5} <FMulByTen> [MLSP10]
 EE52  F1        POP     AF
 EE53  3D        DEC     A
 EE54  C9        RET
- 
-; {VALN10} <ProcessDigit>
+
+; {VALN10} <ProcessDigit> [ADDIG]
 ; "Processa um dígito ASCII. Multiplicamos o total
 ; atual por dez, então somamos o valor deste dígito
 ; a ele."
- 
+
 ; "Preserva o expoente atual (DE) e copia o valor
 ; do dígito ASCII para D."
 EE55  D5        PUSH    DE
@@ -8904,131 +8928,140 @@ EE59  47        LD      B,A
 EE5A  C5        PUSH    BC
 EE5B  E5        PUSH    HL
 EE5C  D5        PUSH    DE
-EE5D  CDBCEC    CALL    #ECBC ; {HIROU5} <FMulByTen>
+EE5D  CDBCEC    CALL    #ECBC ; {HIROU5} <FMulByTen> [MLSP10]
 EE60  F1        POP     AF
-EE61  D630      SUB     #30
-EE63  CD6CEE    CALL    #EE6C
+EE61  D630      SUB     '0'
+EE63  CD6CEE    CALL    #EE6C ; {PLUS0} [RSCALE]
 EE66  E1        POP     HL
 EE67  C1        POP     BC
 EE68  D1        POP     DE
-EE69  C301EE    JP      #EE01 ; {VALNR2} <FInLoop>
- 
-EE6C  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
-EE6F  CDE5EC    CALL    #ECE5
-; BADD
+EE69  C301EE    JP      #EE01 ; {VALNR2} <FInLoop> [MANLP]
+
+; {PLUS0} [RSCALE]
+EE6C  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
+EE6F  CDE5EC    CALL    #ECE5 ; {SGN0} <FCharToFloat> [FLGREL]
+; BADD:
+; {PLUS} <FAdd> [PADD]
 EE72  C1        POP     BC
 EE73  D1        POP     DE
-EE74  C39AEA    JP      #EA9A ; BCDEPLUSFLOAT
- 
-; {VALN11} <DoExponentDigit>
+EE74  C39AEA    JP      #EA9A ; BCDEPLUSFLOAT {ADD5} [FPADD]
+
+; {VALN11} <DoExponentDigit> [EDIGIT]
 EE77  7B        LD      A,E
 EE78  07        RLCA
 EE79  07        RLCA
 EE7A  83        ADD     A,E
 EE7B  07        RLCA
 EE7C  86        ADD     A,(HL)
-EE7D  D630      SUB     #30
+EE7D  D630      SUB     '0'
 EE7F  5F        LD      E,A
-EE80  C326EE    JP      #EE26
- 
+EE80  C326EE    JP      #EE26 ; {VALNR3} <NextExponentDigit> [EXPLP]
+
 ; Imprime " EM " seguido do valor numérico em HL.
-; {INOUT} <PrintIN>
+; {INOUT} <PrintIN> [LINEIN]
 EE83  E5        PUSH    HL
 EE84  21E5D7    LD      HL,#D7E5 ; {IN} <szIn> [INMSG]
-EE87  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} [PRS]
+EE87  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 EE8A  E1        POP     HL
 ; PRINTHL: Imprime o valor numérico
 ; armazenado em HL.
-; {NUMBO} [PRNTHL]
+; {NUMBO} <PrintInt> [PRNTHL]
 EE8B  EB        EX      DE,HL
 EE8C  AF        XOR     A
-EE8D  0698      LD      B,#98
-EE8F  CDEAEC    CALL    #ECEA ; FLOATBADE {SGN1}
+EE8D  0698      LD      B,#80+24 ; 24 bits.
+EE8F  CDEAEC    CALL    #ECEA ; FLOATBADE {SGN1} <FCharToFloat+5> [RETINT]
 ; Imprime o número de ponto flutuante em
 ; FLOAT.
-; Forja retorno para PRINTSTRHL.
-EE92  2133E7    LD      HL,#E733 ; {TEXTO0} [PRNUMS]
+; Forja retorno para PRINTSTRHL-1.
+EE92  2133E7    LD      HL,#E733 ; {TEXTO0} <PrintSz-1> [PRNUMS]
 EE95  E5        PUSH    HL
 ; STRFLOAT: Monta em #03C4 a representação
 ; string de FLOAT.
 ; {NUMKON} [NUMASC]
-EE96  21C403    LD      HL,#03C4 ; {INTPRB} [PBUFF]
+EE96  21C403    LD      HL,#03C4 ; {INTPRB} <FBUFFER> [PBUFF]
 EE99  E5        PUSH    HL
 ; Verifica o sinal.
 EE9A  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 ; Se positivo ou zero, coloca um espaço no
 ; início.
-EE9D  3620      LD      (HL),#20
-EE9F  F2A4EE    JP      P,#EEA4
+EE9D  3620      LD      (HL),' '
+EE9F  F2A4EE    JP      P,#EEA4 ; {NORM1} <DoZero> [SPCFST]
 ; Se negativo, coloca um "-" no início.
-EEA2  362D      LD      (HL),#2D
+EEA2  362D      LD      (HL),'-'
+; {NORM1} <DoZero> [SPCFST]
 ; Coloca um zero.
 EEA4  23        INC     HL
-EEA5  3630      LD      (HL),#30
+EEA5  3630      LD      (HL),'0'
 ; Se o número for zero, termina.
-EEA7  CA51EF    JP      Z,#EF51
+EEA7  CA51EF    JP      Z,#EF51 ; {NORM12} <NullTerm-3> [JSTZER]
 ;
 EEAA  E5        PUSH    HL
 ; Se for negativo, torna o número positivo.
 ; (Já imprimimos o sinal, agora ele não
 ; importa mais.)
-EEAB  FCFCEC    CALL    M,#ECFC ; NEGFLOAT {ABS1} <FNegate>
+EEAB  FCFCEC    CALL    M,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 ;
 EEAE  AF        XOR     A
 EEAF  F5        PUSH    AF
-EEB0  CD57EF    CALL    #EF57
-; BCDE <- 99999.9
-EEB3  014391    LD      BC,#9143
+EEB0  CD57EF    CALL    #EF57 ; {NORM14} <ToUnder1,000,000> [RNGTST]
+; {NORM2} <ToOver100,000> [SIXDIG]
+EEB3  014391    LD      BC,#9143 ; BCDE <- 99999.9
 EEB6  11F84F    LD      DE,#4FF8
-EEB9  CD4DED    CALL    #ED4D ; CPFLOATBCDE {VORZ1} <FCompare>
+EEB9  CD4DED    CALL    #ED4D ; CPFLOATBCDE {VORZ1} <FCompare> [CMPNUM]
 EEBC  B7        OR      A
-EEBD  E2D0EE    JP      PO,#EED0
+EEBD  E2D0EE    JP      PO,#EED0 ; {NORM4} <PrepareToPrint> [INRNG]
 EEC0  F1        POP     AF
-EEC1  CD4EEE    CALL    #EE4E
+EEC1  CD4EEE    CALL    #EE4E ; {VALNR9} <DecimalShiftUp> [MULTEN]
 EEC4  F5        PUSH    AF
-EEC5  18EC      JR      #EEB3           ; (-20)
+EEC5  18EC      JR      #EEB3 ; {NORM2} <ToOver100,000> [SIXDIG]
+
 ; STRFLOATEXP: Continuação de STRFLOAT,
 ; em que o número vai ser impresso em
 ; formato exponencial (1E+06).
-EEC7  CD1FEC    CALL    #EC1F ; DIVFLOAT10 {DIV0} <FDivByTen>
+; {NORM3} [GTSIXD]
+EEC7  CD1FEC    CALL    #EC1F ; DIVFLOAT10 {DIV0} <FDivByTen> [DIV10]
 EECA  F1        POP     AF
 EECB  3C        INC     A
 EECC  F5        PUSH    AF
-EECD  CD57EF    CALL    #EF57
-EED0  CD89EA    CALL    #EA89 ; FLOATPLUSHALF
+EECD  CD57EF    CALL    #EF57 ; {NORM14} <ToUnder1,000,000> [RNGTST]
+; {NORM4} <PrepareToPrint> [INRNG]
+EED0  CD89EA    CALL    #EA89 ; FLOATPLUSHALF {ADD1} <FAddOneHalf> [ROUND]
 EED3  3C        INC     A
 EED4  CD7AED    CALL    #ED7A ; {INTMOV} <FAsInteger> [FPINT]
-EED7  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE>
-EEDA  010603    LD      BC,#0306
+EED7  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
+EEDA  010603    LD      BC,#0306 ; Faixa de 1E+06 a 1E+03.
 EEDD  F1        POP     AF
 EEDE  81        ADD     A,C
 EEDF  3C        INC     A
-EEE0  FAEBEE    JP      M,#EEEB
+EEE0  FAEBEE    JP      M,#EEEB ; {NORM5} [MAKNUM]
 EEE3  FE08      CP      #08
-EEE5  3004      JR      NC,#EEEB        ; (4)
+EEE5  3004      JR      NC,#EEEB ; {NORM5} [MAKNUM]
 EEE7  3C        INC     A
 EEE8  47        LD      B,A
 EEE9  3E02      LD      A,#02
+; {NORM5} [MAKNUM]
 EEEB  3D        DEC     A
 EEEC  3D        DEC     A
 EEED  E1        POP     HL
 EEEE  F5        PUSH    AF
-EEEF  116AEF    LD      DE,#EF6A
+EEEF  116AEF    LD      DE,#EF6A ; {POF10} <DECIMAL_POWERS> [POWERS]
 EEF2  05        DEC     B
-EEF3  2006      JR      NZ,#EEFB        ; (6)
-EEF5  362E      LD      (HL),#2E
+EEF3  2006      JR      NZ,#EEFB ; {NORM6} [DIGTXT] 
+EEF5  362E      LD      (HL),'.'
 EEF7  23        INC     HL
-EEF8  3630      LD      (HL),#30
+EEF8  3630      LD      (HL),'0'
 EEFA  23        INC     HL
+; {NORM6} [DIGTXT]
 EEFB  05        DEC     B
-EEFC  362E      LD      (HL),#2E
-EEFE  CC29ED    CALL    Z,#ED29 ; {OPLAD1} <IncHL+Return>
+EEFC  362E      LD      (HL),'.'
+EEFE  CC29ED    CALL    Z,#ED29 ; {OPLAD1} <IncHL+Return> [INCHL]
 EF01  C5        PUSH    BC
 EF02  E5        PUSH    HL
 EF03  D5        PUSH    DE
-EF04  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE>
+EF04  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
 EF07  E1        POP     HL
-EF08  062F      LD      B,#2F
+EF08  062F      LD      B,'0'-1
+; {NORM7} [TRYAGN]
 EF0A  04        INC     B
 EF0B  7B        LD      A,E
 EF0C  96        SUB     (HL)
@@ -9043,164 +9076,199 @@ EF14  9E        SBC     A,(HL)
 EF15  4F        LD      C,A
 EF16  2B        DEC     HL
 EF17  2B        DEC     HL
-EF18  30F0      JR      NC,#EF0A        ; (-16)
-EF1A  CD3CEB    CALL    #EB3C
+EF18  30F0      JR      NC,#EF0A ; {NORM7} [TRYAGN]
+EF1A  CD3CEB    CALL    #EB3C ; {ADD19} [PLUCDE]
 EF1D  23        INC     HL
-EF1E  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE>
+EF1E  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 EF21  EB        EX      DE,HL
 EF22  E1        POP     HL
 EF23  70        LD      (HL),B
 EF24  23        INC     HL
 EF25  C1        POP     BC
 EF26  0D        DEC     C
-EF27  20D2      JR      NZ,#EEFB        ; (-46)
+EF27  20D2      JR      NZ,#EEFB ; {NORM6} [DIGTXT]
 EF29  05        DEC     B
-EF2A  280B      JR      Z,#EF37         ; (11)
+EF2A  280B      JR      Z,#EF37 ; {NORM9} [DOEBIT]
+; {NORM8} [SUPTLZ]
 EF2C  2B        DEC     HL
 EF2D  7E        LD      A,(HL)
 EF2E  FE30      CP      '0'
-EF30  28FA      JR      Z,#EF2C         ; (-6)
+EF30  28FA      JR      Z,#EF2C ; {NORM8} [SUPTLZ]
 EF32  FE2E      CP      '.'
-EF34  C429ED    CALL    NZ,#ED29 ; {OPLAD1} <IncHL+Return>
+EF34  C429ED    CALL    NZ,#ED29 ; {OPLAD1} <IncHL+Return> [INCHL]
+; {NORM9} [DOEBIT]
 EF37  F1        POP     AF
-EF38  281A      JR      Z,#EF54         ; (26)
-EF3A  3645      LD      (HL),#45
+EF38  281A      JR      Z,#EF54 ; {NORM13} <NullTerm> [NOENED]
+EF3A  3645      LD      (HL),'E'
 EF3C  23        INC     HL
-EF3D  362B      LD      (HL),#2B
-EF3F  F246EF    JP      P,#EF46
-EF42  362D      LD      (HL),#2D
+EF3D  362B      LD      (HL),'+'
+EF3F  F246EF    JP      P,#EF46 ; {NORM10} [OUTEXP]
+EF42  362D      LD      (HL),'-'
 EF44  2F        CPL
 EF45  3C        INC     A
-EF46  062F      LD      B,#2F
+; {NORM10} [OUTEXP]
+EF46  062F      LD      B,'0'-1
+; {NORM11} [EXPTEN]
 EF48  04        INC     B
-EF49  D60A      SUB     #0A
-EF4B  30FB      JR      NC,#EF48        ; (-5)
-EF4D  C63A      ADD     A,#3A
+EF49  D60A      SUB     10
+EF4B  30FB      JR      NC,#EF48 ; {NORM11} [EXPTEN]
+EF4D  C63A      ADD     A,'9'+1
 EF4F  23        INC     HL
 EF50  70        LD      (HL),B
-;
+; {NORM12} <NullTerm-3> [JSTZER]
 EF51  23        INC     HL
 EF52  77        LD      (HL),A
 EF53  23        INC     HL
+; {NORM13} <NullTerm> [NOENED]
 EF54  71        LD      (HL),C
 EF55  E1        POP     HL
 EF56  C9        RET
+
+; {NORM14} <ToUnder1,000,000> [RNGTST]
 ; BCDE <-- 999999.
 EF57  017494    LD      BC,#9474
 EF5A  11F723    LD      DE,#23F7
 ; Se FLOAT > 999999, escreve em formato
 ; exponencial (1E+06).
-EF5D  CD4DED    CALL    #ED4D ; CPFLOATBCDE {VORZ1} <FCompare>
+EF5D  CD4DED    CALL    #ED4D ; CPFLOATBCDE {VORZ1} <FCompare> [CMPNUM]
 EF60  B7        OR      A
 EF61  E1        POP     HL
-EF62  E2C7EE    JP      PO,#EEC7
+EF62  E2C7EE    JP      PO,#EEC7 ; {NORM3} [GTSIXD]
 EF65  E9        JP      (HL)
+
+; {SQRL} <ONE_HALF> [HALF]
 EF66  00000080  DB      #00,#00,#00,#80 ; 1/2 (0,5)
-EF6A  A0860110  DB      #A0,#86,#01,#10
-EF6E  2700E803  DB      #27,#00,#E8,#03
-EF72  00640000  DB      #00,#64,#00,#00
-EF76  0A000001  DB      #0A,#00,#00,#01
-EF7A  0000      DB      #00,#00
-EF7C  21FCEC    LD      HL,#ECFC ; NEGFLOAT {ABS1} <FNegate>
+
+; Potências de 10.
+; {POF10} <DECIMAL_POWERS> [POWERS]
+EF6A  A08601    DB      #A0,#86,#01 ; 100.000
+EF6D  102700    DB      #10,#27,#00 ; 10.000
+EF70  E80300    DB      #E8,#03,#00 ; 1.000
+EF73  640000    DB      #00,#64,#00 ; 100
+EF76  0A0000    DB      #0A,#00,#00 ; 10
+EF70  010000    DB      #01,#00,#00 ; 1
+
+; {EXPO3} [NEGAFT]
+EF7C  21FCEC    LD      HL,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 EF7F  E3        EX      (SP),HL
 EF80  E9        JP      (HL)
-; BSQR
+
+; BSQR:
 ; sqr x = x^(1/2)
-EF81  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
-EF84  2166EF    LD      HL,#EF66 ; 1/2
-EF87  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem>
-; BPOW.
+; {SQR} <Sqr> [SQR]
+EF81  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
+EF84  2166EF    LD      HL,#EF66 ; {SQRL} <ONE_HALF> [HALF] ; 1/2
+EF87  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
+
+; BPOW:
 ; Potência.
-EF8A  C1        POP     BC
+; {EXPO1} [POWER]
+EF8A  C1        POP     BC ; Obtém a base.
 EF8B  D1        POP     DE
 EF8C  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 EF8F  78        LD      A,B
-EF90  283C      JR      Z,#EFCE         ; (60)
-EF92  F299EF    JP      P,#EF99
+EF90  283C      JR      Z,#EFCE ; {EXP} [EXP]
+EF92  F299EF    JP      P,#EF99 ; {EXPO1} [POWER1]
 EF95  B7        OR      A
-EF96  CA4BD8    JP      Z,#D84B ; DZERRO
+EF96  CA4BD8    JP      Z,#D84B ; DZERRO {DIVER} <DivideByZero> [DZERR]
+ ; {EXPO1} [POWER1]
 EF99  B7        OR      A
-EF9A  CAFEEA    JP      Z,#EAFE
+EF9A  CAFEEA    JP      Z,#EAFE ; {ADD13} [SAVEXP]
 EF9D  D5        PUSH    DE
 EF9E  C5        PUSH    BC
 EF9F  79        LD      A,C
 EFA0  F67F      OR      #7F
-EFA2  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE>
-EFA5  F2B6EF    JP      P,#EFB6
+EFA2  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
+EFA5  F2B6EF    JP      P,#EFB6 ; {EXPO2} [POWER2]
 EFA8  D5        PUSH    DE
 EFA9  C5        PUSH    BC
-EFAA  CDA5ED    CALL    #EDA5
+EFAA  CDA5ED    CALL    #EDA5 ; BINT {INT} <Int> [INT]
 EFAD  C1        POP     BC
 EFAE  D1        POP     DE
 EFAF  F5        PUSH    AF
-EFB0  CD4DED    CALL    #ED4D ; CPFLOATBCDE {VORZ1} <FCompare>
+EFB0  CD4DED    CALL    #ED4D ; CPFLOATBCDE {VORZ1} <FCompare> [CMPNUM]
 EFB3  E1        POP     HL
 EFB4  7C        LD      A,H
 EFB5  1F        RRA
+; {EXPO2} [POWER2]
 EFB6  E1        POP     HL
-EFB7  22C103    LD      (#03C1),HL ; {WRA1+2} <FACCUM+2>
+EFB7  22C103    LD      (#03C1),HL ; {WRA1+2} <FACCUM+2> [FPREG+2]
 EFBA  E1        POP     HL
-EFBB  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG]
-EFBE  DC7CEF    CALL    C,#EF7C
-EFC1  CCFCEC    CALL    Z,#ECFC ; NEGFLOAT {ABS1} <FNegate>
+EFBB  22BF03    LD      (#03BF),HL ; FLOAT {WRA1} <FACCUM> [FPREG]
+EFBE  DC7CEF    CALL    C,#EF7C ; {EXPO3} [NEGAFT]
+EFC1  CCFCEC    CALL    Z,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 EFC4  D5        PUSH    DE
 EFC5  C5        PUSH    BC
-EFC6  CD8EEB    CALL    #EB8E
+EFC6  CD8EEB    CALL    #EB8E ; BLOG {LOG} [LOG]
 EFC9  C1        POP     BC
 EFCA  D1        POP     DE
-EFCB  CDCFEB    CALL    #EBCF
-; BEXP
+EFCB  CDCFEB    CALL    #EBCF ; {MUL1} [FPMULT]
+
+; BEXP:
 ; e^x = 1 + x + x^2/2! + x^3/3! + ...
-EFCE  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
-EFD1  013881    LD      BC,#8138 ; 1,4427
+; {EXP} [EXP]
+EFCE  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
+EFD1  013881    LD      BC,#8138 ; 1,4427 = 1/Ln(2).
 EFD4  113BAA    LD      DE,#AA3B
-EFD7  CDCFEB    CALL    #EBCF
+EFD7  CDCFEB    CALL    #EBCF ; {MUL1} [FPMULT]
 EFDA  3AC203    LD      A,(#03C2) ; {WRA1+3} <FACCUM+3> [FPEXP]
-EFDD  FE88      CP      #88
-EFDF  D2AFEC    JP      NC,#ECAF
-EFE2  CDA5ED    CALL    #EDA5
+EFDD  FE88      CP      #80+8
+EFDF  D2AFEC    JP      NC,#ECAF ; {HIROU2} [OVTST1]
+EFE2  CDA5ED    CALL    #EDA5 ; BINT {INT} <Int> [INT]
 EFE5  C680      ADD     A,#80
 EFE7  C602      ADD     A,#02
-EFE9  DAAFEC    JP      C,#ECAF
+EFE9  DAAFEC    JP      C,#ECAF ; {HIROU2} [OVTST1]
 EFEC  F5        PUSH    AF
-EFED  217DEB    LD      HL,#EB7D
-EFF0  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT
-EFF3  CDC6EB    CALL    #EBC6
+EFED  217DEB    LD      HL,#EB7D ; {LOGL} [UNITY] ; 1
+EFF0  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL]
+EFF3  CDC6EB    CALL    #EBC6 ; {LOG1} [MULLN2]
 EFF6  F1        POP     AF
 EFF7  C1        POP     BC
 EFF8  D1        POP     DE
 EFF9  F5        PUSH    AF
-EFFA  CD97EA    CALL    #EA97 ; BCDEMINUSFLOAT
-EFFD  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate>
-F000  210EF0    LD      HL,#F00E
-F003  CD3EF0    CALL    #F03E
+EFFA  CD97EA    CALL    #EA97 ; BCDEMINUSFLOAT {ADD4} [SUBCDE]
+EFFD  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
+F000  210EF0    LD      HL,#F00E ; {EXPL} [EXPTAB]
+F003  CD3EF0    CALL    #F03E ; {REIHE1} [SMSER1]
 F006  110000    LD      DE,#0000
 F009  C1        POP     BC
 F00A  4A        LD      C,D
-F00B  C3CFEB    JP      #EBCF
+F00B  C3CFEB    JP      #EBCF ; {MUL1} [FPMULT]
 
 ; Dados para cálculo de EXP(X).
+; {EXPL} [EXPTAB]
 F00E  08        DB      #08
 F00F  402E9474  DB      #40,#2E,#94,#74 ; -1,41416E-4 (-1/7! = -1/5040 (-1,98413E-4))
-F013  704F2E77  DB      #70,#4F,#2E,#77 ; 1,32988E-3 (1/6! = 1/720 (1,38889E-3))
+F013  704F2E77  DB      #70,#4F,#2E,#77 ; +1,32988E-3 (1/6! = +1/720 (+1,38889E-3))
 F017  6E02887A  DB      #6E,#02,#88,#7A ; -8,30136E-3 (-1/5! = -1/120 (-8,33333E-3))
-F01B  E6A02A7C  DB      #E6,#A0,#2A,#7C ; 0,0416574 (1/4! = 1/24 (0,0416667))
+F01B  E6A02A7C  DB      #E6,#A0,#2A,#7C ; +0,0416574 (1/4! = +1/24 (+0,0416667))
 F01F  50AAAA7E  DB      #50,#AA,#AA,#7E ; -0,166665 (-1/3! = -1/6 (-0,166667))
-F023  FFFF7F7F  DB      #FF,#FF,#7F,#7F ; 1/2 (0,5)
-F027  00008081  DB      #00,#00,#80,#81 ; -1
-F02B  00000081  DB      #00,#00,#00,#81 ; 1
-F02F  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
-F032  11CDEB    LD      DE,#EBCD ; Forja retorno para BMUL.
+F023  FFFF7F7F  DB      #FF,#FF,#7F,#7F ; +0,5 (+1/2! = +1/2)
+F027  00008081  DB      #00,#00,#80,#81 ; -1 (-1/1! = -1/1)
+F02B  00000081  DB      #00,#00,#00,#81 ; +1 (+1/0! = +1/1)
+
+; {Rotina para desenvolvimento de funções em série.}
+; {REIHE} [SUMSER]
+F02F  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
+F032  11CDEB    LD      DE,#EBCD ; Forja retorno para BMUL {MUL} <FMul> [MULT]
 F035  D5        PUSH    DE
 F036  E5        PUSH    HL
-F037  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE>
-F03A  CDCFEB    CALL    #EBCF
+F037  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
+F03A  CDCFEB    CALL    #EBCF ; {MUL1} [FPMULT]
 F03D  E1        POP     HL
-F03E  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
+; {REIHE1} [SMSER1]
+F03E  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 F041  7E        LD      A,(HL)
 F042  23        INC     HL
-F043  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem>
-F046  06F1      LD      B,#F1
+F043  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
+; O byte abaixo:
+F046  06        DB      #06
+; compõe com a instrução seguinte a instrução
+; F046  06F1      LD      B,#F1
+; , ocultando-a.
+; {REIHE2} [SUMLP]
+F047  F1        POP     AF
+;
 F048  C1        POP     BC
 F049  D1        POP     DE
 F04A  3D        DEC     A
@@ -9209,20 +9277,22 @@ F04C  D5        PUSH    DE
 F04D  C5        PUSH    BC
 F04E  F5        PUSH    AF
 F04F  E5        PUSH    HL
-F050  CDCFEB    CALL    #EBCF
+F050  CDCFEB    CALL    #EBCF ; {MUL1} [FPMULT]
 F053  E1        POP     HL
-F054  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
+F054  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 F057  E5        PUSH    HL
-F058  CD9AEA    CALL    #EA9A ; BCDEPLUSFLOAT
+F058  CD9AEA    CALL    #EA9A ; BCDEPLUSFLOAT {ADD5} [FPADD]
 F05B  E1        POP     HL
-F05C  18E9      JR      #F047           ; (-23)
-; BRND
+F05C  18E9      JR      #F047 ; {REIHE2} [SUMLP]
+
+; BRND:
+; {RND} <Rnd> [RND]
 F05E  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
-F061  211903    LD      HL,#0319
-F064  FABEF0    JP      M,#F0BE
-F067  213A03    LD      HL,#033A
-F06A  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem>
-F06D  211903    LD      HL,#0319
+F061  211903    LD      HL,#0319 ; {RNDVR3} [SEED+2]
+F064  FABEF0    JP      M,#F0BE ; {RND3} [RESEED]
+F067  213A03    LD      HL,#033A ; {RNDVR4} [LSTRND]
+F06A  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
+F06D  211903    LD      HL,#0319 ; {RNDVR3} [SEED+2]
 F070  C8        RET     Z
 F071  86        ADD     A,(HL)
 F072  E607      AND     #07
@@ -9233,22 +9303,23 @@ F078  87        ADD     A,A
 F079  87        ADD     A,A
 F07A  4F        LD      C,A
 F07B  09        ADD     HL,BC
-F07C  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem>
-F07F  CDCFEB    CALL    #EBCF
-F082  3A1803    LD      A,(#0318)
+F07C  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
+F07F  CDCFEB    CALL    #EBCF ; {MUL1} [FPMULT]
+F082  3A1803    LD      A,(#0318) ; {RNDVR2} [SEED+1]
 F085  3C        INC     A
 F086  E603      AND     #03
 F088  0600      LD      B,#00
 F08A  FE01      CP      #01
 F08C  88        ADC     A,B
-F08D  321803    LD      (#0318),A
-F090  21C2F0    LD      HL,#F0C2
+F08D  321803    LD      (#0318),A ; {RNDVR2} [SEED+1]
+F090  21C2F0    LD      HL,#F0C2 ; {RNDL-4} [RNDTAB-4]
 F093  87        ADD     A,A
 F094  87        ADD     A,A
 F095  4F        LD      C,A
 F096  09        ADD     HL,BC
-F097  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT
-F09A  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE>
+F097  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL]
+; {RND1} [RND1]
+F09A  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
 F09D  7B        LD      A,E
 F09E  59        LD      E,C
 F09F  EE4F      XOR     #4F
@@ -9257,64 +9328,73 @@ F0A2  3680      LD      (HL),#80
 F0A4  2B        DEC     HL
 F0A5  46        LD      B,(HL)
 F0A6  3680      LD      (HL),#80
-F0A8  211703    LD      HL,#0317
+F0A8  211703    LD      HL,#0317 ; {RNDVR1} [SEED]
 F0AB  34        INC     (HL)
 F0AC  7E        LD      A,(HL)
-F0AD  D6AB      SUB     #AB
-F0AF  2004      JR      NZ,#F0B5        ; (4)
+F0AD  D6AB      SUB     #AB ; 171
+F0AF  2004      JR      NZ,#F0B5 ; {RND2} [RND2]
 F0B1  77        LD      (HL),A
 F0B2  0C        INC     C
 F0B3  15        DEC     D
 F0B4  1C        INC     E
-F0B5  CDEAEA    CALL    #EAEA
-F0B8  213A03    LD      HL,#033A
+; {RND2} [RND2]
+F0B5  CDEAEA    CALL    #EAEA ; {ADD10} [BNORM]
+F0B8  213A03    LD      HL,#033A ; {RNDVR4} [LSTRND]
 F0BB  C32BED    JP      #ED2B ; HLFLOAT {OPTRAN} <FCopyToMem> [FPTHL]
+
+; {RND3} [RESEED]
 F0BE  77        LD      (HL),A
 F0BF  2B        DEC     HL
 F0C0  77        LD      (HL),A
 F0C1  2B        DEC     HL
 F0C2  77        LD      (HL),A
-F0C3  C39AF0    JP      #F09A
+F0C3  C39AF0    JP      #F09A ; {RND1} [RND1]
+
 ; Dados para cálculo de RND(X).
+; {RNDL} [RNDTAB]
 F0C6  68B14668  DB      #68,#B1,#46,#68 ; 4,62618E-8
 F0CA  99E99269  DB      #99,#E9,#92,#69 ; -6,84115E-8
 F0CE  10D17568  DB      #10,#D1,#75,#68 ; 5,72337E-8
+
 ; BCOS
 ; cos x = sen (x + PI/2)
 F0D2  211CF1    LD      HL,#F11C ; PI/2
-F0D5  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT
+F0D5  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL]
+
 ; BSIN
 ; sen x = x - x^3/3! + x^5/5! - x^7/7! + ...
-F0D8  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
+F0D8  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 F0DB  014983    LD      BC,#8349 ; BCDE <-- 2*PI (6,28319)
 F0DE  11DB0F    LD      DE,#0FDB
-F0E1  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE>
+F0E1  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 F0E4  C1        POP     BC
 F0E5  D1        POP     DE
-F0E6  CD2DEC    CALL    #EC2D ; DIVBCDEFLOAT
-F0E9  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
-F0EC  CDA5ED    CALL    #EDA5
+F0E6  CD2DEC    CALL    #EC2D ; DIVBCDEFLOAT {DIV1} [DVBCDE]
+F0E9  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
+F0EC  CDA5ED    CALL    #EDA5 ; BINT {INT} <Int> [INT]
 F0EF  C1        POP     BC
 F0F0  D1        POP     DE
-F0F1  CD97EA    CALL    #EA97 ; BCDEMINUSFLOAT
+F0F1  CD97EA    CALL    #EA97 ; BCDEMINUSFLOAT {ADD4} [SUBCDE]
 F0F4  2120F1    LD      HL,#F120 ; 1/4
-F0F7  CD91EA    CALL    #EA91 ; HLMINUSFLOAT
+F0F7  CD91EA    CALL    #EA91 ; HLMINUSFLOAT {ADD3} [SUBPHL]
 F0FA  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 F0FD  37        SCF
 F0FE  F208F1    JP      P,#F108
-F101  CD89EA    CALL    #EA89 ; FLOATPLUSHALF
+F101  CD89EA    CALL    #EA89 ; FLOATPLUSHALF {ADD1} <FAddOneHalf> [ROUND]
 F104  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 F107  B7        OR      A
 F108  F5        PUSH    AF
-F109  F4FCEC    CALL    P,#ECFC ; NEGFLOAT {ABS1} <FNegate>
+F109  F4FCEC    CALL    P,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 F10C  2120F1    LD      HL,#F120 ; 1/4
-F10F  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT
+F10F  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL]
 F112  F1        POP     AF
-F113  D4FCEC    CALL    NC,#ECFC ; NEGFLOAT {ABS1} <FNegate>
+F113  D4FCEC    CALL    NC,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 F116  2124F1    LD      HL,#F124
-F119  C32FF0    JP      #F02F
+F119  C32FF0    JP      #F02F ; {REIHE} [SUMSER]
+
 F11C  DB0F4981  DB      #DB,#0F,#49,#81 ; PI/2 (1,5708)
 F120  0000007F  DB      #00,#00,#00,#7F ; 1/4 (0,25)
+
 ; Dados para cálculo de SIN(X).
 F124  05        DB      #05
 F125  BAD71E86  DB      #BA,#D7,#1E,#86 ; 39,7107
@@ -9322,35 +9402,38 @@ F129  64269987  DB      #64,#26,#99,#87 ; -76,575
 F12D  58342387  DB      #58,#34,#23,#87 ; 81,6022
 F131  E05DA586  DB      #E0,#5D,#A5,#86 ; -41,3417
 F135  DA0F4983  DB      #DA,#0F,#49,#83 ; 2*PI (6,28391)
+
 ; BTAN
 ; tg x = sen x / cos x
-F139  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
+F139  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 F13C  CDD8F0    CALL    #F0D8 ; BSIN
 F13F  C1        POP     BC
 F140  E1        POP     HL
-F141  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush>
+F141  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 F144  EB        EX      DE,HL
-F145  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE>
+F145  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 F148  CDD2F0    CALL    #F0D2 ; BCOS
 F14B  C32BEC    JP      #EC2B ; BDIV
+
 ; BATN
 ; arc tg x = x - x^3/3 + x^5/5 - x^7/7 + ...
 F14E  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
-F151  FC7CEF    CALL    M,#EF7C
-F154  FCFCEC    CALL    M,#ECFC ; NEGFLOAT {ABS1} <FNegate>
+F151  FC7CEF    CALL    M,#EF7C ; {EXPO3} [NEGAFT]
+F154  FCFCEC    CALL    M,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 F157  3AC203    LD      A,(#03C2) ; {WRA1+3} <FACCUM+3> [FPEXP]
 F15A  FE81      CP      #81
 F15C  380C      JR      C,#F16A         ; (12)
 F15E  010081    LD      BC,#8100 ; BCDE <-- 1
 F161  51        LD      D,C
 F162  59        LD      E,C
-F163  CD2DEC    CALL    #EC2D ; DIVBCDEFLOAT
-F166  2191EA    LD      HL,#EA91 ; HLMINUSFLOAT
+F163  CD2DEC    CALL    #EC2D ; DIVBCDEFLOAT {DIV1} [DVBCDE]
+F166  2191EA    LD      HL,#EA91 ; HLMINUSFLOAT {ADD3} [SUBPHL]
 F169  E5        PUSH    HL
 F16A  2174F1    LD      HL,#F174
-F16D  CD2FF0    CALL    #F02F
+F16D  CD2FF0    CALL    #F02F ; {REIHE} [SUMSER]
 F170  211CF1    LD      HL,#F11C ; PI/2
 F173  C9        RET
+
 ; Dados para cálculo de ATN(X).
 F174  09        DB      #09
 F175  4AD73B78  DB      #4A,#D7,#3B,#78 ; 0,00286623 (1/17 (0,0588235))
@@ -9362,6 +9445,7 @@ F189  C87F917E  DB      #C8,#7F,#91,#7E ; -0,142089 (-1/7 (-0,142857))
 F18D  E4BB4C7E  DB      #E4,#BB,#4C,#7E ; 0,199936 (1/5 (0,2))
 F191  6CAAAA7F  DB      #6C,#AA,#AA,#7F ; -0,333331 (-1/3 (0,333333))
 F195  00000081  DB      #00,#00,#00,#81 ; 1
+
 ; CHKINVERSE: Checa se está em modo INVERSE.
 ; Caso afirmativo, alterna o 8º bit do
 ; caracter (salvo em caso de caracter de
