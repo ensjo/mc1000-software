@@ -1597,7 +1597,7 @@ C823  CD90C8    CALL    #C890 ; BANK2
 ; Preenche de HL a DE com espaços.
 C826  3620      LD      (HL),#20
 C828  23        INC     HL
-C829  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+C829  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 C82C  C226C8    JP      NZ,#C826
 C82F  CD79C8    CALL    #C879 ; BANK0
 C832  C9        RET
@@ -1935,7 +1935,7 @@ CA3C  C325C9    JP      #C925
 CA3F  2A6301    LD      HL,(#0163) ; DSNAM
 CA42  EB        EX      DE,HL
 CA43  2A5B01    LD      HL,(#015B) ; SNPTR
-CA46  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+CA46  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 CA49  CCFCC0    CALL    Z,#C0FC ; BEEP
 CA4C  CA2FC9    JP      Z,#C92F
 CA4F  CD5BCB    CALL    #CB5B ; CALLUPDBCM
@@ -1952,7 +1952,7 @@ CA5F  C32FC9    JP      #C92F
 CA62  2A5B01    LD      HL,(#015B) ; SNPTR
 CA65  ED5B6501  LD      DE,(#0165) ; DENAM
 CA69  2B        DEC     HL
-CA6A  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+CA6A  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 CA6D  CCFCC0    CALL    Z,#C0FC ; BEEP
 CA70  CA2FC9    JP      Z,#C92F
 CA73  CD5BCB    CALL    #CB5B ; CALLUPDBCM
@@ -2000,7 +2000,7 @@ CAB4  ED5B1301  LD      DE,(#0113) ; DLNG
 CAB8  19        ADD     HL,DE
 CAB9  EB        EX      DE,HL
 CABA  2A5B01    LD      HL,(#015B) ; SNPTR
-CABD  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+CABD  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 CAC0  DCFCC0    CALL    C,#C0FC ; BEEP
 CAC3  DA2FC9    JP      C,#C92F
  
@@ -2022,7 +2022,7 @@ CADC  C325C9    JP      #C925
 ; Impressão de caracter de controle #7F (RUBOUT).
 CADF  ED5B6301  LD      DE,(#0163) ; DSNAM
 CAE3  2A5B01    LD      HL,(#015B) ; SNPTR
-CAE6  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+CAE6  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 CAE9  CA2FC9    JP      Z,#C92F
 CAEC  CD11CB    CALL    #CB11
 CAEF  2A5B01    LD      HL,(#015B) ; SNPTR
@@ -2745,7 +2745,7 @@ CE8F  77        LD      (HL),A
 CE90  23        INC     HL
 CE91  220901    LD      (#0109),HL ; RCRDPT
 CE94  C9        RET
- 
+
 ; BAS8K:
 ; Inicializa algumas variáveis do BASIC e do sistema.
 ; (Inicializações próprias do BASIC do MC-1000,
@@ -2764,7 +2764,7 @@ CEAE  325303    LD      (#0353),A
 CEB1  CDCEC7    CALL    #C7CE ; ISCN
 CEB4  CDFCC0    CALL    #C0FC ; BEEP
 CEB7  C3D6CE    JP      #CED6 ; BAENT0
- 
+
 ; Inicializa som (silêncio).
 CEBA  AF        XOR     A
 CEBB  327201    LD      (#0172),A ; TONEA
@@ -2781,7 +2781,7 @@ CED0  D320      OUT     (#20),A ; REG
 CED2  AF        XOR     A
 CED3  D360      OUT     (#60),A ; WR
 CED5  C9        RET
- 
+
 ; BAENT0 : Início CCE BASIC.
 ; Copia o bloco de dados em (#D792~#D7DF) (tabela de inicialização)
 ; para (#0300~#034D) (área de trabalho).
@@ -2804,7 +2804,7 @@ CEF2  CDFDC2    CALL    #C2FD ; FINDRAMTOP [MLOOP]
 CEF5  1100FF    LD      DE,#FF00 ; -256=-#0100
 CEF8  19        ADD     HL,DE ; HL
 CEF9  112C03    LD      DE,#032C
-CEFC  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+CEFC  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 CEFF  DA3ED8    JP      C,#D83E ; FMERRO
 CF02  1100FE    LD      DE,#FE00 ; -512=-#0200
 CF05  229203    LD      (#0392),HL ; topo da RAM - #0100 {MEMSIZ} [LSTRAM]
@@ -2833,7 +2833,7 @@ CF2D  315103    LD      SP,#0351 ; {INPBUF+6} [STACK] ; Pilha temporária.
 ; [BRKRET]:
 CF30  CDC7D9    CALL    #D9C7 ; {INITR} <ResetStack> [CLREG]
 CF33  C38DD8    JP      #D88D ; {EDIT} [PRNTOK] ; Obtém linha de comando.
- 
+
 ; BWIDTH
 ; {WIDTH} [WIDTH]
 CF36  2B        DEC     HL
@@ -2841,7 +2841,7 @@ CF37  CD96E9    CALL    #E996 ; {ARGVAL} <GetSubscript> [FNDNUM]
 CF3A  324203    LD      (#0342),A ; {LINLEN} [LWIDTH]
 CF3D  324303    LD      (#0343),A ; {PRLISI} [COMMAN]
 CF40  C9        RET
- 
+
 ;
 CF41  F5        PUSH    AF
 CF42  2B        DEC     HL
@@ -2859,7 +2859,7 @@ CF53  29        ADD     HL,HL
 CF54  29        ADD     HL,HL
 CF55  29        ADD     HL,HL
 CF56  C9        RET
- 
+
 ;
 CF57  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 CF5A  2C        DB      ','
@@ -2875,107 +2875,107 @@ CF69  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
 CF6C  2F        CPL
 CF6D  3C        INC     A
 CF6E  C9        RET
- 
+
 ;
 CF6F  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 CF72  2C        DB      ','
 CF73  C399E9    JP      #E999 ; {ARGVL1} [GETINT]
- 
+
 ; Lê os três parâmetros de TEMPO
 ; e SOUND: B, C, A.
-CF76 CD99E9 CALL #E999 ; {ARGVL1} [GETINT]
-CF79 47 LD B,A
-CF7A C5 PUSH BC
-CF7B CD11DC CALL #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
-CF7E 2C DB ','
-CF7F CD99E9 CALL #E999 ; {ARGVL1} [GETINT]
-CF82 C1 POP BC
-CF83 4F LD C,A
-CF84 C5 PUSH BC
-CF85 CD11DC CALL #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
-CF88 2C DB ','
-CF89 CD99E9 CALL #E999 ; {ARGVL1} [GETINT]
+CF76  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
+CF79  47        LD      B,A
+CF7A  C5        PUSH    BC
+CF7B  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
+CF7E  2C        DB      ','
+CF7F  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
+CF82  C1        POP     BC
+CF83  4F        LD      C,A
+CF84  C5        PUSH    BC
+CF85  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
+CF88  2C        DB      ','
+CF89  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
 ; Checa valor do canal (1~3).
-CF8C FE01 CP #01
-CF8E DAF6DE JP C,#DEF6 ; PIERRO {FCER} [FCERR]
-CF91 FE04 CP #04
-CF93 D2F6DE JP NC,#DEF6 ; PIERRO {FCER} [FCERR]
-CF96 FE02 CP #02
-CF98 C1 POP BC
-CF99 C9 RET
+CF8C  FE01      CP      #01
+CF8E  DAF6DE    JP      C,#DEF6 ; PIERRO {FCER} [FCERR]
+CF91  FE04      CP      #04
+CF93  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+CF96  FE02      CP      #02
+CF98  C1        POP     BC
+CF99  C9        RET
  
 ; BTEMPO
-CF9A C8 RET Z
+CF9A  C8        RET     Z
 ; Pega os três parâmetros.
-CF9B CD76CF CALL #CF76
+CF9B  CD76CF    CALL    #CF76
 ; Checa 2º parâmetro (0~3).
-CF9E F5 PUSH AF
-CF9F 79 LD A,C
-CFA0 FE00 CP #00
-CFA2 DAF6DE JP C,#DEF6 ; PIERRO {FCER} [FCERR]
-CFA5 FE04 CP #04
-CFA7 D2F6DE JP NC,#DEF6 ; PIERRO {FCER} [FCERR]
-CFAA F1 POP AF
+CF9E  F5        PUSH    AF
+CF9F  79        LD      A,C
+CFA0  FE00      CP      #00
+CFA2  DAF6DE    JP      C,#DEF6 ; PIERRO {FCER} [FCERR]
+CFA5  FE04      CP      #04
+CFA7  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+CFAA  F1        POP     AF
 ; Forja retorno.
-CFAB 11BACE LD DE,#CEBA
-CFAE D5 PUSH DE
+CFAB  11BACE    LD      DE,#CEBA
+CFAE  D5        PUSH    DE
 ;
-CFAF 3814 JR C,#CFC5 ; (20)
-CFB1 2809 JR Z,#CFBC ; (9)
+CFAF  3814      JR      C,#CFC5 ; (20)
+CFB1  2809      JR      Z,#CFBC ; (9)
 ; Canal 3.
-CFB3 78 LD A,B
-CFB4 327B01 LD (#017B),A
-CFB7 79 LD A,C
-CFB8 324B01 LD (#014B),A ; CVALUE
-CFBB C9 RET
+CFB3  78        LD      A,B
+CFB4  327B01    LD      (#017B),A
+CFB7  79        LD      A,C
+CFB8  324B01    LD      (#014B),A ; CVALUE
+CFBB  C9        RET
 ; Canal 2.
-CFBC 78 LD A,B
-CFBD 327501 LD (#0175),A
-CFC0 79 LD A,C
-CFC1 324201 LD (#0142),A ; BVALUE
-CFC4 C9 RET
+CFBC  78        LD      A,B
+CFBD  327501    LD      (#0175),A
+CFC0  79        LD      A,C
+CFC1  324201    LD      (#0142),A ; BVALUE
+CFC4  C9        RET
 ; Canal 1.
-CFC5 78 LD A,B
-CFC6 326F01 LD (#016F),A
-CFC9 79 LD A,C
-CFCA 323901 LD (#0139),A ; AVALUE
-CFCD C9 RET
- 
+CFC5  78        LD      A,B
+CFC6  326F01    LD      (#016F),A
+CFC9  79        LD      A,C
+CFCA  323901    LD      (#0139),A ; AVALUE
+CFCD  C9        RET
+
 ; BSOUND
-CFCE C8 RET Z
-CFCF E5 PUSH HL
-CFD0 3A0100 LD A,(#0001)
-CFD3 B7 OR A
-CFD4 2007 JR NZ,#CFDD ; (7)
-CFD6 3C INC A
-CFD7 320100 LD (#0001),A
-CFDA CDE1C1 CALL #C1E1
-CFDD E1 POP HL
-CFDE CD76CF CALL #CF76
-CFE1 3820 JR C,#D003 ; (32)
-CFE3 280F JR Z,#CFF4 ; (15)
+CFCE  C8        RET Z
+CFCF  E5        PUSH    HL
+CFD0  3A0100    LD      A,(#0001)
+CFD3  B7        OR      A
+CFD4  2007      JR      NZ,#CFDD ; (7)
+CFD6  3C        INC     A
+CFD7  320100    LD      (#0001),A
+CFDA  CDE1C1    CALL    #C1E1
+CFDD  E1        POP     HL
+CFDE  CD76CF    CALL    #CF76
+CFE1  3820      JR      C,#D003 ; (32)
+CFE3  280F      JR      Z,#CFF4 ; (15)
 ; Canal 3.
 ; Espera acabar a nota anterior.
-CFE5 3A7E01 LD A,(#017E) ; TONEC
-CFE8 B7 OR A
-CFE9 20FA JR NZ,#CFE5 ; (-6)
+CFE5  3A7E01    LD      A,(#017E) ; TONEC
+CFE8  B7        OR      A
+CFE9  20FA      JR      NZ,#CFE5 ; (-6)
 ; Armazena nota e duração.
-CFEB 78 LD A,B
-CFEC 327D01 LD (#017D),A
-CFEF 79 LD A,C
-CFF0 327E01 LD (#017E),A ; TONEC
-CFF3 C9 RET
+CFEB  78        LD      A,B
+CFEC  327D01    LD      (#017D),A
+CFEF  79        LD      A,C
+CFF0  327E01    LD      (#017E),A ; TONEC
+CFF3  C9        RET
 ; Canal 2.
 ; Espera acabar a nota anterior.
-CFF4 3A7801 LD A,(#0178) ; TONEB
-CFF7 B7 OR A
-CFF8 20FA JR NZ,#CFF4 ; (-6)
+CFF4  3A7801    LD      A,(#0178) ; TONEB
+CFF7  B7        OR      A
+CFF8  20FA      JR      NZ,#CFF4 ; (-6)
 ; Armazena nota e duração.
-CFFA 78 LD A,B
-CFFB 327701 LD (#0177),A
-CFFE 79 LD A,C
-CFFF 327801 LD (#0178),A ; TONEB
-D002 C9 RET
+CFFA  78        LD      A,B
+CFFB  327701    LD      (#0177),A
+CFFE  79        LD      A,C
+CFFF  327801    LD      (#0178),A ; TONEB
+D002  C9 RET
 
 ; Canal 1.
 ; Espera acabar a nota anterior.
@@ -3247,7 +3247,7 @@ D193  79        LD      A,C
 D194  28E8      JR      Z,#D17E         ; (-24)
 D196  F5        PUSH    AF
 D197  D5        PUSH    DE
-D198  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D198  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D19B  201C      JR      NZ,#D1B9        ; (28)
 D19D  E5        PUSH    HL
 D19E  D1        POP     DE
@@ -3264,7 +3264,7 @@ D1AC  7E        LD      A,(HL)
 D1AD  23        INC     HL
 D1AE  77        LD      (HL),A
 D1AF  2B        DEC     HL
-D1B0  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D1B0  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D1B3  2803      JR      Z,#D1B8         ; (3)
 D1B5  2B        DEC     HL
 D1B6  18F4      JR      #D1AC           ; (-12)
@@ -3787,7 +3787,7 @@ D472  110098    LD      DE,#9800
 D475  CD86C8    CALL    #C886 ; BANK1
 D478  3620      LD      (HL),#20
 D47A  23        INC     HL
-D47B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D47B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D47E  C278D4    JP      NZ,#D478
 D481  CD79C8    CALL    #C879 ; BANK0
 ; Habilita hook para intermitência
@@ -3857,7 +3857,7 @@ D4E1  210080    LD      HL,#8000
 D4E4  110098    LD      DE,#9800
 D4E7  3600      LD      (HL),#00
 D4E9  23        INC     HL
-D4EA  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D4EA  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D4ED  C2E7D4    JP      NZ,#D4E7
 D4F0  CD79C8    CALL    #C879 ; BANK0
 D4F3  D1        POP     DE
@@ -4316,7 +4316,7 @@ D806  B3        OR      E
 D807  EB        EX      DE,HL
 D808  2804      JR      Z,#D80E         ; (4)
 D80A  EB        EX      DE,HL
-D80B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D80B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 ; {FORSR2}
 D80E  010D00    LD      BC,#000D ; +13
 D811  E1        POP     HL
@@ -4344,7 +4344,7 @@ D81B  C1        POP     BC
 ; {LININ2} <CopyMemLoop>
 ; Copia de HL para BC, decrementando-os,
 ; até que HL = DE.
-D81C  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D81C  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D81F  7E        LD      A,(HL)
 D820  02        LD      (BC),A
 D821  C8        RET     Z
@@ -4424,7 +4424,7 @@ D876  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 ; Pula se erro ao entrar na área de RAM durante a partida fria.(?)
 D879  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
 D87C  11FEFF    LD      DE,#FFFE
-D87F  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D87F  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D882  CA95CE    JP      Z,#CE95 ; {PRIST1}
 D885  7C        LD      A,H
 D886  A5        AND     L
@@ -4485,7 +4485,7 @@ D8CE  220002    LD      (#0200),HL ; {INPBUF} <LINE_BUFFER> [BUFFER]
 ; Ultrapassou o número de linha final? Desativa AUTO.
 D8D1  EB        EX      DE,HL
 D8D2  2A5E03    LD      HL,(#035E)
-D8D5  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D8D5  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D8D8  381C      JR      C,#D8F6 ; {LIN2} ; (28)
 ; Imprime o número de linha.
 D8DA  EB        EX      DE,HL
@@ -4556,7 +4556,7 @@ D934  1A        LD      A,(DE)
 D935  02        LD      (BC),A
 D936  03        INC     BC
 D937  13        INC     DE
-D938  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D938  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D93B  20F7      JR      NZ,#D934 ; {LIN7} <RemoveProgramLine+4> [SFTPRG]
 D93D  60        LD      H,B ; Atualiza o endereço do fim do programa.
 D93E  69        LD      L,C
@@ -4640,7 +4640,7 @@ D98E  7E        LD      A,(HL)
 D98F  23        INC     HL
 D990  66        LD      H,(HL)
 D991  6F        LD      L,A
-D992  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+D992  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D995  60        LD      H,B ; HL = início da linha atual.
 D996  69        LD      L,C
 D997  7E        LD      A,(HL) ; HL = endereço da próxima linha.
@@ -5114,7 +5114,7 @@ DC07  F1        POP     AF
 DC08  C32ADB    JP      #DB2A
 ;
 ; RHLDE: Simula "CP HL,DE".
-; {CPREG} <CompareHLDE>
+; {CPREG} <CompareHLDE> [CPDEHL]
 DC0B  7C        LD      A,H
 DC0C  92        SUB     D
 DC0D  C0        RET     NZ
@@ -5228,7 +5228,7 @@ DC8F  23        INC     HL
 DC90  56        LD      D,(HL)
 DC91  E5        PUSH    HL
 DC92  2A5E03    LD      HL,(#035E)
-DC95  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+DC95  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 DC98  E1        POP     HL
 DC99  3004      JR      NC,#DC9F        ; (4)
 DC9B  C1        POP     BC
@@ -5669,7 +5669,7 @@ DF04  F5        PUSH    AF
 ; Se for produzir um número maior do que
 ; 65535, produz "SN ERRO".
 DF05  219919    LD      HL,#1999 ; 6553
-DF08  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+DF08  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 DF0B  DA48D8    JP      C,#D848 ; SNERRO
 ; DE = DE * 10 + (A - #30).
 DF0E  62        LD      H,D
@@ -5716,7 +5716,7 @@ DF4A  E5        PUSH    HL
 DF4B  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND]
 DF4E  012800    LD      BC,#0028
 DF51  09        ADD     HL,BC
-DF52  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+DF52  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 DF55  D23ED8    JP      NC,#D83E ; FMERRO
 DF58  EB        EX      DE,HL
 DF59  224503    LD      (#0345),HL ; {STDPTR} <STACK_TOP> [STRSPC]
@@ -5750,7 +5750,7 @@ DF80  CDFBDE    CALL    #DEFB ; {DCHEX} <LineNumberFromStr> [ATOH]
 DF83  CDC4DF    CALL    #DFC4 ; BREM
 DF86  E5        PUSH    HL
 DF87  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
-DF8A  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+DF8A  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 DF8D  E1        POP     HL
 DF8E  23        INC     HL
 DF8F  DC85D9    CALL    C,#D985
@@ -5816,25 +5816,25 @@ DFD1  FE22      CP      '"'
 DFD3  28F3      JR      Z,#DFC8         ; (-13)
 DFD5  18F4      JR      #DFCB           ; (-12)
 ;
-; BLET
+; BLET:
 ;
 ; Interpreta nome da variável/matriz
 ; e obtém o endereço dos quatro bytes
 ; de armazenamento em DE.
-DFD7  CD84E4    CALL    #E484 ; {DIM1} <GetVar> [GETVAR]
+DFD7  CD84E4    CALL    #E484 ; {DIM1} <GetVar> [GETVAR] ; Lê nome da variável e obtém seu endereço.
 ; Passa pelo sinal de igual.
 DFDA  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 DFDD  C6        DB      #C6 ; token "="
 ;
-DFDE  D5        PUSH    DE
+DFDE  D5        PUSH    DE ; Preserva endereço do conteúdo da variável.
 DFDF  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
-DFE2  F5        PUSH    AF
+DFE2  F5        PUSH    AF ; Preserva tipo da variável.
 ; Avalia a expressão.
 DFE3  CDD0E2    CALL    #E2D0 ; EVAL {SNALY} <EvalExpression> [EVAL]
 ;
-DFE6  F1        POP     AF
-DFE7  E3        EX      (SP),HL
-DFE8  22AF03    LD      (#03AF),HL ; {CUSTMT} <PROG_PTR_TEMP> [BRKLIN]
+DFE6  F1        POP     AF ; Restaura tipo da variável.
+DFE7  E3        EX      (SP),HL ; Restaura endereço do conteúdo da variável e preserva ponteiro de execução do BASIC.
+DFE8  22AF03    LD      (#03AF),HL ; {CUSTMT} <PROG_PTR_TEMP> [BRKLIN] ; Preserva endereço do conteúdo da variável.
 ; Compara tipo da variável com o
 ; tipo do resultado da expressão.
 ; (PI ERRO se diferentes.)
@@ -5842,34 +5842,42 @@ DFEB  1F        RRA
 DFEC  CDC1E2    CALL    #E2C1 ; {SNALY5} [CHKTYP]
 ; Desvia se forem numéricos.
 DFEF  CA27E0    JP      Z,#E027 ; {LET4} [LETNUM]
+
 ; Trata atribuição de string.
 ; {LET1} [LETSTR]
-DFF2  E5        PUSH    HL
-DFF3  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
-DFF6  E5        PUSH    HL
+DFF2  E5        PUSH    HL ; Preserva endereço do conteúdo da variável.
+DFF3  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] ; Endereço do registro temporário na pilha.
+DFF6  E5        PUSH    HL ; Preserva.
 DFF7  23        INC     HL
 DFF8  23        INC     HL
-DFF9  5E        LD      E,(HL)
+DFF9  5E        LD      E,(HL) ; DE = endereço do conteúdo da string.
 DFFA  23        INC     HL
 DFFB  56        LD      D,(HL)
-DFFC  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT]
-DFFF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
-E002  3012      JR      NC,#E016        ; (18)
-E004  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC]
-E007  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
-E00A  D1        POP     DE
-E00B  3011      JR      NC,#E01E        ; (17)
-E00D  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND]
-E010  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
-E013  3009      JR      NC,#E01E        ; (9)
-E015  3ED1      LD      A,#D1
-E017  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP]
-E01A  EB        EX      DE,HL
-E01B  CDD1E6    CALL    #E6D1 ; {STR_1} [SAVSTR]
-E01E  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP]
-E021  E1        POP     HL
-E022  CD2EED    CALL    #ED2E ; LD4HLDE {OPTRN1}
-E025  E1        POP     HL
+DFFC  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT] ; Endereço de início do programa BASIC.
+DFFF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O conteúdo da string se situa antes do programa? (No buffer de linha?)
+E002  3012      JR      NC,#E016 ; {LET2} [CRESTR] ; Sim: cria registro de string.
+E004  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC] ; Início da área de strings.
+E007  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O conteúdo da string se situa na área do programa BASIC (literal string)?
+E00A  D1        POP     DE ; Restaura endereço do registro de string.
+E00B  3011      JR      NC,#E01E ; {LET3} [MVSTPT] ; Sim: configura ponteiro.
+E00D  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND] ; Endereço do início da área de variáveis logo após o programa BASIC.
+E010  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O registro da string se situa antes da área de variáveis (é temporário)?
+E013  3009      JR      NC,#E01E ; {LET3} [MVSTPT] ; Sim: configura ponteiro.
+; O byte seguinte:
+E015  3E        DB      #3E
+; compõe uma instrução de dois bytes (LD A,#D1),
+; ocultando a instrução seguinte:
+; {LET2} [CRESTR]
+E016  D1        POP     DE ; Restaura endereço do registro de string.
+;
+E017  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; [Back to last tmp-str entry]
+E01A  EB        EX      DE,HL ; Endereço do registro de string.
+E01B  CDD1E6    CALL    #E6D1 ; {STR_1} [SAVSTR] ; Salva string na área de strings.
+; {LET3} [MVSTPT]
+E01E  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; Back to last tmp-str entry]
+E021  E1        POP     HL ; Restaura ponteiro para o registro da string.
+E022  CD2EED    CALL    #ED2E ; LD4HLDE {OPTRN1} ; Move o registro para a variável.
+E025  E1        POP     HL ; Restaura o ponteiro de execução do programa BASIC.
 E026  C9        RET
 
 ; Trata atribuição de numérico.
@@ -6715,7 +6723,7 @@ E4CC  2AB903    LD      HL,(#03B9) ; {DVARPT} <VAR_ARRAY_BASE> [VAREND]
 E4CF  EB        EX      DE,HL
 ; HL = início da área de variáveis.
 E4D0  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND]
-E4D3  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E4D3  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E4D6  2810      JR      Z,#E4E8         ; (16)
 E4D8  79        LD      A,C
 E4D9  96        SUB     (HL)
@@ -6739,7 +6747,7 @@ E4E8  E1        POP     HL
 E4E9  E3        EX      (SP),HL
 E4EA  D5        PUSH    DE
 E4EB  1195E3    LD      DE,#E395
-E4EE  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E4EE  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E4F1  D1        POP     DE
 E4F2  2829      JR      Z,#E51D ; RSTFLOAT
 E4F4  E3        EX      (SP),HL
@@ -6765,7 +6773,7 @@ E50A  22B903    LD      (#03B9),HL ; {DVARPT} <VAR_ARRAY_BASE> [VAREND]
 ; Zera o novo descritor.
 E50D  2B        DEC     HL
 E50E  3600      LD      (HL),#00
-E510  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E510  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E513  20F8      JR      NZ,#E50D        ; (-8)
 ; Armazena o nome da variável.
 E515  D1        POP     DE
@@ -6834,7 +6842,7 @@ E556  EB        EX      DE,HL
 E557  2ABB03    LD      HL,(#03BB) ; {FSLPTR} <VAR_TOP> [ARREND]
 E55A  EB        EX      DE,HL
 ; Desvia se HL chegou ao fim da área de matrizes.
-E55B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E55B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E55E  2824      JR      Z,#E584         ; (36)
 ; Encontramos a matriz procurada (nome em BC)?
 E560  7E        LD      A,(HL)
@@ -6911,7 +6919,7 @@ E5BD  CD30D8    CALL    #D830
 E5C0  22BB03    LD      (#03BB),HL ; {FSLPTR} <VAR_TOP> [ARREND]
 E5C3  2B        DEC     HL
 E5C4  3600      LD      (HL),#00
-E5C6  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E5C6  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E5C9  20F8      JR      NZ,#E5C3        ; (-8)
 E5CB  03        INC     BC
 E5CC  57        LD      D,A
@@ -6941,7 +6949,7 @@ E5E6  56        LD      D,(HL)
 E5E7  23        INC     HL
 E5E8  E3        EX      (SP),HL
 E5E9  F5        PUSH    AF
-E5EA  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E5EA  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E5ED  D27FE5    JP      NC,#E57F ; IIERRO {BSER}
 E5F0  E5        PUSH    HL
 E5F1  CDBEED    CALL    #EDBE
@@ -7045,7 +7053,7 @@ E674  7E        LD      A,(HL)
 E675  23        INC     HL
 E676  66        LD      H,(HL)
 E677  6F        LD      L,A
-E678  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E678  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E67B  CA54D8    JP      Z,#D854 ; FIERRO
 E67E  4E        LD      C,(HL)
 E67F  23        INC     HL
@@ -7218,7 +7226,7 @@ E71F  329003    LD      (#0390),A ; {DATYPE} [TYPE]
 E722  CD2EED    CALL    #ED2E ; LD4HLDE {OPTRN1}
 ; Se HL e DE são iguais, significa que a área para strings
 ; temporárias já está repleta. Gerar erro "CC" adiante.
-E725  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E725  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 ; Atualiza ponteiro.
 E728  229403    LD      (#0394),HL ; {SPTPTR} [TMSTPT]
 E72B  E1        POP     HL ; Restaura ponteiro de interpretação.
@@ -7273,7 +7281,7 @@ E759  06FF      LD      B,#FF
 E75B  09        ADD     HL,BC
 E75C  23        INC     HL
 ; Desvia se HL < DE.
-E75D  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E75D  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E760  3807      JR      C,#E769 ; {STROP3} [TESTOS] ; Faz coleta de lixo se ainda não tiver sido feita, senão ?FC ERRO.
 ; Atualiza ponto atual da área de strings.
 E762  22A603    LD      (#03A6),HL ; {SWAPTR} [STRBOT]
@@ -7303,14 +7311,14 @@ E783  219603    LD      HL,#0396 ; {LSPTBG} [TMSTPL]
 E786  EB        EX      DE,HL
 E787  2A9403    LD      HL,(#0394) ; {SPTPTR} [TMSTPT]
 E78A  EB        EX      DE,HL
-E78B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E78B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E78E  0186E7    LD      BC,#E786
 E791  2042      JR      NZ,#E7D5        ; (66)
 E793  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND]
 E796  EB        EX      DE,HL
 E797  2AB903    LD      HL,(#03B9) ; {DVARPT} <VAR_ARRAY_BASE> [VAREND]
 E79A  EB        EX      DE,HL
-E79B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E79B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E79E  280A      JR      Z,#E7AA         ; (10)
 E7A0  7E        LD      A,(HL)
 E7A1  23        INC     HL
@@ -7322,7 +7330,7 @@ E7A9  C1        POP     BC
 E7AA  EB        EX      DE,HL
 E7AB  2ABB03    LD      HL,(#03BB) ; {FSLPTR} <VAR_TOP> [ARREND]
 E7AE  EB        EX      DE,HL
-E7AF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E7AF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E7B2  284A      JR      Z,#E7FE         ; (74)
 E7B4  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E7B7  7B        LD      A,E
@@ -7340,7 +7348,7 @@ E7C7  23        INC     HL
 E7C8  EB        EX      DE,HL
 E7C9  2AA803    LD      HL,(#03A8) ; {LBYTEX} [CUROPR]
 E7CC  EB        EX      DE,HL
-E7CD  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E7CD  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E7D0  28D8      JR      Z,#E7AA         ; (-40)
 E7D2  01C8E7    LD      BC,#E7C8
 E7D5  C5        PUSH    BC
@@ -7358,13 +7366,13 @@ E7E1  C8        RET     Z
 E7E2  44        LD      B,H
 E7E3  4D        LD      C,L
 E7E4  2AA603    LD      HL,(#03A6) ; {SWAPTR} [STRBOT]
-E7E7  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E7E7  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E7EA  60        LD      H,B
 E7EB  69        LD      L,C
 E7EC  D8        RET     C
 E7ED  E1        POP     HL
 E7EE  E3        EX      (SP),HL
-E7EF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E7EF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E7F2  E3        EX      (SP),HL
 E7F3  E5        PUSH    HL
 E7F4  60        LD      H,B
@@ -7478,7 +7486,7 @@ E87A  59        LD      E,C
 E87B  1B        DEC     DE
 E87C  4E        LD      C,(HL)
 E87D  2AA603    LD      HL,(#03A6) ; {SWAPTR} [STRBOT]
-E880  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE>
+E880  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E883  2005      JR      NZ,#E88A ; {STRZS4} [POPHL]
 E885  47        LD      B,A
 E886  09        ADD     HL,BC
@@ -7501,8 +7509,8 @@ E890  46        LD      B,(HL) ; BC = Endereço do conteúdo da última string t
 E891  2B        DEC     HL
 E892  4E        LD      C,(HL)
 E893  2B        DEC     HL
-E894  2B        DEC     HL ; 
-E895  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> ; DE aponta para este último registro?
+E894  2B        DEC     HL ; HL = endereço do último registro temporário na pilha.
+E895  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; DE aponta para este último registro?
 E898  C0        RET     NZ ; Sim
 E899  229403    LD      (#0394),HL ; {SPTPTR} [TMSTPT]
 E89C  C9        RET
