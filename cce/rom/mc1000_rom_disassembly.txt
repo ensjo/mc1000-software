@@ -5846,23 +5846,26 @@ DFEF  CA27E0    JP      Z,#E027 ; {LET4} [LETNUM]
 ; Trata atribuição de string.
 ; {LET1} [LETSTR]
 DFF2  E5        PUSH    HL ; Preserva endereço do conteúdo da variável.
-DFF3  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] ; Endereço do registro temporário na pilha.
+DFF3  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] ; Endereço do registro temporário na pilha (resultado da expressão).
 DFF6  E5        PUSH    HL ; Preserva.
 DFF7  23        INC     HL
 DFF8  23        INC     HL
 DFF9  5E        LD      E,(HL) ; DE = endereço do conteúdo da string.
 DFFA  23        INC     HL
 DFFB  56        LD      D,(HL)
+; Onde está o conteúdo da string?
 DFFC  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT] ; Endereço de início do programa BASIC.
 DFFF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O conteúdo da string se situa antes do programa? (No buffer de linha?)
 E002  3012      JR      NC,#E016 ; {LET2} [CRESTR] ; Sim: cria registro de string.
 E004  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC] ; Início da área de strings.
 E007  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O conteúdo da string se situa na área do programa BASIC (literal string)?
 E00A  D1        POP     DE ; Restaura endereço do registro de string.
-E00B  3011      JR      NC,#E01E ; {LET3} [MVSTPT] ; Sim: configura ponteiro.
+E00B  3011      JR      NC,#E01E ; {LET3} [MVSTPT] ; Sim: apenas configura ponteiro.
+; O conteúdo da string está na área de strings.
+; Onde está o registro da string? 
 E00D  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND] ; Endereço do início da área de variáveis logo após o programa BASIC.
 E010  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O registro da string se situa antes da área de variáveis (é temporário)?
-E013  3009      JR      NC,#E01E ; {LET3} [MVSTPT] ; Sim: configura ponteiro.
+E013  3009      JR      NC,#E01E ; {LET3} [MVSTPT] ; Sim: apenas configura ponteiro.
 ; O byte seguinte:
 E015  3E        DB      #3E
 ; compõe uma instrução de dois bytes (LD A,#D1),
@@ -5874,7 +5877,7 @@ E017  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; [Back to last tmp-str entry]
 E01A  EB        EX      DE,HL ; Endereço do registro de string.
 E01B  CDD1E6    CALL    #E6D1 ; {STR_1} [SAVSTR] ; Salva string na área de strings.
 ; {LET3} [MVSTPT]
-E01E  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; Back to last tmp-str entry]
+E01E  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; [Back to last tmp-str entry]
 E021  E1        POP     HL ; Restaura ponteiro para o registro da string.
 E022  CD2EED    CALL    #ED2E ; LD4HLDE {OPTRN1} ; Move o registro para a variável.
 E025  E1        POP     HL ; Restaura o ponteiro de execução do programa BASIC.
@@ -6999,25 +7002,25 @@ E626  AF        XOR     A
 E627  329003    LD      (#0390),A ; {DATYPE} [TYPE]
 E62A  0698      LD      B,#80+24 ; 24 bits.
 E62C  C3EAEC    JP      #ECEA ; FLOATBADE {SGN1} <FCharToFloat+5> [RETINT]
- 
-; FLOATAC
+
+; FLOATAC:
 E62F  41        LD      B,C
-; FLOATAB
+; FLOATAB:
 E630  50        LD      D,B
 E631  1E00      LD      E,#00
 E633  219003    LD      HL,#0390 ; {DATYPE} [TYPE]
 E636  73        LD      (HL),E
 E637  0690      LD      B,#80+16 ; 16 bits.
 E639  C3EAEC    JP      #ECEA ; FLOATBADE {SGN1} <FCharToFloat+5> [RETINT]
- 
-; BPOS
+
+; BPOS:
 E63C  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
 ; FLOATA
 E63F  47        LD      B,A
 E640  AF        XOR     A
 E641  18ED      JR      #E630 ; FLOATAB           ; (-19)
- 
-; BDEF
+
+; BDEF:
 E643  CDB0E6    CALL    #E6B0
 ; Previne uso em modo direto.
 E646  CDA2E6    CALL    #E6A2 ; [IDTEST]
@@ -7138,6 +7141,7 @@ E6E5  C9        RET
 ; um registro de string para essa área.
 ; No final HL = #03A2, DE = endereço do conteúdo da string.
 E6E6  CD4CE7    CALL    #E74C ; ALOCA {STROP} [TESTR]
+
 ; Cria em #03A2 {STRDAT} [TMPSTR] um registro de string para a
 ; string de comprimento A apontada por DE.
 ; {SADTB1} [CRTMST]
