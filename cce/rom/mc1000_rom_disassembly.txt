@@ -17,6 +17,8 @@
 ; 3. Listagem do interpretador NASCOM ROM BASIC (8KB), de 1978:
 ;    http://www.nascomhomepage.com/lang/8kbasic.asm
 ;    Estes serão indicados entre colchetes [].
+; 4. Código-fonte original do Microsoft BASIC para 6502 (1978):
+;    https://github.com/brajeshwar/Microsoft-BASIC-for-6502-Original-Source-Code-1978/blob/master/M6502.MAC.txt
 
 
 C000  C363C0    JP      #C063 ; ST: Partida a frio
