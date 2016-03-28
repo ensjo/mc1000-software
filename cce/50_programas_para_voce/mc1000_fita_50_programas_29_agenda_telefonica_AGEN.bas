@@ -1,5 +1,5 @@
 0  REM ************************
-1  REM **     ÿ- CCESOFT -   **
+1  REM **     ~FF- CCESOFT -   **
 2  REM **  FELIPE ABRAMVEZT  **
 3  REM ** VERSAO 1.1 MAIO/85 **
 4  REM ************************

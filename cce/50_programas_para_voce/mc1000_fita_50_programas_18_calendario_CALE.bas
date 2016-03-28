@@ -1,10 +1,4 @@
-0  REM ************************
-1  REM *     - CCESOFT -      *
-2  REM *OTTO LONGO SERNATINGER*
-3  REM *  VERSAO 1.1   05/85  *
-4  REM ************************
-5  REM *      CALENDARIO      *
-6  REM ************************
+0  REM ************************ 1  REM *     - CCESOFT -      * 2  REM *OTTO LONGO SERNATINGER* 3  REM *  VERSAO 1.1   05/85  * 4  REM ************************ 5  REM *      CALENDARIO      * 6  REM ************************
 2  HOME : PRINT : PRINT  TAB( 11)"- CCESOFT -": PRINT : PRINT  TAB( 13)"ATENCAO": PRINT : PRINT  TAB( 7)"ESTE PROGRAMA SUPOE": PRINT  TAB( 8)"QUE VOCE ENTRARA'": PRINT  TAB( 8)"COM DATAS VALIDAS"
 3  FOR A = 1 TO 1500: NEXT A
 4  HOME : PRINT : PRINT  TAB( 11)"- CCESOFT -": PRINT : INVERSE : PRINT  SPC( 6);"C A L E N D A R I O"; SPC( 7): NORMAL 
@@ -26,12 +20,12 @@
 210  GOSUB 500:Y = F
 220 N = 0
 230  IF M > 2 THEN 300
-240 N =  2
+240 N = ~202
 250  IF Y = 0 THEN 280
 260 Z = Y:B = 4
 265  GOSUB 500:R = F
 270  IF R <  > 0 THEN 300
-275  GOTO  295
+275  GOTO ~20295
 280 B = 4: GOSUB 500
 285  IF F <  > 0 THEN 300
 295 N = 1

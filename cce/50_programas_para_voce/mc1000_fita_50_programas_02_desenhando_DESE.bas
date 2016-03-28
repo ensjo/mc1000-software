@@ -22,9 +22,9 @@
 25  PRINT " 8)        MEDIO-(4)"
 27  PRINT " 9)      DEVAGAR-(6)"
 29  PRINT  TAB( 10);"CORES:"
-30  PRINT  " VERMELHO-(V)"
-32  PRINT  "   BRANCO-(B)"
-34  PRINT  "     AZUL-(A)"
+30  PRINT ~20" VERMELHO-(V)"
+32  PRINT ~20"   BRANCO-(B)"
+34  PRINT ~20"     AZUL-(A)"
 82 P = 0
 90 H = 0:V = 0
 160 A$ =  CHR$ ( PEEK (284))

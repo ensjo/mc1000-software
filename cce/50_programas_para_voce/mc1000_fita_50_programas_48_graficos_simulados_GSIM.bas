@@ -5,7 +5,7 @@
 4  REM ************************
 5  REM * SIMULACAO DE GRAFICO *
 6  REM ************************
-120  DEF   FN A(X) =  EXP ( - X * X * .4)
+120  DEF ~20 FN A(X) =  EXP ( - X * X * .4)
 130 A =  - 3:L = 30:B = 3:Y1 = 0:Y2 = 1:H = .4
 500 D = Y2 - Y1
 510 K =  INT ((L - 1) / D)

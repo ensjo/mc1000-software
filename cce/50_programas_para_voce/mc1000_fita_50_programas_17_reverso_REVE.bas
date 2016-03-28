@@ -1,5 +1,3 @@
->>> Arquivo: [125_REVE.bin].
->>> ID do arquivo: [REVE ].
 1  REM ************************
 2  REM *    - CCESOFT -       *
 3  REM * JORGE LUIS S. SANTOS *
@@ -42,10 +40,10 @@
 126  PRINT "TECLE UM NUMERO INTEIRO DE 2 A 9"
 128  REM ######################## VERIFICA SE O NUMERO JA E' 1234...########
 130  GOSUB 4000
-135  IF Q = 9 GOTO 1 
+135  IF Q = 9 GOTO 1~20
 138  REM ####################### N=NUMERO DE ALGARISMOS QUE SE QUER INVERT.##
 140  INPUT N
-145  REM ###################ROTINA DE INVERSAO######### DRAW ####################
+145  REM ###################ROTINA DE INVERSAO#########`#####################
 150  IF N < 2 OR N > 9 GOTO 140
 160 T = N:U = 1:B(U) = A(T)
 180 B(U) = A(T)

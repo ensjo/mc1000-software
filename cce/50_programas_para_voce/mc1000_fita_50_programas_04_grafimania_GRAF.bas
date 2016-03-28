@@ -32,7 +32,7 @@
 230  IF F > 0 GOTO 210
 231  REM 
 232  REM ..........PLOTAGEM EM BAIXA RESOLUCAO..........
-240  GR  
+240  GR ~20
 250 L = 0:A = 1:B = 2:C = 3
 251  REM .......DEFINICAO DA VARIAVEL DE COR................
 260 F = 0:A = A + 1: IF A > 3 THEN A = 1
