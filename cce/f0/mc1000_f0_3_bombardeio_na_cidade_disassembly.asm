@@ -4,296 +4,149 @@
 ;
 ; on Wednesday, 18 of April 2007 at 05:11 PM
 ;
-0100  ff        rst     #38
-0101  ff        rst     #38
-0102  ff        rst     #38
-0103  ff        rst     #38
-0104  010100    ld      bc,#0001
-0107  ff        rst     #38
-0108  ff        rst     #38
-0109  ff        rst     #38
-010a  ff        rst     #38
-010b  ff        rst     #38
-010c  ff        rst     #38
-010d  ff        rst     #38
-010e  ff        rst     #38
-010f  ff        rst     #38
-0110  ff        rst     #38
-0111  ff        rst     #38
-0112  ff        rst     #38
-0113  ff        rst     #38
-0114  ff        rst     #38
-0115  ff        rst     #38
-0116  ff        rst     #38
-0117  ff        rst     #38
-0118  ff        rst     #38
-0119  ff        rst     #38
-011a  ff        rst     #38
-011b  ff        rst     #38
-011c  ff        rst     #38
-011d  ff        rst     #38
-011e  ff        rst     #38
-011f  ff        rst     #38
+; Variáveis do sistema (#0100-#01ff).
+0100  ffffffff  db      #ff,#ff,#ff,#ff
+; PLAY:
+0104  01        db      #01
+; PLAYMX:
+0105  01        db      #01
+; HEAD:
+0106  00        db      #00
+; RANDOM:
+0107  ffff      dw      #ffff
+; RCRDPT:
+0109  ff        db      #ff
+; 
+010a  ff        db      #ff
+; RECORD:
+010b  ffffffff  db      #ff,#ff,#ff,#ff
+010f  ffffffff  db      #ff,#ff,#ff,#ff
+0113  ffffffff  db      #ff,#ff,#ff,#ff
+0117  ffffffff  db      #ff,#ff,#ff,#ff
+; KEY0:
+011b  ffffffff  db      #ff,#ff,#ff,#ff
+011f  ff        db      #ff
+; JOB:
 0120  c9        ret
- 
-0121  ff        rst     #38
-0122  ff        rst     #38
-0123  00        nop
-0124  00        nop
-0125  ff        rst     #38
-0126  ff        rst     #38
-0127  ff        rst     #38
-0128  ff        rst     #38
-0129  ff        rst     #38
-012a  ff        rst     #38
-012b  ff        rst     #38
-012c  ff        rst     #38
-012d  ff        rst     #38
-012e  ff        rst     #38
-012f  ff        rst     #38
+0121  ffff      db      #ff,#ff
+; SCOREA:
+0123  00        db      #00
+; SCOREB:
+0124  00        db      #00
+; SHAPE0:
+0125  ff        db      #ff
+;
+0126  ffff      db      #ff,ff
+0128  ffffffff  db      #ff,#ff,#ff,#ff
+012c  ffffffff  db      #ff,#ff,#ff,#ff
+; JOBM:
 0130  c9        ret
- 
-0131  ff        rst     #38
-0132  ff        rst     #38
-0133  ff        rst     #38
-0134  ff        rst     #38
-0135  ff        rst     #38
-0136  ff        rst     #38
-0137  ff        rst     #38
-0138  ff        rst     #38
-0139  00        nop
-013a  ff        rst     #38
-013b  ff        rst     #38
-013c  ff        rst     #38
-013d  ff        rst     #38
-013e  ff        rst     #38
-013f  ff        rst     #38
-0140  ff        rst     #38
-0141  ff        rst     #38
-0142  00        nop
-0143  ff        rst     #38
-0144  ff        rst     #38
-0145  ff        rst     #38
-0146  ff        rst     #38
-0147  ff        rst     #38
-0148  ff        rst     #38
-0149  ff        rst     #38
-014a  ff        rst     #38
-014b  00        nop
-014c  ff        rst     #38
-014d  ff        rst     #38
-014e  ff        rst     #38
-014f  ff        rst     #38
-0150  ff        rst     #38
-0151  ff        rst     #38
-0152  ff        rst     #38
-0153  ff        rst     #38
-0154  ff        rst     #38
-0155  ff        rst     #38
-0156  ff        rst     #38
-0157  ff        rst     #38
-0158  ff        rst     #38
-0159  ff        rst     #38
-015a  ff        rst     #38
-015b  ff        rst     #38
-015c  ff        rst     #38
-015d  ff        rst     #38
-015e  00        nop
-015f  ff        rst     #38
-0160  ff        rst     #38
-0161  ff        rst     #38
-0162  ff        rst     #38
-0163  ff        rst     #38
-0164  ff        rst     #38
-0165  ff        rst     #38
-0166  ff        rst     #38
-0167  ff        rst     #38
-0168  ff        rst     #38
-0169  ff        rst     #38
-016a  ff        rst     #38
-016b  ff        rst     #38
-016c  ff        rst     #38
-016d  ff        rst     #38
-016e  ff        rst     #38
-016f  ff        rst     #38
-0170  ff        rst     #38
-0171  ff        rst     #38
-0172  ff        rst     #38
-0173  ff        rst     #38
-0174  ff        rst     #38
-0175  ff        rst     #38
-0176  ff        rst     #38
-0177  ff        rst     #38
-0178  ff        rst     #38
-0179  ff        rst     #38
-017a  ff        rst     #38
-017b  ff        rst     #38
-017c  ff        rst     #38
-017d  ff        rst     #38
-017e  ff        rst     #38
-017f  ff        rst     #38
-0180  ff        rst     #38
-0181  ff        rst     #38
-0182  ff        rst     #38
-0183  ff        rst     #38
-0184  ff        rst     #38
-0185  ff        rst     #38
-0186  ff        rst     #38
-0187  ff        rst     #38
-0188  ff        rst     #38
-0189  ff        rst     #38
-018a  ff        rst     #38
-018b  ff        rst     #38
-018c  ff        rst     #38
-018d  ff        rst     #38
-018e  ff        rst     #38
-018f  ff        rst     #38
-0190  ff        rst     #38
-0191  ff        rst     #38
-0192  ff        rst     #38
-0193  ff        rst     #38
-0194  ff        rst     #38
-0195  ff        rst     #38
-0196  ff        rst     #38
-0197  ff        rst     #38
-0198  ff        rst     #38
-0199  ff        rst     #38
-019a  ff        rst     #38
-019b  ff        rst     #38
-019c  ff        rst     #38
-019d  ff        rst     #38
-019e  ff        rst     #38
-019f  ff        rst     #38
-01a0  ff        rst     #38
-01a1  ff        rst     #38
-01a2  ff        rst     #38
-01a3  ff        rst     #38
-01a4  ff        rst     #38
-01a5  ff        rst     #38
-01a6  ff        rst     #38
-01a7  ff        rst     #38
-01a8  ff        rst     #38
-01a9  ff        rst     #38
-01aa  ff        rst     #38
-01ab  ff        rst     #38
-01ac  ff        rst     #38
-01ad  ff        rst     #38
-01ae  ff        rst     #38
-01af  ff        rst     #38
-01b0  ff        rst     #38
-01b1  ff        rst     #38
-01b2  ff        rst     #38
-01b3  ff        rst     #38
-01b4  ff        rst     #38
-01b5  ff        rst     #38
-01b6  ff        rst     #38
-01b7  ff        rst     #38
-01b8  ff        rst     #38
-01b9  ff        rst     #38
-01ba  ff        rst     #38
-01bb  ff        rst     #38
-01bc  ff        rst     #38
-01bd  ff        rst     #38
-01be  ff        rst     #38
-01bf  ff        rst     #38
-01c0  ff        rst     #38
-01c1  ff        rst     #38
-01c2  ff        rst     #38
-01c3  ff        rst     #38
-01c4  ff        rst     #38
-01c5  ff        rst     #38
-01c6  ff        rst     #38
-01c7  ff        rst     #38
-01c8  ff        rst     #38
-01c9  ff        rst     #38
-01ca  ff        rst     #38
-01cb  ff        rst     #38
-01cc  ff        rst     #38
-01cd  ff        rst     #38
-01ce  ff        rst     #38
-01cf  ff        rst     #38
-01d0  ff        rst     #38
-01d1  ff        rst     #38
-01d2  ff        rst     #38
-01d3  ff        rst     #38
-01d4  ff        rst     #38
-01d5  ff        rst     #38
-01d6  ff        rst     #38
-01d7  ff        rst     #38
-01d8  ff        rst     #38
-01d9  ff        rst     #38
-01da  ff        rst     #38
-01db  ff        rst     #38
-01dc  ff        rst     #38
-01dd  ff        rst     #38
-01de  ff        rst     #38
-01df  ff        rst     #38
-01e0  ff        rst     #38
-01e1  ff        rst     #38
-01e2  ff        rst     #38
-01e3  ff        rst     #38
-01e4  ff        rst     #38
-01e5  ff        rst     #38
-01e6  ff        rst     #38
-01e7  ff        rst     #38
-01e8  ff        rst     #38
-01e9  ff        rst     #38
-01ea  ff        rst     #38
-01eb  ff        rst     #38
-01ec  ff        rst     #38
-01ed  ff        rst     #38
-01ee  ff        rst     #38
-01ef  ff        rst     #38
-01f0  ff        rst     #38
-01f1  ff        rst     #38
-01f2  ff        rst     #38
-01f3  ff        rst     #38
-01f4  ff        rst     #38
-01f5  ff        rst     #38
-01f6  ff        rst     #38
-01f7  ff        rst     #38
-01f8  ff        rst     #38
-01f9  ff        rst     #38
-01fa  ff        rst     #38
-01fb  ff        rst     #38
-01fc  ff        rst     #38
-01fd  ff        rst     #38
-01fe  ff        rst     #38
-01ff  ff        rst     #38
-0200  c31c02    jp      #021c
-0203  21f008    ld      hl,#08f0
-0206  223701    ld      (#0137),hl
+0131  ffff      db      #ff,#ff
+;
+0133  ffffffff  db      #ff,#ff,#ff,#ff
+0137  ffff      db      #ff,#ff
+; AVALUE:
+0139  00        db      #00
+;
+013a  ffffffff  db      #ff,#ff,#ff,#ff
+013e  ffffffff  db      #ff,#ff,#ff,#ff
+; BVALUE:
+0142  00        db      #00
+;
+0143  ffffffff  db      #ff,#ff,#ff,#ff
+0147  ffffffff  db      #ff,#ff,#ff,#ff
+; CVALUE:
+014b  00        db      #00
+;
+014c  ffffffff  db      #ff,#ff,#ff,#ff
+0150  ffffffff  db      #ff,#ff,#ff,#ff
+0154  ffffffff  db      #ff,#ff,#ff,#ff
+0158  ffffffff  db      #ff,#ff,#ff,#ff
+015c  ffff      db      #ff,#ff
+; CHECK:
+015e  00        db      #00
+;
+015f  ff        db      #ff
+0160  ffffffff  db      #ff,#ff,#ff,#ff
+0164  ffffffff  db      #ff,#ff,#ff,#ff
+0168  ffffffff  db      #ff,#ff,#ff,#ff
+016c  ffffffff  db      #ff,#ff,#ff,#ff
+0170  ffffffff  db      #ff,#ff,#ff,#ff
+0174  ffffffff  db      #ff,#ff,#ff,#ff
+0178  ffffffff  db      #ff,#ff,#ff,#ff
+017c  ffffffff  db      #ff,#ff,#ff,#ff
+0180  ffffffff  db      #ff,#ff,#ff,#ff
+0184  ffffffff  db      #ff,#ff,#ff,#ff
+0188  ffffffff  db      #ff,#ff,#ff,#ff
+018c  ffffffff  db      #ff,#ff,#ff,#ff
+0190  ffffffff  db      #ff,#ff,#ff,#ff
+0194  ffffffff  db      #ff,#ff,#ff,#ff
+0198  ffffffff  db      #ff,#ff,#ff,#ff
+019c  ffffffff  db      #ff,#ff,#ff,#ff
+01a0  ffffffff  db      #ff,#ff,#ff,#ff
+01a4  ffffffff  db      #ff,#ff,#ff,#ff
+01a8  ffffffff  db      #ff,#ff,#ff,#ff
+01ac  ffffffff  db      #ff,#ff,#ff,#ff
+01b0  ffffffff  db      #ff,#ff,#ff,#ff
+01b4  ffffffff  db      #ff,#ff,#ff,#ff
+01b8  ffffffff  db      #ff,#ff,#ff,#ff
+01bc  ffffffff  db      #ff,#ff,#ff,#ff
+01c0  ffffffff  db      #ff,#ff,#ff,#ff
+01c4  ffffffff  db      #ff,#ff,#ff,#ff
+01c8  ffffffff  db      #ff,#ff,#ff,#ff
+01cc  ffffffff  db      #ff,#ff,#ff,#ff
+01d0  ffffffff  db      #ff,#ff,#ff,#ff
+01d4  ffffffff  db      #ff,#ff,#ff,#ff
+01d8  ffffffff  db      #ff,#ff,#ff,#ff
+01dc  ffffffff  db      #ff,#ff,#ff,#ff
+01e0  ffffffff  db      #ff,#ff,#ff,#ff
+01e4  ffffffff  db      #ff,#ff,#ff,#ff
+01e8  ffffffff  db      #ff,#ff,#ff,#ff
+01ec  ffffffff  db      #ff,#ff,#ff,#ff
+01f0  ffffffff  db      #ff,#ff,#ff,#ff
+01f4  ffffffff  db      #ff,#ff,#ff,#ff
+01f8  ffffffff  db      #ff,#ff,#ff,#ff
+01fc  ffffffff  db      #ff,#ff,#ff,#ff
+
+; Pontos de entrada dos tópicos de jogo.
+0200  c31c02    jp      #021c ; Tópico 1. (único).
+
+; Inicializa som.
+0203  21f008    ld      hl,#08f0 ; Dados de música.
+0206  223701    ld      (#0137),hl ; NAA.
 0209  3e8d      ld      a,#8d
-020b  323901    ld      (#0139),a
+020b  323901    ld      (#0139),a ; VOICEA.
 020e  af        xor     a
-020f  324201    ld      (#0142),a
-0212  324b01    ld      (#014b),a
+020f  324201    ld      (#0142),a ; BVALUE.
+0212  324b01    ld      (#014b),a ; CVALUE.
 0215  c9        ret
  
 0216  cd6508    call    #0865
 0219  23        inc     hl
 021a  23        inc     hl
 021b  c9        ret
- 
+
+; Tópico 1.
 021c  310002    ld      sp,#0200
-021f  3ad508    ld      a,(#08d5)
+021f  3ad508    ld      a,(#08d5) ; Inicialização do sistema já feita?
 0222  a7        and     a
-0223  c24202    jp      nz,#0242
-0226  321b01    ld      (#011b),a
-0229  320601    ld      (#0106),a
-022c  3ec9      ld      a,#c9
-022e  322001    ld      (#0120),a
-0231  3ec3      ld      a,#c3
-0233  323800    ld      (#0038),a
-0236  2124c0    ld      hl,#c024
+0223  c24202    jp      nz,#0242 ; Sim, desvia.
+0226  321b01    ld      (#011b),a ; KEY0.
+0229  320601    ld      (#0106),a ; HEAD.
+022c  3ec9      ld      a,#c9 ; Instrução RET.
+022e  322001    ld      (#0120),a ; JOB.
+0231  3ec3      ld      a,#c3 ; Instrução JP.
+0233  323800    ld      (#0038),a ; 
+0236  2124c0    ld      hl,#c024 ; Ponto de entrada para INTRUP.
 0239  223900    ld      (#0039),hl
 023c  fb        ei
-023d  3e02      ld      a,#02
+023d  3e02      ld      a,#02 ; Indica que inicialização já foi feita.
 023f  32d508    ld      (#08d5),a
-0242  3e88      ld      a,#88
-0244  d380      out     (#80),a
-0246  0600      ld      b,#00
-0248  cd30c0    call    #c030
+;
+0242  3e88      ld      a,#88 ; Modo de vídeo "GR".
+0244  d380      out     (#80),a ; COL32.
+0246  0600      ld      b,#00 ; Preenche a tela com zeros.
+0248  cd30c0    call    #c030 ; Ponto de entrada para XCLEAR.
 024b  216d81    ld      hl,#816d
 024e  112000    ld      de,#0020
 0251  01070d    ld      bc,#0d07
@@ -318,10 +171,10 @@
 0278  cd42c0    call    #c042
 027b  0603      ld      b,#03
 027d  112f80    ld      de,#802f
-0280  cd42c0    call    #c042
+0280  cd42c0    call    #c042 ; Ponto de entrada para SHOWNO.
 0283  0604      ld      b,#04
 0285  11af83    ld      de,#83af
-0288  cd42c0    call    #c042
+0288  cd42c0    call    #c042 ; Ponto de entrada para SHOWNO.
 028b  218384    ld      hl,#8483
 028e  119806    ld      de,#0698
 0291  cd1602    call    #0216
@@ -379,7 +232,7 @@
 0314  cd2a08    call    #082a
 0317  15        dec     d
 0318  c21403    jp      nz,#0314
-031b  cd30c0    call    #c030
+031b  cd30c0    call    #c030 ; Ponto de entrada para XCLEAR.
 031e  af        xor     a
 031f  21db08    ld      hl,#08db
 0322  060e      ld      b,#0e
@@ -526,13 +379,13 @@
 03f1  23        inc     hl
 03f2  77        ld      (hl),a
 03f3  32dc08    ld      (#08dc),a
-03f6  3a4201    ld      a,(#0142)
+03f6  3a4201    ld      a,(#0142) ; BVALUE.
 03f9  a7        and     a
 03fa  c20804    jp      nz,#0408
 03fd  211909    ld      hl,#0919
-0400  224001    ld      (#0140),hl
+0400  224001    ld      (#0140),hl ; NBB.
 0403  3e45      ld      a,#45
-0405  324201    ld      (#0142),a
+0405  324201    ld      (#0142),a ; BVALUE.
 0408  21de08    ld      hl,#08de
 040b  7e        ld      a,(hl)
 040c  feff      cp      #ff
@@ -569,7 +422,7 @@
 0442  2b        dec     hl
 0443  3600      ld      (hl),#00
 0445  af        xor     a
-0446  324201    ld      (#0142),a
+0446  324201    ld      (#0142),a ; BVALUE.
 0449  c31504    jp      #0415
 044c  216206    ld      hl,#0662
 044f  eb        ex      de,hl
@@ -627,11 +480,11 @@
 04ba  e1        pop     hl
 04bb  c39c04    jp      #049c
 04be  af        xor     a
-04bf  324201    ld      (#0142),a
+04bf  324201    ld      (#0142),a ; BVALUE.
 04c2  214a09    ld      hl,#094a
-04c5  224001    ld      (#0140),hl
+04c5  224001    ld      (#0140),hl ; NBB.
 04c8  3eb5      ld      a,#b5
-04ca  324201    ld      (#0142),a
+04ca  324201    ld      (#0142),a ; BVALUE.
 04cd  e1        pop     hl
 04ce  23        inc     hl
 04cf  34        inc     (hl)
@@ -674,17 +527,17 @@
 0515  05        dec     b
 0516  c20f05    jp      nz,#050f
 0519  218909    ld      hl,#0989
-051c  223701    ld      (#0137),hl
+051c  223701    ld      (#0137),hl ; NAA.
 051f  21000a    ld      hl,#0a00
-0522  224001    ld      (#0140),hl
+0522  224001    ld      (#0140),hl ; NBB.
 0525  3e7d      ld      a,#7d
-0527  323901    ld      (#0139),a
+0527  323901    ld      (#0139),a ; AVALUE.
 052a  3e79      ld      a,#79
-052c  324201    ld      (#0142),a
+052c  324201    ld      (#0142),a ; BVALUE.
 052f  cd3505    call    #0535
 0532  c31c02    jp      #021c
 0535  af        xor     a
-0536  324b01    ld      (#014b),a
+0536  324b01    ld      (#014b),a ; CVALUE.
 0539  1606      ld      d,#06
 053b  0160ea    ld      bc,#ea60
 053e  cd2d08    call    #082d
@@ -693,8 +546,8 @@
 0545  15        dec     d
 0546  c23b05    jp      nz,#053b
 0549  af        xor     a
-054a  323901    ld      (#0139),a
-054d  324201    ld      (#0142),a
+054a  323901    ld      (#0139),a ; AVALUE.
+054d  324201    ld      (#0142),a ; BVALUE.
 0550  c9        ret
  
 0551  111b07    ld      de,#071b
@@ -705,26 +558,26 @@
 055a  ca7303    jp      z,#0373
 055d  1606      ld      d,#06
 055f  21960a    ld      hl,#0a96
-0562  224901    ld      (#0149),hl
+0562  224901    ld      (#0149),hl ; NCC.
 0565  3e2d      ld      a,#2d
-0567  324b01    ld      (#014b),a
+0567  324b01    ld      (#014b),a ; CVALUE.
 056a  af        xor     a
-056b  323901    ld      (#0139),a
-056e  324201    ld      (#0142),a
-0571  3e8a      ld      a,#8a
-0573  d380      out     (#80),a
+056b  323901    ld      (#0139),a ; AVALUE.
+056e  324201    ld      (#0142),a ; BVALUE.
+0571  3e8a      ld      a,#8a ; Paleta de cores alternativa.
+0573  d380      out     (#80),a ; COL32.
 0575  cd1806    call    #0618
 0578  cd3908    call    #0839
-057b  3e88      ld      a,#88
-057d  d380      out     (#80),a
+057b  3e88      ld      a,#88 ; Paleta de cores original.
+057d  d380      out     (#80),a ; COL32.
 057f  cd2706    call    #0627
 0582  cd3908    call    #0839
-0585  3e8a      ld      a,#8a
-0587  d380      out     (#80),a
+0585  3e8a      ld      a,#8a ; Paleta de cores alternativa.
+0587  d380      out     (#80),a ; COL32.
 0589  cd2706    call    #0627
 058c  cd3908    call    #0839
-058f  3e88      ld      a,#88
-0591  d380      out     (#80),a
+058f  3e88      ld      a,#88 ; Paleta de cores original.
+0591  d380      out     (#80),a ; COL32.
 0593  cd1806    call    #0618
 0596  cd3908    call    #0839
 0599  15        dec     d
@@ -732,11 +585,11 @@
 059d  0160ea    ld      bc,#ea60
 05a0  cd2d08    call    #082d
 05a3  21450a    ld      hl,#0a45
-05a6  224901    ld      (#0149),hl
+05a6  224901    ld      (#0149),hl ; NCC.
 05a9  3e79      ld      a,#79
-05ab  324b01    ld      (#014b),a
+05ab  324b01    ld      (#014b),a ; CVALUE.
 05ae  cd3905    call    #0539
-05b1  324b01    ld      (#014b),a
+05b1  324b01    ld      (#014b),a ; CVALUE.
 05b4  c31c02    jp      #021c
 05b7  cd1602    call    #0216
 05ba  117e06    ld      de,#067e
@@ -745,7 +598,7 @@
 05c1  eb        ex      de,hl
 05c2  010001    ld      bc,#0100
 05c5  d5        push    de
-05c6  cd42c0    call    #c042
+05c6  cd42c0    call    #c042 ; Ponto de entrada de SHOWNO.
 05c9  d1        pop     de
 05ca  13        inc     de
 05cb  13        inc     de
@@ -758,7 +611,7 @@
 05d6  13        inc     de
 05d7  0604      ld      b,#04
 05d9  d5        push    de
-05da  cd42c0    call    #c042
+05da  cd42c0    call    #c042 ; Ponto de entrada de SHOWNO.
 05dd  d1        pop     de
 05de  eb        ex      de,hl
 05df  23        inc     hl
@@ -768,25 +621,25 @@
 05e7  118906    ld      de,#0689
 05ea  cd1602    call    #0216
 05ed  e5        push    hl
-05ee  cd06c0    call    #c006
+05ee  cd06c0    call    #c006 ; Ponto de entrada de KEY.
 05f1  e1        pop     hl
 05f2  0601      ld      b,#01
-05f4  fe59      cp      #59
+05f4  fe59      cp      'Y'
 05f6  ca0e06    jp      z,#060e
 05f9  0602      ld      b,#02
-05fb  fe31      cp      #31
+05fb  fe31      cp      '1'
 05fd  ca0e06    jp      z,#060e
 0600  0603      ld      b,#03
-0602  fe49      cp      #49
+0602  fe49      cp      'I'
 0604  ca0e06    jp      z,#060e
-0607  fe51      cp      #51
+0607  fe51      cp      'Q'
 0609  0604      ld      b,#04
 060b  c2ed05    jp      nz,#05ed
 060e  78        ld      a,b
 060f  f5        push    af
 0610  eb        ex      de,hl
 0611  0e00      ld      c,#00
-0613  cd42c0    call    #c042
+0613  cd42c0    call    #c042 ; Ponto de entrada de SHOWNO.
 0616  f1        pop     af
 0617  c9        ret
  
@@ -966,7 +819,7 @@
 074a  c24007    jp      nz,#0740
 074d  0e02      ld      c,#02
 074f  c5        push    bc
-0750  01deff    ld      bc,#ffde
+0750  01deff    ld      bc,#ffde ; -34.
 0753  eb        ex      de,hl
 0754  09        add     hl,bc
 0755  eb        ex      de,hl
@@ -988,7 +841,7 @@
 076f  0e02      ld      c,#02
 0771  c5        push    bc
 0772  eb        ex      de,hl
-0773  01deff    ld      bc,#ffde
+0773  01deff    ld      bc,#ffde ; -34.
 0776  09        add     hl,bc
 0777  eb        ex      de,hl
 0778  cdb108    call    #08b1
@@ -1005,7 +858,7 @@
 078e  fe0b      cp      #0b
 0790  da7f07    jp      c,#077f
 0793  47        ld      b,a
-0794  3a0701    ld      a,(#0107)
+0794  3a0701    ld      a,(#0107) ; RANDOM.
 0797  1e00      ld      e,#00
 0799  fe40      cp      #40
 079b  daae07    jp      c,#07ae
@@ -1103,20 +956,24 @@
 0827  03        inc     bc
 0828  40        ld      b,b
 0829  dd01d007  ld      bc,#07d0
+
+; Temporização de BC ciclos.
 082d  0d        dec     c
 082e  c22d08    jp      nz,#082d
 0831  78        ld      a,b
 0832  a7        and     a
 0833  c8        ret     z
- 
 0834  05        dec     b
 0835  c22d08    jp      nz,#082d
 0838  c9        ret
  
+; Temporização de #3000=12288 ciclos.
 0839  010030    ld      bc,#3000
 083c  c32d08    jp      #082d
+
+; Limpa KEY0 ~ KEY0+3.
 083f  af        xor     a
-0840  211b01    ld      hl,#011b
+0840  211b01    ld      hl,#011b ; KEY0.
 0843  77        ld      (hl),a
 0844  23        inc     hl
 0845  77        ld      (hl),a
@@ -1125,27 +982,27 @@
 0848  23        inc     hl
 0849  77        ld      (hl),a
 084a  c5        push    bc
-084b  cd27c0    call    #c027
+084b  cd27c0    call    #c027 ; Ponto de entrada de SKEY?.
 084e  b7        or      a
 084f  c1        pop     bc
 0850  c9        ret
- 
-0851  3a1b01    ld      a,(#011b)
+
+; Retorna flag Z ligado se alguma das 4 teclas
+; pressionadas for igual ao registrador C.
+0851  3a1b01    ld      a,(#011b) ; KEY0.
 0854  b9        cp      c
 0855  c8        ret     z
- 
-0856  3a1c01    ld      a,(#011c)
+0856  3a1c01    ld      a,(#011c) ; KEY0+1.
 0859  b9        cp      c
 085a  c8        ret     z
- 
-085b  3a1d01    ld      a,(#011d)
+085b  3a1d01    ld      a,(#011d) ; KEY0+2.
 085e  b9        cp      c
 085f  c8        ret     z
- 
-0860  3a1e01    ld      a,(#011e)
+0860  3a1e01    ld      a,(#011e) ; KEY0+3.
 0863  b9        cp      c
 0864  c9        ret
- 
+
+;
 0865  e5        push    hl
 0866  d5        push    de
 0867  c5        push    bc
@@ -1167,7 +1024,8 @@
 0880  d1        pop     de
 0881  e1        pop     hl
 0882  c9        ret
- 
+
+;
 0883  e5        push    hl
 0884  d5        push    de
 0885  c5        push    bc
@@ -1196,12 +1054,14 @@
 08ae  d1        pop     de
 08af  e1        pop     hl
 08b0  c9        ret
- 
-08b1  3a0701    ld      a,(#0107)
+
+; Atualiza RANDOM.
+08b1  3a0701    ld      a,(#0107) ; RANDOM.
 08b4  c625      add     a,#25
-08b6  320701    ld      (#0107),a
+08b6  320701    ld      (#0107),a ; RANDOM.
 08b9  c9        ret
- 
+
+;
 08ba  21dd08    ld      hl,#08dd
 08bd  23        inc     hl
 08be  7e        ld      a,(hl)
@@ -1251,6 +1111,8 @@
 08ed  ff        rst     #38
 08ee  ff        rst     #38
 08ef  ff        rst     #38
+
+; Dados de música.
 08f0  af        xor     a
 08f1  80        add     a,b
 08f2  2010      jr      nz,#0904        ; (16)
@@ -1273,7 +1135,10 @@
 0911  010c01    ld      bc,#010c
 0914  0b        dec     bc
 0915  010a01    ld      bc,#010a
-0918  ee0f      xor     #0f
+0918  ee        db      #ee
+
+; Dados de música.
+0919  0f        db      #0f
 091a  f0        ret     p
  
 091b  f0        ret     p
@@ -1302,6 +1167,8 @@
 0944  0651      ld      b,#51
 0946  0650      ld      b,#50
 0948  06ee      ld      b,#ee
+
+; Dados de música.
 094a  0f        rrca
 094b  00        nop
 094c  00        nop
@@ -1335,6 +1202,8 @@
 0983  1002      djnz    #0987           ; (2)
 0985  2001      jr      nz,#0988        ; (1)
 0987  20ee      jr      nz,#0977        ; (-18)
+
+; Dados de música.
 0989  0f        rrca
 098a  80        add     a,b
 098b  2000      jr      nz,#098d        ; (0)
@@ -1444,6 +1313,8 @@
 09fb  50        ld      d,b
 09fc  1000      djnz    #09fe           ; (0)
 09fe  10ee      djnz    #09ee           ; (-18)
+
+; Dados de música.
 0a00  0f        rrca
 0a01  80        add     a,b
 0a02  2000      jr      nz,#0a04        ; (0)
@@ -1481,6 +1352,8 @@
 0a3f  104b      djnz    #0a8c           ; (75)
 0a41  1000      djnz    #0a43           ; (0)
 0a43  20ee      jr      nz,#0a33        ; (-18)
+
+; Dados de música.
 0a45  0f        rrca
 0a46  80        add     a,b
 0a47  2000      jr      nz,#0a49        ; (0)
@@ -1560,7 +1433,10 @@
 0a92  08        ex      af,af'
 0a93  00        nop
 0a94  08        ex      af,af'
-0a95  ee0f      xor     #0f
+0a95  ee        db      #ee
+
+; Dados de música.
+0a96  0f        db      #0f
 0a97  40        ld      b,b
 0a98  1010      djnz    #0aaa           ; (16)
 0a9a  7b        ld      a,e
