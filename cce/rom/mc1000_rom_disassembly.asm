@@ -6460,11 +6460,11 @@ E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; é dígito: interpr
 E353  CDDCDE    CALL    #DEDC ; {CLETST} <CharIsAlpha> [CHKLTR]
 E356  D292E3    JP      NC,#E392 ; é letra: interpreta variável/matriz.
 E359  FEBE      CP      #BE ; token "+"
-E35B  28E7      JR      Z,#E344 ; {SNLY13} [OPRND]
+E35B  28E7      JR      Z,#E344 ; {SNLY13} [OPRND] ; operador '+' unário: ignora e recomeça do próximo caracter.
 E35D  FE2E      CP      '.'
-E35F  CAEFED    JP      Z,#EDEF ; {VALNRM} <FIn> [ASCTFP]
+E35F  CAEFED    JP      Z,#EDEF ; {VALNRM} <FIn> [ASCTFP] ; é ponto: interpreta literal numérico.
 E362  FEBF      CP      #BF ; token "-"
-E364  281B      JR      Z,#E381         ; (27)
+E364  281B      JR      Z,#E381 ; operador '-' unário.
 E366  FE22      CP      '"'
 E368  CAF6E6    JP      Z,#E6F6 ; {SOPRND} [QTSTR] ; é string
 E36B  FEBB      CP      #BB ; token "NOT"
