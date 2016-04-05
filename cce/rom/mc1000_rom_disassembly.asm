@@ -5864,7 +5864,7 @@ E007  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O cont
 E00A  D1        POP     DE ; Restaura endereço do registro de string.
 E00B  3011      JR      NC,#E01E ; {LET3} [MVSTPT] ; Sim: apenas configura ponteiro.
 ; O conteúdo da string está na área de strings.
-; Onde está o registro da string? 
+; Onde está o registro da string?
 E00D  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND] ; Endereço do início da área de variáveis logo após o programa BASIC.
 E010  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O registro da string se situa antes da área de variáveis (é temporário)?
 E013  3009      JR      NC,#E01E ; {LET3} [MVSTPT] ; Sim: apenas configura ponteiro.
@@ -6456,9 +6456,9 @@ E345  329003    LD      (#0390),A ; {DATYPE} [TYPE]
 E348  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E34B  1E24      LD      E,#24 ; erro "FO"
 E34D  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR]
-E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; é dígito
+E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; é dígito: interpreta literal numérico.
 E353  CDDCDE    CALL    #DEDC ; {CLETST} <CharIsAlpha> [CHKLTR]
-E356  D292E3    JP      NC,#E392 ; é letra
+E356  D292E3    JP      NC,#E392 ; é letra: interpreta variável/matriz.
 E359  FEBE      CP      #BE ; token "+"
 E35B  28E7      JR      Z,#E344 ; {SNLY13} [OPRND]
 E35D  FE2E      CP      '.'
@@ -7482,7 +7482,7 @@ E86F  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] ; HL aponta p
 E872  EB        EX      DE,HL ; DE aponta para registro de string temporário "atual".
 ; {STRZS3} [GSTRDE]
 E873  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; HL aponta para o último registro de string temporária; obtém em BC o endereço do conteúdo dessa string; se DE = HL, desempilha essa string.
-E876  EB        EX      DE,HL ; DE aponta para o último registro de string temporária (tenha sido desempilhado ou não); HL aponta para registro de string temporário "atual". 
+E876  EB        EX      DE,HL ; DE aponta para o último registro de string temporária (tenha sido desempilhado ou não); HL aponta para registro de string temporário "atual".
 E877  C0        RET     NZ ; Se não foi desempilhado, retorna.
 ; Se a string desempilhada foi a última a ter
 ; área alocada, libera a área correspondente.
@@ -7660,24 +7660,24 @@ E933  C9        RET
 E934  CDA1E8    CALL    #E8A1 ; ALEN
 E937  CAFDEA    JP      Z,#EAFD ; FLOAT0 {ADD12} <FZero> [RESZER]
 ;
-E93A  5F        LD      E,A
-E93B  23        INC     HL
+E93A  5F        LD      E,A ; DE = tamanho da string.
+E93B  23        INC     HL ; HL = endereço do conteúdo da string.
 E93C  23        INC     HL
 E93D  7E        LD      A,(HL)
 E93E  23        INC     HL
 E93F  66        LD      H,(HL)
 E940  6F        LD      L,A
-E941  E5        PUSH    HL
-E942  19        ADD     HL,DE
-E943  46        LD      B,(HL)
-E944  72        LD      (HL),D
-E945  E3        EX      (SP),HL
-E946  C5        PUSH    BC
-E947  7E        LD      A,(HL)
+E941  E5        PUSH    HL ; Preserva endereço do conteúdo da string.
+E942  19        ADD     HL,DE ; HL = endereço do fim da string + 1.
+E943  46        LD      B,(HL) ; Preserva em B o byte após o conteúdo da string...
+E944  72        LD      (HL),D ; ...e o substitui pelo terminador 0.
+E945  E3        EX      (SP),HL ; Preserva o endereço do fim da string + 1 e recupera o endereço do início.
+E946  C5        PUSH    BC ; Preserva o byte original após o conteúdo da string.
+E947  7E        LD      A,(HL) ; A = primeiro caracter da string.
 E948  CDEFED    CALL    #EDEF ; {VALNRM} <FIn> [ASCTFP]
-E94B  C1        POP     BC
-E94C  E1        POP     HL
-E94D  70        LD      (HL),B
+E94B  C1        POP     BC ; Recupera em B byte original após o conteúdo da string.
+E94C  E1        POP     HL ; Recupera o endereço do fim da string + 1.
+E94D  70        LD      (HL),B ; Restaura o byte original após o conteúdo da string.
 E94E  C9        RET
 
 ; {STREND} [LFRGNM]
