@@ -20,7 +20,6 @@
 ; 4. Código-fonte original do Microsoft BASIC para 6502 (1978):
 ;    https://github.com/brajeshwar/Microsoft-BASIC-for-6502-Original-Source-Code-1978/blob/master/M6502.MAC.txt
 
-
 C000  C363C0    JP      #C063 ; ST: Partida a frio
 C003  C3D6CE    JP      #CED6 ; BAENT0: Início CCE BASIC
 C006  C31BC3    JP      #C31B ; KEY: Entrada console
@@ -54,7 +53,7 @@ C057  C38FCB    JP      #CB8F ; DISPY: Exibe 1 ou 2 dígitos
 C05A  C3CBC0    JP      #C0CB ; LPDRV: Envia um caracter para a impressora
 C05D  C3DAC0    JP      #C0DA ; LPSTS: Testa status da impressora
 C060  C3FCC0    JP      #C0FC ; BEEP
- 
+
 ; ST : Partida a frio.
 ; Inicialização do computador.
 ; Prepara jump para a rotina de interrupção.
@@ -104,14 +103,14 @@ C0B5  223101    LD      (#0131),HL ; JOBM+1
 C0B8  3E5A      LD      A,#5A
 C0BA  325E01    LD      (#015E),A ; CHECK
 C0BD  C395CE    JP      #CE95 ; {PRIST1}
- 
+
 ;
 C0C0  AF        XOR     A
 C0C1  323901    LD      (#0139),A ; AVALUE
 C0C4  324201    LD      (#0142),A ; BVALUE
 C0C7  324B01    LD      (#014B),A ; CVALUE
 C0CA  C9        RET
- 
+
 ; LPDRV: Envia um caracter para a impressora.
 ; O código do caracter deve estar armazenado em C.
 C0CB  F5        PUSH    AF
@@ -123,14 +122,14 @@ C0D5  AF        XOR     A
 C0D6  D304      OUT     (#04),A ; STROB
 C0D8  F1        POP     AF
 C0D9  C9        RET
- 
+
 ; LPSTS: Testa status da impressora.
 ; Se bit de carry retorna desligado, a impressora
 ; está pronta.
 C0DA  DB04      IN      A,(#04) ; SPORT
 C0DC  0F        RRCA
 C0DD  C9        RET
- 
+
 ; MSG: Apresenta uma string na tela.
 ; Imprime a string apontada por HL.
 ; A string termina com um byte '#00'.
@@ -141,14 +140,14 @@ C0E1  4F        LD      C,A
 C0E2  CD97C8    CALL    #C897 ; CO
 C0E5  23        INC     HL
 C0E6  C3DEC0    JP      #C0DE ; MSG
- 
+
 ; Decrementa contador para intermitência do
 ; cursor.
 C0E9  3A3301    LD      A,(#0133) ; FLASHB
 C0EC  3D        DEC     A
 C0ED  323301    LD      (#0133),A ; FLASHB
 C0F0  C0        RET     NZ
- 
+
 ; Efetua intermitência do cursor e registra
 ; seu estado atual.
 ; (Cursor aceso: FSHCNT (#012F) é par.)
@@ -157,7 +156,7 @@ C0F4  3A2F01    LD      A,(#012F) ; FSHCNT
 C0F7  3C        INC     A
 C0F8  322F01    LD      (#012F),A ; FSHCNT
 C0FB  C9        RET
- 
+
 ; Instrui o PSG a produzir um BEEP
 ; no alto-falante.
 C0FC  E5        PUSH    HL
@@ -182,25 +181,25 @@ C11B  F1        POP     AF
 C11C  C1        POP     BC
 C11D  E1        POP     HL
 C11E  C9        RET
- 
+
 ; Dados para produção do BEEP.
 ; Pares: registrador do PSG & valor.
 C11F  0420      DB      #04,#20
 C121  077B      DB      #07,#7B
 C123  0A1F      DB      #0A,#1F
 C125  0D0D      DB      #0D,#0D
- 
+
 ; Silencia PSG.
 C127  3E07      LD      A,#07
 C129  D320      OUT     (#20),A ; REG
 C12B  3E7F      LD      A,#7F
 C12D  D360      OUT     (#60),A ; WR
 C12F  C9        RET
- 
+
 C130  CD27C1    CALL    #C127
 C133  325001    LD      (#0150),A ; ENABLE
 C136  C9        RET
- 
+
 ; BITFROMTAPE: Lê o toca-fitas.
 ; Lê um pulso (se houver), um
 ; silêncio e retorna em A o
@@ -230,14 +229,14 @@ C14E  DA4AC1    JP      C,#C14A
 C151  7A        LD      A,D
 C152  D1        POP     DE
 C153  C9        RET
- 
+
 ; TLOAD: Carrega jogo do cassete.
 C154  310002    LD      SP,#0200
 C157  3E01      LD      A,#01
 C159  320601    LD      (#0106),A ; HEAD
 C15C  210001    LD      HL,#0100
 C15F  22FB00    LD      (#00FB),HL ; STAR
- 
+
 ; TAPIN: Entrada cassete
 C162  F3        DI
 ; Modo texto (fundo verde)
@@ -264,9 +263,9 @@ C180  C275C1    JP      NZ,#C175
 C183  3A0601    LD      A,(#0106) ; HEAD
 C186  3C        INC     A
 C187  C8        RET     Z
- 
+
 ; GET1: Carrega dados do cassete
- 
+
 ; Lê os endereços de início e fim(+1)
 ; do bloco salvo na fita.
 C188  CD6EC2    CALL    #C26E ; BYTEFROMTAPE
@@ -374,7 +373,7 @@ C234  360D      LD      (HL),#0D
 DZD:
 C236  CD5FC5    CALL    #C55F ; INTRUP
 C239  C9        RET
- 
+
 ; Lê 64 pulsos (e silêncios) de
 ; comprimento D <= x < E, somando
 ; esses comprimentos.
@@ -396,10 +395,10 @@ C254  29        ADD     HL,HL
 C255  29        ADD     HL,HL
 C256  4C        LD      C,H
 C257  C9        RET
- 
+
 ; HEADERFROMTAPE: Lê um header da fita,
 ; calibrando o comprimento dos pulsos.
- 
+
 ; Lê 64 pulsos (e silêncios) de
 ; comprimento 37 <= x < 68
 ; (bits "1").
@@ -420,7 +419,7 @@ C268  A7        AND     A
 C269  1F        RRA
 C26A  32FF00    LD      (#00FF),A ; BORDER
 C26D  C9        RET
- 
+
 ; BYTEFROMTAPE: Lê um byte da fita.
 C26E  C5        PUSH    BC
 C26F  D5        PUSH    DE
@@ -455,7 +454,7 @@ C299  79        LD      A,C
 C29A  D1        POP     DE
 C29B  C1        POP     BC
 C29C  C9        RET
- 
+
 ; PARITYERR
 C29D  F1        POP     AF
 C29E  F1        POP     AF
@@ -469,7 +468,7 @@ C2AD  3A0601    LD      A,(#0106) ; HEAD
 C2B0  3C        INC     A
 C2B1  C8        RET     Z
 C2B2  C362C1    JP      #C162 ; TAPIN
- 
+
 ;
 C2B5  0D0A      DB      #0D,#0A ; CR+LF
 C2B7  5245424F  DB      'REBOBINE A FITA E'
@@ -487,10 +486,10 @@ C2DE  59
 C2DF  20202020  DB      '    '
 C2E3  0D0A      DB      #0D,#0A ; CR+LF
 C2E5  00        DB      #00
- 
+
 ; GREENRED: Alterna a cor do vídeo durante uma
 ; operação de fita a cada 256 bytes.
- 
+
 ; Se o byte menos significativo do endereço do
 ; ponto atual de leitura/gravação for igual ao
 ; bytes menos significativo do endereço de fim
@@ -509,7 +508,7 @@ C2F8  D380      OUT     (#80),A ; COL32
 C2FA  7C        LD      A,H
 C2FB  BA        CP      D
 C2FC  C9        RET
- 
+
 ; FINDRAMTOP: A partir do endereço em HL,
 ; testa a escrita na RAM. Retorna o último
 ; endereço que aceita escrita.
@@ -528,7 +527,7 @@ C309  CAFDC2    JP      Z,#C2FD ; FINDRAMTOP [MLOOP]
 ; [SETTOP]
 C30C  2B        DEC     HL
 C30D  C9        RET
- 
+
 ; DELAYB: Produz uma pausa de BC
 ; milissegundos.
 C30E  3ED2      LD      A,#D2
@@ -539,7 +538,7 @@ C315  78        LD      A,B
 C316  B1        OR      C
 C317  C20EC3    JP      NZ,#C30E ; DELAYB
 C31A  C9        RET
- 
+
 ; KEY: Entrada console.
 ; Aguarda até que uma tecla seja pressionada
 ; e então liberada.
@@ -555,7 +554,7 @@ C32F  CD39C3    CALL    #C339
 C332  C9        RET
 C333  CD47C3    CALL    #C347 ; KEY?
 C336  C31BC3    JP      #C31B ; KEY
- 
+
 ; Há uma tecla pressionada?
 ; Se estiver, espera até que seja liberada.
 C339  F5        PUSH    AF
@@ -566,7 +565,7 @@ C341  B7        OR      A
 C342  C23AC3    JP      NZ,#C33A
 C345  F1        POP     AF
 C346  C9        RET
- 
+
 ; KEY?: Verifica se uma mesma tecla está
 ; pressionada em um intervalo de 7ms.
 ; Se sim, A e KEYSW (#012E) recebem #FF,
@@ -601,7 +600,7 @@ C379  322E01    LD      (#012E),A ; KEYSW
 C37C  C1        POP     BC
 C37D  D1        POP     DE
 C37E  C9        RET
- 
+
 ; SKEY?: Procura status do teclado
 ; para jogo.
 ; Retorna #00 se nenhuma tecla
@@ -635,7 +634,9 @@ C38F  220701    LD      (#0107),HL ; RANDOM
 C392  0100FE    LD      BC,#FE00
 ; K1:
 ; Seleciona linha do teclado indicada por B.
-C395  F3        DI
+C395  F3        DI      ; Impede que a interrupção periódica do Z80 (0x0038) que
+                        ; por padrão é configurada para chamar a rotina de som (INTRUP)
+                        ; se intrometa e altere a seleção dos registradores do PSG.
 C396  3E0E      LD      A,#0E
 C398  D320      OUT     (#20),A ; REG
 C39A  78        LD      A,B
@@ -743,7 +744,7 @@ C41C  D8        RET     C
 ; Senão, termina a varredura.
 C41D  F1        POP     AF
 C41E  C3B5C3    JP      #C3B5
- 
+
 ; Ajustes finais.
 ; [ --> RETURN
 ; \ --> SPACE
@@ -802,7 +803,7 @@ C461  C1        POP     BC
 C462  D1        POP     DE
 C463  E1        POP     HL
 C464  C9        RET
- 
+
 ; INPUT: Lê em A o registrador #0F do PSG.
 ; Isto obtém uma "linha" do teclado.
 ; Os bits são normalmente ligados.
@@ -815,7 +816,7 @@ C468  D320      OUT     (#20),A ; REG
 C46A  DB40      IN      A,(#40) ; RD
 C46C  FB        EI
 C46D  C9        RET
- 
+
 ; MPY: Multiplicação.
 ; HL <-- A * C, sempre positivo.
 C46E  C5        PUSH    BC
@@ -832,7 +833,7 @@ C47D  C276C4    JP      NZ,#C476
 C480  D1        POP     DE
 C481  C1        POP     BC
 C482  C9        RET
- 
+
 ; DIV: Divisão
 ; HL/C = L+H/C
 ; Erro se carry=0.
@@ -855,7 +856,7 @@ C499  C1        POP     BC
 C49A  C9        RET
 C49B  91        SUB     C
 C49C  C392C4    JP      #C492
- 
+
 ; FREQ: Tabela dos períodos máximos das notas musicais.
 C49F  5D0D      DW      #0D5D ; C = 3421
 C4A1  9C0C      DW      #0C9C ; C# = 3228
@@ -869,7 +870,7 @@ C4AF  6B08      DW      #086B ; G# = 2155
 C4B1  F207      DW      #07F2 ; A = 2034
 C4B3  8007      DW      #0780 ; A# = 1920
 C4B5  1407      DW      #0714 ; B = 1812
- 
+
 ; TAPOUT: Saída cassete
 C4B7  F3        DI
 ; Modo texto (fundo verde).
@@ -913,7 +914,7 @@ C4F6  3E01      LD      A,#01
 C4F8  D380      OUT     (#80),A ; COL32
 C4FA  32F500    LD      (#00F5),A ; MODBUF
 C4FD  C9        RET
- 
+
 ; HEADERTOTAPE
 ; Silencia fita.
 C4FE  3E0E      LD      A,#0E
@@ -934,10 +935,10 @@ C516  CD39C5    CALL    #C539 ; BITTOTAPE
 C519  05        DEC     B
 C51A  C215C5    JP      NZ,#C515
 C51D  C9        RET
- 
+
 ; BYTETOTAPE: Envia um byte (armazenado em C)
 ; à fita.
- 
+
 ; Envia um pulso curto (bit "1") à fita.
 C51E  37        SCF
 C51F  CD39C5    CALL    #C539 ; BITTOTAPE
@@ -958,7 +959,7 @@ C533  3F        CCF
 C534  EC39C5    CALL    PE,#C539 ; BITTOTAPE
 C537  C1        POP     BC
 C538  C9        RET
- 
+
 ; BITTOTAPE: Envia um bit (armazenado no
 ; carry flag) à fita: um pulso seguido
 ; de um silêncio. Se o bit é 0, o pulso
@@ -978,7 +979,7 @@ C547  D360      OUT     (#60),A ; WR
 C549  CD4EC5    CALL    #C54E ; BITTOTAPEDELAY
 C54C  F1        POP     AF
 C54D  C9        RET
- 
+
 ; BITTOTAPEDELAY: Produz uma pausa.
 ; Se carry flag desligado (bit "0"), a pausa
 ; tem o dobro da duração.
@@ -988,7 +989,7 @@ C553  07        RLCA
 C554  3D        DEC     A
 C555  C254C5    JP      NZ,#C554
 C558  C9        RET
- 
+
 ; Controle de impressão.
 C559  7D        LD      A,L
 C55A  BB        CP      E
@@ -996,7 +997,7 @@ C55B  C0        RET     NZ
 C55C  7C        LD      A,H
 C55D  BA        CP      D
 C55E  C9        RET
- 
+
 ; INTRUP
 C55F  F3        DI
 C560  F5        PUSH    AF
@@ -1038,7 +1039,7 @@ C5AC  E1        POP     HL
 C5AD  F1        POP     AF
 C5AE  FB        EI
 C5AF  ED4D      RETI
- 
+
 ; SUB1:
 ; HL = valor para REGIST.
 ; D = valor para MSB de ONAMP e para AMPLIT.
@@ -1078,7 +1079,7 @@ C5D9  7E        LD      A,(HL)
 C5DA  B0        OR      B
 C5DB  77        LD      (HL),A
 C5DC  C9        RET
- 
+
 ; AI:
 ; G1:
 ; Desvia se o bit 1 de AVALUE/BVALUE/CVALUE também for 1.
@@ -1109,7 +1110,7 @@ C5F2  7E        LD      A,(HL)
 C5F3  F602      OR      #02
 C5F5  77        LD      (HL),A
 C5F6  C9        RET
- 
+
 ; INIABC:
 ; VOICEA/VOICEB/VOICEC = (AVALUE/BVALUE/CVALUE >> 2) & 3
 C5F7  E5        PUSH    HL
@@ -1123,7 +1124,7 @@ C602  E5        PUSH    HL
 C603  CA0CC6    JP      Z,#C60C ; SONG4
 C606  CD11C7    CALL    #C711 ; N7
 C609  C30FC6    JP      #C60F ; SONG5
- 
+
 ; SONG4:
 C60C  CD4BC7    CALL    #C74B ; COAMP
 ; SONG5:
@@ -1162,7 +1163,7 @@ C630  D5        PUSH    DE
 C631  CD42C6    CALL    #C642 ; NOISE
 C634  D1        POP     DE
 C635  E1        POP     HL
- 
+
 ; TONE:
 C636  CDABC7    CALL    #C7AB ; FREQU
 ; Modifica ENABLE para ativar tom do canal.
@@ -1171,7 +1172,7 @@ C63C  3A5401    LD      A,(#0154) ; DEFIN
 C63F  A6        AND     (HL)
 C640  77        LD      (HL),A
 C641  C9        RET
- 
+
 ; NOSE:
 C642  1B        DEC     DE
 C643  3E06      LD      A,#06
@@ -1200,7 +1201,7 @@ C665  07        RLCA
 C666  A6        AND     (HL)
 C667  77        LD      (HL),A
 C668  C9        RET
- 
+
 ; SONGAS:
 C669  EB        EX      DE,HL
 C66A  2A5501    LD      HL,(#0155) ; ONAMP
@@ -1274,7 +1275,7 @@ C6B7  1A        LD      A,(DE)
 C6B8  E6FD      AND     #FD
 C6BA  12        LD      (DE),A
 C6BB  C9        RET
- 
+
 ; OVER:
 ; Se [[NSA/NSB/NSC] +/- 1] <> #FF, desvia.
 C6BC  FEFF      CP      #FF
@@ -1299,12 +1300,12 @@ C6D3  C0        RET     NZ
 C6D4  AF        XOR     A
 C6D5  320200    LD      (#0002),A ; SNDSW
 C6D8  C9        RET
- 
+
 ; BAS:
 C6D9  1A        LD      A,(DE)
 C6DA  E6FC      AND     #FC
 C6DC  C3CAC6    JP      #C6CA ; OVERP
- 
+
 ; NEXT:
 C6DF  1A        LD      A,(DE)
 C6E0  E6C0      AND     #C0
@@ -1350,7 +1351,7 @@ C71B  1A        LD      A,(DE)
 C71C  E60F      AND     #0F
 C71E  D360      OUT     (#60),A ; WR
 C720  C9        RET
- 
+
 ; F1:
 ; Entrada:
 ; HL aponta para byte aaaabbbb.
@@ -1398,7 +1399,7 @@ C745  79        LD      A,C
 C746  1F        RRA
 C747  4F        LD      C,A
 C748  C33CC7    JP      #C73C ; F1A
- 
+
 ; COAMP:
 ; Configura a amplitude do canal para ser
 ; variável, controlada pelo gerador da
@@ -1442,7 +1443,7 @@ C773  13        INC     DE
 C774  1A        LD      A,(DE)
 C775  D360      OUT     (#60),A ; WR
 C777  C9        RET
- 
+
 ; TONREG:
 ; Envia dados a portas do PSG.
 ; porta H recebe B.
@@ -1456,7 +1457,7 @@ C77F  D320      OUT     (#20),A ; REG
 C781  78        LD      A,B
 C782  D360      OUT     (#60),A ; WR
 C784  C9        RET
- 
+
 ; AMP:
 C785  78        LD      A,B
 C786  FE02      CP      #02
@@ -1474,7 +1475,7 @@ C794  3D        DEC     A
 ; AMPP:
 C795  D360      OUT     (#60),A ; WR
 C797  C9        RET
- 
+
 ; ND:
 ; Obtém a duração da nota e armazena em TEMPA/TEMPB/TEMPC.
 C798  D5        PUSH    DE
@@ -1492,7 +1493,7 @@ C7A7  3602      LD      (HL),#02
 ; NND:
 C7A9  D1        POP     DE
 C7AA  C9        RET
- 
+
 ; FREQU:
 C7AB  E5        PUSH    HL
 C7AC  EB        EX      DE,HL
@@ -1505,7 +1506,7 @@ C7B6  2A5201    LD      HL,(#0152) ; REGIST
 C7B9  CD78C7    CALL    #C778 ; TONREG ; Aplica o período ao PSG.
 C7BC  E1        POP     HL
 C7BD  C9        RET
- 
+
 ; DREG1:
 ; Dados para inicialização dos registradores
 ; do monitor de 80 colunas (MC6845).
@@ -1542,7 +1543,7 @@ C7CB  5C        DB      #5C
 C7CC  50        DB      #50
 ; R0: Horizontal Total <-- 109 chars
 C7CD  6D        DB      #6D
- 
+
 ; ISCN: Apaga tela de texto
 C7CE  3A0F00    LD      A,(#000F) ; C40?80
 C7D1  B7        OR      A
@@ -1652,7 +1653,7 @@ C880  F601      OR      #01
 C882  D380      OUT     (#80),A ; COL32
 C884  F1        POP     AF
 C885  C9        RET
- 
+
 ; BANK1: Habilita VRAM 32 colunas.
 C886  F5        PUSH    AF
 C887  3AF500    LD      A,(#00F5) ; MODBUF
@@ -1660,14 +1661,14 @@ C88A  E6FE      AND     #FE
 C88C  D380      OUT     (#80),A ; COL32
 C88E  F1        POP     AF
 C88F  C9        RET
- 
+
 ; BANK2: Habilita VRAM 80 colunas.
 C890  F5        PUSH    AF
 C891  3E01      LD      A,#01
 C893  D312      OUT     (#12),A ; COL80
 C895  F1        POP     AF
 C896  C9        RET
- 
+
 ; CO: Imprime o caracter armazenado em C.
 C897  E5        PUSH    HL
 C898  D5        PUSH    DE
@@ -1679,7 +1680,7 @@ C89F  3A0F00    LD      A,(#000F) ; C40?80
 C8A2  B7        OR      A
 C8A3  CA86C8    JP      Z,#C886 ; BANK1
 C8A6  C390C8    JP      #C890 ; BANK2
- 
+
 ; CO0: Imprime o caracter armazenado em C (continuação).
 ; Desvia se está em uma seqüência de ESCape.
 C8A9  212D01    LD      HL,#012D ; COSW
@@ -1775,11 +1776,11 @@ C938  D1        POP     DE
 C939  E1        POP     HL
 C93A  CD79C8    CALL    #C879 ; BANK0
 C93D  C9        RET
- 
+
 ; Impressão chegou ao fim da tela.
 C93E  F1        POP     AF
 C93F  C30ECA    JP      #CA0E ; SCROLL
- 
+
 ; Atualiza endereço do início da linha atual.
 C942  E5        PUSH    HL
 C943  2A1301    LD      HL,(#0113) ; DLNG
@@ -1789,13 +1790,13 @@ C94A  19        ADD     HL,DE
 C94B  225901    LD      (#0159),HL ; LNHD
 C94E  E1        POP     HL
 C94F  C9        RET
- 
+
 ; SPECAL: Trata impressão de ESC.
 ; Ativa um flag de seqüência de ESCape.
 C950  212D01    LD      HL,#012D ; COSW
 C953  CBC6      SET     0,(HL)
 C955  C336C9    JP      #C936
- 
+
 ; DIRECT: Trata seqüência de ESCape.
 ; Já foi impresso um caracter após o ESC?
 C958  212D01    LD      HL,#012D ; COSW
@@ -1860,7 +1861,7 @@ C9B5  CD55CB    CALL    #CB55 ; CALLUPDBM
 C9B8  7A        LD      A,D
 C9B9  325D01    LD      (#015D),A ; LCNT
 C9BC  C32FC9    JP      #C92F
- 
+
 ; Posição horizontal >= 32.
 ; Se posição horizontal >= 112, ignora seqüência de ESCape.
 C9BF  FE70      CP      #70
@@ -1877,7 +1878,7 @@ C9CA  BC        CP      H
 C9CB  CA2FC9    JP      Z,#C92F
 C9CE  DA2FC9    JP      C,#C92F
 C9D1  C397C9    JP      #C997
- 
+
 ; Põe o cursor no início da tela.
 C9D4  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 C9D7  2A6301    LD      HL,(#0163) ; DSNAM
@@ -1888,7 +1889,7 @@ C9E1  CD4DC8    CALL    #C84D
 C9E4  C3F7C9    JP      #C9F7
 C9E7  CD0AC8    CALL    #C80A
 C9EA  C3F7C9    JP      #C9F7
- 
+
 ; Limpa tela.
 C9ED  3A0F00    LD      A,(#000F) ; C40?80
 C9F0  B7        OR      A
@@ -1903,11 +1904,11 @@ C9FD  E602      AND     #02
 C9FF  CAF7C9    JP      Z,#C9F7
 CA02  CD18C8    CALL    #C818
 CA05  C3F7C9    JP      #C9F7
- 
+
 ; Impressão do caracter de controle #07 (BEEP).
 CA08  CDFCC0    CALL    #C0FC ; BEEP
 CA0B  C32FC9    JP      #C92F
- 
+
 ; SCROLL: Rola a tela de texto uma linha para cima.
 CA0E  C5        PUSH    BC
 CA0F  2A6301    LD      HL,(#0163) ; DSNAM
@@ -1931,7 +1932,7 @@ CA38  2600      LD      H,#00
 CA3A  19        ADD     HL,DE
 CA3B  C1        POP     BC
 CA3C  C325C9    JP      #C925
- 
+
 ; Impressão de caracter de controle #08 (BS).
 ; Se encontrou o início da tela, produz BEEP.
 CA3F  2A6301    LD      HL,(#0163) ; DSNAM
@@ -1947,7 +1948,7 @@ CA56  225B01    LD      (#015B),HL ; SNPTR
 CA59  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 CA5C  CD11CB    CALL    #CB11
 CA5F  C32FC9    JP      #C92F
- 
+
 ; Impressão de caracter de controle #0C.
 ; Deveria ser o avanço de cursor, mas não funciona.
 ; A instrução DEC HL deveria ser DEC DE.
@@ -1959,7 +1960,7 @@ CA6D  CCFCC0    CALL    Z,#C0FC ; BEEP
 CA70  CA2FC9    JP      Z,#C92F
 CA73  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 CA76  C300C9    JP      #C900
- 
+
 ; Impressão de caracter de controle #0D (CR).
 ; Move o cursor para o início da linha.
 CA79  CD5BCB    CALL    #CB5B ; CALLUPDBCM
@@ -1969,7 +1970,7 @@ CA82  CD55CB    CALL    #CB55 ; CALLUPDBM
 CA85  AF        XOR     A
 CA86  325D01    LD      (#015D),A ; LCNT
 CA89  C32FC9    JP      #C92F
- 
+
 ; Impressão de caracter de controle #0A (LF).
 CA8C  CD5BCB    CALL    #CB5B ; CALLUPDBCM
 ; Incrementa a posição do cursor na VRAM com
@@ -1993,7 +1994,7 @@ CAA9  09        ADD     HL,BC
 CAAA  225901    LD      (#0159),HL ; LNHD
 CAAD  E1        POP     HL
 CAAE  C325C9    JP      #C925
- 
+
 ; Impressão de caracter de controle #0B.
 ; Se o cursor já está na primeira linha
 ; apenas produz BEEP.
@@ -2005,7 +2006,7 @@ CABA  2A5B01    LD      HL,(#015B) ; SNPTR
 CABD  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 CAC0  DCFCC0    CALL    C,#C0FC ; BEEP
 CAC3  DA2FC9    JP      C,#C92F
- 
+
 ; Decrementa a posição de início da linha com
 ; a quantidade de caracteres de uma linha.
 CAC6  ED5B1301  LD      DE,(#0113) ; DLNG
@@ -2020,7 +2021,7 @@ CAD6  AF        XOR     A
 CAD7  2A5B01    LD      HL,(#015B) ; SNPTR
 CADA  ED52      SBC     HL,DE
 CADC  C325C9    JP      #C925
- 
+
 ; Impressão de caracter de controle #7F (RUBOUT).
 CADF  ED5B6301  LD      DE,(#0163) ; DSNAM
 CAE3  2A5B01    LD      HL,(#015B) ; SNPTR
@@ -2034,7 +2035,7 @@ CAF5  3620      LD      (HL),#20
 CAF7  CD55CB    CALL    #CB55 ; CALLUPDBM
 CAFA  225B01    LD      (#015B),HL ; SNPTR
 CAFD  C32FC9    JP      #C92F
- 
+
 ; Põe cursor no fim da linha anterior.
 CB00  2A5901    LD      HL,(#0159) ; LNHD
 CB03  ED4B1301  LD      BC,(#0113) ; DLNG
@@ -2043,7 +2044,7 @@ CB08  ED42      SBC     HL,BC
 CB0A  225901    LD      (#0159),HL ; LNHD
 CB0D  3A1301    LD      A,(#0113) ; DLNG
 CB10  C9        RET
- 
+
 ; Decrementa posição horizontal do cursor.
 CB11  3A5D01    LD      A,(#015D) ; LCNT
 CB14  B7        OR      A
@@ -2051,7 +2052,7 @@ CB15  CC00CB    CALL    Z,#CB00
 CB18  3D        DEC     A
 CB19  325D01    LD      (#015D),A ; LCNT
 CB1C  C9        RET
- 
+
 ; Exibe cursor em 32 colunas.
 ; (Inverte o caracter na posição do cursor.)
 CB1D  CD86C8    CALL    #C886 ; BANK1
@@ -2063,7 +2064,7 @@ CB27  77        LD      (HL),A
 CB28  E1        POP     HL
 CB29  CD79C8    CALL    #C879 ; BANK0
 CB2C  C9        RET
- 
+
 ; Apaga cursor se estiver aceso. (Em 32 colunas.)
 ; (Necessário, por exemplo, antes de movê-lo.)
 CB2D  F5        PUSH    AF
@@ -2075,7 +2076,7 @@ CB39  AF        XOR     A
 CB3A  322F01    LD      (#012F),A ; FSHCNT
 CB3D  F1        POP     AF
 CB3E  C9        RET
- 
+
 ; Exibe o cursor em 80 colunas.
 CB3F  E5        PUSH    HL
 CB40  2A5B01    LD      HL,(#015B) ; SNPTR
@@ -2104,7 +2105,7 @@ CB5B  E5        PUSH    HL
 CB5C  2AF900    LD      HL,(#00F9) ; UPDBCM
 CB5F  E3        EX      (SP),HL
 CB60  C9        RET
- 
+
 ; XCLEAR: Limpa tela gráfica.
 ; Preenche 2kb de VRAM com o valor contido em B.
 ; 2kb = 64 linhas de vídeo (1 linha = 32 bytes).
@@ -2116,7 +2117,7 @@ CB66  7C        LD      A,H
 CB67  FE88      CP      #88
 CB69  C264CB    JP      NZ,#CB64 ; XCLR1
 CB6C  C9        RET
- 
+
 ; D4X5: Display padrão 4x5.
 ; Coloca 5 bytes em linhas consecutivas
 ; da VRAM, produzindo uma figura de 4x5
@@ -2137,26 +2138,26 @@ CB77  D1        POP     DE
 CB78  05        DEC     B
 CB79  C26FCB    JP      NZ,#CB6F
 CB7C  C9        RET
- 
+
 ; TOP: Mostra tópico do jogo.
 CB7D  3E88      LD      A,#88
 CB7F  D380      OUT     (#80),A ; COL32
 CB81  010000    LD      BC,#0000
 CB84  CD61CB    CALL    #CB61 ; XCLEAR
 CB87  3A0401    LD      A,(#0104) ; PLAY
- 
+
 ; PLAYNO: Mostra número do jogo.
 ; Exibe o valor contido em A com um ou
 ; dois dígitos.
 ; C define cores: vide SHOWNO.
 CB8A  114080    LD      DE,#8040
- 
+
 ; DISPY2: Exibe 2 dígitos.
 ; Exibe o valor em A com dois dígitos
 ; a partir do endereço de VRAM em DE.
 ; C define cores: vide SHOWNO.
 CB8D  2600      LD      H,#00
- 
+
 ; DISPY: Exibe 1 ou 2 dígitos.
 ; Exibe o valor em A com um ou dois dígitos
 ; a partir do endereço de VRAM em DE.
@@ -2242,10 +2243,10 @@ CBCF  EB        EX      DE,HL
 CBD0  05        DEC     B
 CBD1  C2BFCB    JP      NZ,#CBBF
 CBD4  C9        RET
- 
+
 ; NEXTGM: Muda número do jogo.
 ; Recebe A = última tecla pressionada.
- 
+
 ; Desvia se tecla foi Ctrl+H.
 CBD5  FE08      CP      #08 ; Ctrl+H
 CBD7  CA00CC    JP      Z,#CC00
@@ -2273,7 +2274,7 @@ CBFA  220901    LD      (#0109),HL ; RCRDPT
 CBFD  E1        POP     HL
 CBFE  F1        POP     AF
 CBFF  C9        RET
- 
+
 ; Retorna se HEAD = $ff.
 CC00  3A0601    LD      A,(#0106) ; HEAD
 CC03  3C        INC     A
@@ -2302,7 +2303,7 @@ CC23  1600      LD      D,#00
 CC25  21FD01    LD      HL,#01FD ; $0200 - 3
 CC28  19        ADD     HL,DE
 CC29  C3C4C1    JP      #C1C4
- 
+
 ; JSTICK: Entrada do joystick.
 ; A = valor de entrada.
 ; A = valor de saída.
@@ -2379,30 +2380,30 @@ CCA5  0621      LD      B,#21
 CCA7  78        LD      A,B
 CCA8  C1        POP     BC
 CCA9  C9        RET
- 
+
 ; JFL:
 CCAA  E1        POP     HL
 CCAB  3E02      LD      A,#02
 CCAD  C1        POP     BC
 CCAE  C9        RET
- 
+
 ; JFR:
 CCAF  E1        POP     HL
 CCB0  3E03      LD      A,#03
 CCB2  C1        POP     BC
 CCB3  C9        RET
- 
+
 ; JRR:
 CCB4  3E03      LD      A,#03
 CCB6  C1        POP     BC
 CCB7  C9        RET
- 
+
 ; "Exibe score." (???)
 CCB8  C9        RET
- 
+
 ; "Exibe score esquerdo." (???)
 CCB9  C9        RET
- 
+
 ; SHAPON: Mostra contorno.
 ; HL aponta para o ponto da VRAM onde
 ; o desenho vai começar.
@@ -2436,7 +2437,7 @@ CCD3  C1        POP     BC
 CCD4  D1        POP     DE
 CCD5  E1        POP     HL
 CCD6  C9        RET
- 
+
 ; SHAPOF: Apaga contorno.
 ; Apaga a figura desenhada por SHAPON,
 ; substituindo os bytes da figura pelo
@@ -2472,7 +2473,7 @@ CCF9  C5        PUSH    BC
 CCFA  71        LD      (HL),C
 CCFB  13        INC     DE
 CCFC  C3DECC    JP      #CCDE
- 
+
 ; Padrões de dígitos usados por SHOWNO.
 ; "0"
 CCFF  0554      DB      #05,#54 ; --XX|XXX-
@@ -2564,7 +2565,7 @@ CD8D  0000      DB      #00,#00 ; ----|----
 CD8F  0000      DB      #00,#00 ; ----|----
 CD91  0000      DB      #00,#00 ; ----|----
 CD93  0000      DB      #00,#00 ; ----|----
- 
+
 ; SCORE: Exibe pontos na direita e na esquerda.
 ; Limpa a tela em cor amarela.
 CD95  3E88      LD      A,#88
@@ -2714,13 +2715,13 @@ CE68 13 INC DE
 CE69 7D LD A,L
 CE6A CD8FCB CALL #CB8F ; DISPY
 CE6D C9 RET
- 
+
 ; LSCORE: Exibe pontos da direita.
 ; (Esta descrição no manual de referência
 ; está errada! LSCORE na verdade transfere
 ; os scores do jogo recém-jogado para
 ; a tabela de scores.)
- 
+
 ; Tabela de scores está cheia?
 CE6E  2A0901    LD      HL,(#0109) ; RCRDPT
 CE71  7D        LD      A,L
@@ -2905,7 +2906,7 @@ CF93  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
 CF96  FE02      CP      #02
 CF98  C1        POP     BC
 CF99  C9        RET
- 
+
 ; BTEMPO
 CF9A  C8        RET     Z
 ; Pega os três parâmetros.
@@ -2990,7 +2991,7 @@ D00A  327101    LD      (#0171),A
 D00D  79        LD      A,C
 D00E  327201    LD      (#0172),A ; TONEA
 D011  C9        RET
- 
+
 ; BUNDRAW
 D012  AF        XOR     A
 D013  1802      JR      #D017           ; (2)
@@ -3042,7 +3043,7 @@ D058  D5        PUSH    DE
 D059  F5        PUSH    AF
 D05A  78        LD      A,B ; novo Y
 D05B  C383D3    JP      #D383
- 
+
 ;
 D05E  F1        POP     AF ; novo X
 D05F  C1        POP     BC ; novo Y
@@ -3850,7 +3851,7 @@ D4D5  C9        RET
 D4D6  C0        RET     NZ
 D4D7  3E02      LD      A,#02
 D4D9  C3ACD4    JP      #D4AC ; XGR
- 
+
 ; Limpa tela gráfica.
 D4DC  E5        PUSH    HL
 D4DD  D5        PUSH    DE
@@ -3892,18 +3893,18 @@ D515  C9        RET
 ; Configuração para 32 colunas.
 D516  AF        XOR     A
 D517  18F4      JR      #D50D           ; (-12)
- 
+
 ; BTLOAD
 D519  C0        RET     NZ
 D51A  C354C1    JP      #C154 ; TLOAD
- 
+
 ; Lê parâmetro de COLOR.
 D51D  2B        DEC     HL
 D51E  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 D521  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 D524  C6        DB      #C6 ; token "="
 D525  C399E9    JP      #E999 ; {ARGVL1} [GETINT]
- 
+
 ; BCOLOR
 ; Lê parâmetro.
 D528  CD1DD5    CALL    #D51D
@@ -3914,7 +3915,7 @@ D52F  FE04      CP      #04
 D531  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
 D534  32F600    LD      (#00F6),A
 D537  C9        RET
- 
+
 ; {BYT} [BFREE]
 D538  20425954  DB      ' BYT'
 D53C  4553      DB      'ES'
@@ -3930,7 +3931,7 @@ D556  4D505554  DB      'MPUT'
 D55A  45522020  DB      'ER  '
 D55E  0D0A      DB      #0D,#0A; CR+LF
 D560  00        DB      #00
- 
+
 ; {ADRTB2} <KW_INLINE_FNS>
 ; Endereços das funções.
 D561  E2EC      DW      #ECE2 ; BSGN {SGN} <Sgn>
@@ -3957,7 +3958,7 @@ D589  BDE8      DW      #E8BD ; BCHR$ {CHR_}
 D58B  CDE8      DW      #E8CD ; BLEFT$ {LEFT_}
 D58D  FCE8      DW      #E8FC ; BRIGHT$ {RGHT_}
 D58F  05E9      DW      #E905 ; BMID$ {MID_}
- 
+
 ; {MNEMTB} <KEYWORDS>
 ; Palavras reservadas do BASIC.
 ; A primeira letra de cada palavra
@@ -4084,7 +4085,7 @@ D6E4  5424      DB      'T$'
 D6E6  CD494424  DB      'M'+#80,'ID$' ; mid$
 ; Fim da lista de palavras reservadas.
 D6EA  80        DB      #80
- 
+
 ; {ADRTB1} <KW_GENERAL_FNS>
 ; Endereços dos comandos.
 D6EB  21DE      DW      #DE21 ; BEND {END} <Stop>
@@ -4141,7 +4142,7 @@ D74F  90D0      DW      #D090 ; BEDIT
 D751  85D0      DW      #D085 ; BINVERSE
 D753  8CD0      DW      #D08C ; BNORMAL
 D755  F4F1      DW      #F1F4 ; BDEBUG
- 
+
 ; {ADRTB3} <KW_ARITH_OP_FNS>
 ; Precedência e endereço do operador.
 D757  79        DB      #79
@@ -4158,7 +4159,7 @@ D766  50        DB      #50
 D767  DAE3      DW      #E3DA ; BAND {AND}
 D769  46        DB      #46
 D76A  D9E3      DB      #E3D9 ; BOR {OR}
- 
+
 ; TABERRCOD: Tabela de códigos de erro.
 ; {ERRTAB} <ERROR_CODES> [ERRORS]
 D76C  4E46      DB      'NF' ; NEXT sem FOR / NF=NEXT without FOR.
@@ -4180,23 +4181,23 @@ D78A  4343      DB      'CC' ; Cadeia complexa / ST=String formula too complex.
 D78C  4E43      DB      'NC' ; Não pode continuar / CN=Cannot continue.
 D78E  4649      DB      'FI' ; Função indefinida / UF=Undefined function.
 D790  464F      DB      'FO' ; Falta operando / MO=Missing operand.
- 
+
 ; {RAMST} [INITAB]
 ; Este bloco de dados (#D792~#D7DF) é copiado
 ; para (#0300~#034D) na inicialização.
 ; INÍCIO DO BLOCO.
 ; #0300:{WSP} [WRKSPC]
 D792  C32DCF    JP      #CF2D
- 
+
 ; Ponto de entrada da função USR.
 ; #0303:BUSR {USRLOC} [USR]
 D795  C3F6DE    JP      #DEF6 ; PIERRO {FCER} [FCERR]
- 
+
 ; Rotina auxiliar para OUT.
 ; #0306:OUTAUX {PORTAD} [OUTSUB]
 D798  D300      OUT     (#00),A ; #0307:{PORTAD+1} [OTPORT]
 D79A  C9        RET
- 
+
 ; Rotina auxiliar para DIV.
 ; Os valores #00 serão substituídos.
 ; #0309:{DIVVAR} [DIVSUP]
@@ -4210,7 +4211,7 @@ D7A3  DE00      SBC     A,#00 ; #0312:{DVAR3} [DIV3]
 D7A5  47        LD      B,A
 D7A6  3E00      LD      A,#00 ; #0315:{DVAR4} [DIV4]
 D7A8  C9        RET
- 
+
 ; Dados auxiliares para RND().
 D7A9  00        DB      #00 ; #0317:{RNDVR1} [SEED]
 D7AA  00        DB      #00 ; #0318:{RNDVR2} [SEED+1]
@@ -4224,12 +4225,12 @@ D7C0  0A1A9F98  DB      #0A,#1A,#9F,#98 ; -1.04269E+7
 D7C4  65BCCD98  DB      #65,#BC,#CD,#98 ; -1.34831E+7
 D7C8  D6773E98  DB      #D6,#77,#3E,#98 ; +1.24825E+7
 D7CC  52C74F80  DB      #52,#C7,#4F,#80 ; .811653 ; #033A:{RNDV4} [LSTRND]
- 
+
 ; Rotina auxiliar para INP().
 ; #033E:[INPSUB]
 D7D0  DB00      IN      A,(#00) ; #033F:[INPORT]
 D7D2  C9        RET
- 
+
 ; #0341: Quantidade de caracteres ASCII NULL a serem impressos
 ; após um CR+LF.
 ; (O Altair BASIC tinha um comando NULL para definir este valor.)
@@ -4255,7 +4256,7 @@ D7D9  FEFF      DB      #FFFE
 ; {PSTBEG} <PROGRAM_BASE> [BASTXT]
 D7DB  D503      DB      #03D5 ; {PRAM}
 ; FIM DO BLOCO ([INITBE]) mais abaixo, em #D7DF.
- 
+
 ; <Status Strings>
 ; {ERR} <szError> [ERRMSG]
 D7DD  20        DB      ' '
@@ -4273,13 +4274,13 @@ D7EE  00        DB      #00
 D7EF  50415553  DB      'PAUS'
 D7F3  41        DB      'A'
 D7F4  00        DB      #00
- 
+
 ; {FORSR} <GetFlowPtr>
 ; "Faz HL apontar para a estrutura de fluxo apropriada na pilha.
 ; Na entrada, se a rotina foi chamada pelo tratador da palavra-chave
 ; NEXT então DE está apontando para a variável após a palavra-chave
 ; NEXT."
- 
+
 ; "Os quatro primeiros bytes são (ou deveriam ser) dois endereços
 ; de retorno. Não estamos interessados neles, então a primeira
 ; coisa a fazer é fazer HL apontar para SP+4."
@@ -4325,7 +4326,7 @@ D811  E1        POP     HL
 D812  C8        RET     Z
 D813  09        ADD     HL,BC
 D814  18E3      JR      #D7F9           ; (-29)
- 
+
  ; {LININ} <CopyMemoryUp> [MOVUP]
 ; "Copia um bloco de memória de BC para HL. A cópia
 ; é feita do fim para o começo, descendo e incluindo
@@ -4334,7 +4335,7 @@ D814  18E3      JR      #D7F9           ; (-29)
 ; a frente blocos de memória de uns poucos bytes. Se
 ; ela copiasse do começo para o fim, então o bloco de
 ; memória se sobrescreveria."
- 
+
 ; Checa memória disponível.
 D816  CD30D8    CALL    #D830 ; {TMEMO1} <CheckEnoughMem>
 ; {LININ1}
@@ -4353,7 +4354,7 @@ D821  C8        RET     Z
 D822  0B        DEC     BC
 D823  2B        DEC     HL
 D824  C31CD8    JP      #D81C ; {LININ2} <CopyMemLoop>
- 
+
 ; Verifica memória disponível
 ; para 2xC bytes.
 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
@@ -4378,7 +4379,7 @@ D83A  67        LD      H,A
 D83B  39        ADD     HL,SP
 D83C  E1        POP     HL
 D83D  D8        RET     C
- 
+
 ; FMERRO: Produz erro "FM" (fim de memória)
 ; {OMER} <OutOfMemory>
 D83E  1E0C      LD      E,#0C ; erro "FM"
@@ -4401,7 +4402,7 @@ D851  1E12      LD      E,#12 ; erro "MR"
 D853  01        DB      #01 ; Oculta a instrução seguinte.
 ; {UFER}
 D854  1E22      LD      E,#22 ; erro "FI"
- 
+
 ; ERROE: Exibe erro indicado pelo registrador E.
 ; {ERROO} <Error> [ERROR]
 D856  CDC7D9    CALL    #D9C7 ; {INITR} <ResetStack> [CLREG]
@@ -4475,7 +4476,7 @@ D8BD  AF        XOR     A
 D8BE  326103    LD      (#0361),A ; AUTOEXEC
 ; Vai para {NEW2}.
 D8C1  C3ADD9    JP      #D9AD ; {NEW2} <ResetAll> [RUNFST]
- 
+
 ; AUTO está ativo.
 ; Acrescenta 10 ao número de linha.
 D8C4  110A00    LD      DE,#000A ; +10
@@ -4706,14 +4707,14 @@ D9DC  C5        PUSH    BC ; Recoloca endereço de retorno na pilha.
 ; [DOAGN]
 D9DD  2AAF03    LD      HL,(#03AF) ; {CUSTMT} <PROG_PTR_TEMP> [BRKLIN]
 D9E0  C9        RET
- 
+
 ; {OUT?} <InputLineWith?> [PROMPT]
 D9E1  3E3F      LD      A,'?'
 D9E3  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 D9E6  3E20      LD      A,' '
 D9E8  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 D9EB  C3C9DA    JP      #DAC9 ; GETL {INPLOC} <InputLine> [RINPUT]
- 
+
 ; {SCANN} <Tokenize> [CRUNCH]
 D9EE  AF        XOR     A
 D9EF  329103    LD      (#0391),A ; {DSTMNT}
@@ -4742,7 +4743,7 @@ DA0F  FE30      CP      '0'
 DA11  3805      JR      C,#DA18 ; {DCLI0} ; (5)
 DA13  FE3C      CP      '<'
 DA15  DA67DA    JP      C,#DA67 ; {SCANN9} <WriteChar>
- 
+
 ; Procura string na lista de palavras-chave.
 ; {DCLI0}
 DA18  D5        PUSH    DE
@@ -4800,19 +4801,19 @@ DA58  B9        CP      C
 DA59  28E5      JR      Z,#DA40 ; {SCANN4} ; (-27)
 DA5B  E1        POP     HL
 DA5C  C32FDA    JP      #DA2F ; {SCANN2}
- 
+
 ; {SCANN7}
 DA5F  48        LD      C,B
 DA60  F1        POP     AF
 DA61  EB        EX      DE,HL
 DA62  C9        RET
- 
+
 ; {SCANN8}
 DA63  EB        EX      DE,HL
 DA64  79        LD      A,C
 DA65  C1        POP     BC
 DA66  D1        POP     DE
- 
+
 ; {SCANN9} <WriteChar>
 DA67  23        INC     HL
 DA68  12        LD      (DE),A
@@ -4847,21 +4848,21 @@ DA97  12        LD      (DE),A
 DA98  13        INC     DE
 DA99  12        LD      (DE),A
 DA9A  C9        RET
- 
+
 ; Trata Ctrl+C: cancela entrada.
 ; Adicionalmente, desativa AUTO.
 DA9B  CDC7E0    CALL    #E0C7 ; PRINTCRLF [PRNTCR]
 DA9E  AF        XOR     A
 DA9F  325D03    LD      (#035D),A ; {AUTOFG}
 DAA2  C9        RET
- 
+
 ;
 DAA3  3E1A      LD      A,#1A ; limpa a tela
 DAA5  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 DAA8  3E1E      LD      A,#1E ; cursor no início da tela
 DAAA  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 DAAD  C3D2DA    JP      #DAD2
- 
+
 ; Trata Ctrl+H ou RUBOUT.
 DAB0  3E08      LD      A,#08
 ; Se B < 2, apenas emite bip e
@@ -5123,7 +5124,7 @@ DC0D  C0        RET     NZ
 DC0E  7D        LD      A,L
 DC0F  93        SUB     E
 DC10  C9        RET
- 
+
 ; CHKSYN: Checa sintaxe.
 ; Verifica se o próximo caracter do
 ; programa BASIC corresponde ao byte
@@ -5137,7 +5138,7 @@ DC14  23        INC     HL
 DC15  E3        EX      (SP),HL
 DC16  CAA0DD    JP      Z,#DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 DC19  C348D8    JP      #D848 ; SNERRO
- 
+
 ; PRINTAPOS: Imprime o caracter em A,
 ; atualizando o valor de POS() e
 ; providenciando quebra de linha
@@ -6033,13 +6034,13 @@ E101  E5        PUSH    HL
 E102  280E      JR      Z,#E112 ; {TAB1} [DOSPC]
 E104  FE04      CP      #04
 E106  CA3AE1    JP      Z,#E13A ; Trata VTAB.
- 
+
 ; Trata TAB.
 E109  7B        LD      A,E
 E10A  FE01      CP      #01
 E10C  DAF6DE    JP      C,#DEF6 ; PIERRO {FCER} [FCERR]
 E10F  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
- 
+
 ; Trata SPC.
 ; {TAB1} [DOSPC]
 E112  2F        CPL
@@ -6053,13 +6054,13 @@ E118  3E20      LD      A,' ' ; Espaço.
 E11A  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 E11D  05        DEC     B
 E11E  20FA      JR      NZ,#E11A; {TAB3} [SPCLP]
- 
+
 ; Trata ";" no comando PRINT.
 ; {TAB4} [NEXITM]
 E120  E1        POP     HL
 E121  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E124  C370E0    JP      #E070 ; {PRINT2} [PRNTLP]
- 
+
 ; Verifica parâmetro de VTAB.
 ; Se o modo de texto é de 32 colunas...
 E127  3A0F00    LD      A,(#000F) ; C40?80
@@ -6075,7 +6076,7 @@ E134  C9        RET
 ; O parâmetro de VTAB deve ser 0~23.
 E135  FE18      CP      #18
 E137  C331E1    JP      #E131
- 
+
 ; Trata VTAB.
 E13A  43        LD      B,E
 E13B  CD27E1    CALL    #E127 ; Verifica parâmetro segundo 32/80 colunas.
@@ -6145,7 +6146,7 @@ E180  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E183  2C        DB      ','
 E184  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 E187  C3DDD9    JP      #D9DD ; [DOAGN] ; Repita último INPUT.
- 
+
 ; BINPUT:
 ; {INPUT} <Input> [INPUT]
 E18A  CDA2E6    CALL    #E6A2 ; [IDTEST]
@@ -6174,7 +6175,7 @@ E1AF  C5        PUSH    BC ; Empilha ponto de interpretação.
 E1B0  CAC1DF    JP      Z,#DFC1 ; [NXTDTA] ; Sim, procura próxima instrução DATA.
 E1B3  362C      LD      (HL),',' ; Armazena vírgula como separador.
 E1B5  1805      JR      #E1BC ; [NXTITM] ; Obtém próximo item.
- 
+
 ; BREAD:
 ; {READ} <Read> [READ]
 E1B7  E5        PUSH    HL ; Salva ponto de interpretação.
@@ -6540,7 +6541,7 @@ E3D5  23        INC     HL
 E3D6  66        LD      H,(HL)
 E3D7  69        LD      L,C
 E3D8  E9        JP      (HL)
- 
+
 ; BOR
 ; A instrução abaixo oculta a instrução
 ; ; BAND
@@ -6793,7 +6794,7 @@ E519  23        INC     HL
 E51A  EB        EX      DE,HL
 E51B  E1        POP     HL
 E51C  C9        RET
- 
+
 ; RSTFLOAT: Põe em FLOAT string nula
 ; ou numérico zero.
 E51D  32C203    LD      (#03C2),A ; {WRA1+3} <FACCUM+3> [FPEXP]
@@ -6801,7 +6802,7 @@ E520  21E9D7    LD      HL,#D7E9
 E523  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG]
 E526  E1        POP     HL
 E527  C9        RET
- 
+
 ; Empilha (#038F).
 E528  E5        PUSH    HL
 E529  2A8F03    LD      HL,(#038F) ; {LOCCRE} <DIM_OR_EVAL>
@@ -6876,7 +6877,7 @@ E578  CA18EC    JP      Z,#EC18 ; POPHLRET
 ;
 E57B  96        SUB     (HL)
 E57C  CADEE5    JP      Z,#E5DE
- 
+
 ; IIERRO: {BSER}
 E57F  1E10      LD      E,#10 ; erro "II"
 E581  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
@@ -6972,7 +6973,7 @@ E5FF  09        ADD     HL,BC
 E600  EB        EX      DE,HL
 E601  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR]
 E604  C9        RET
- 
+
 ; BFRE
 ; DE = início da área livre após
 ; matrizes.
@@ -7043,7 +7044,7 @@ E660  44        LD      B,H
 E661  4D        LD      C,L
 E662  E3        EX      (SP),HL
 E663  1838      JR      #E69D           ; (56)
- 
+
 ; Avalia FN.
 E665  CDB0E6    CALL    #E6B0
 E668  D5        PUSH    DE
@@ -7087,7 +7088,7 @@ E69D  71        LD      (HL),C
 E69E  23        INC     HL
 E69F  70        LD      (HL),B
 E6A0  184D      JR      #E6EF           ; (77)
- 
+
 ; Previne modo programado.
 ; [IDTEST]:
 E6A2  E5        PUSH    HL
@@ -7097,11 +7098,11 @@ E6A7  7C        LD      A,H
 E6A8  B5        OR      L
 E6A9  E1        POP     HL
 E6AA  C0        RET     NZ
- 
+
 ; DIERRO
 E6AB  1E16      LD      E,#16 ; erro "DI"
 E6AD  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
- 
+
 ;
 E6B0  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E6B3  B8        DB      #B8 ; token "FN"
@@ -7112,7 +7113,7 @@ E6B9  B6        OR      (HL)
 E6BA  47        LD      B,A
 E6BB  CD89E4    CALL    #E489
 E6BE  C3BFE2    JP      #E2BF ; STR?TI {SNALY3} [TSTNUM]
- 
+
 ; BSTR$
 ; {STR_} [STR]
 E6C1  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
@@ -7157,7 +7158,7 @@ E6F1  23        INC     HL
 E6F2  72        LD      (HL),D
 E6F3  E1        POP     HL
 E6F4  C9        RET
- 
+
 ; NEWSTRREC: Cria em $03A2 {STRDAT} [TMPSTR]
 ; um novo registro de string temporário para
 ; a string apontada por HL, transferindo-o
@@ -7183,7 +7184,7 @@ E6F4  C9        RET
 ; interpretação do BASIC.
 ; {SLEN0} [CRTST]
 E6F5  2B        DEC     HL
- 
+
 ; Avalia literal string terminada com 0
 ; ou aspas a partir de HL + 1.
 ; {SOPRND} [QTSTR]: 
@@ -7265,7 +7266,7 @@ E744  FE0D      CP      #0D
 E746  CCD1E0    CALL    Z,#E0D1 ; POSZERO {CRWDY3}
 E749  03        INC     BC
 E74A  18F2      JR      #E73E ; {TEXTO2} [PRSLP]
- 
+
 ; ALOCA: Aloca A bytes na área de strings.
 ; O endereço da área alocada retorna em DE.
 ; {STROP} [TESTR]
@@ -7521,14 +7522,13 @@ E898  C0        RET     NZ ; Sim
 E899  229403    LD      (#0394),HL ; {SPTPTR} [TMSTPT]
 E89C  C9        RET
 
-
 ; BLEN
 ; Forja retorno para FLOATA.
 E89D  013FE6    LD      BC,#E63F ; FLOATA
 E8A0  C5        PUSH    BC
 ; ALEN
 ; Obtém em A o comprimento da string.
- 
+
 ; Checa tipo string e desempilha se possível.
 E8A1  CD6CE8    CALL    #E86C
 ; Define tipo numérico (e zera D).
@@ -7732,7 +7732,7 @@ E98D  320703    LD      (#0307),A ; [OUTPORT]
 E990  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E993  2C        DB      ','
 E994  1803      JR      #E999 ; {ARGVL1} [GETINT]
- 
+
 ; Avalia uma expressão numérica positiva e obtém seu valor
 ; inteiro 0~255 em A. Caso contrário, produz "PI ERRO".
 ; {ARGVAL} <GetSubscript> [FNDNUM]
@@ -7749,7 +7749,7 @@ E9A4  2B        DEC     HL
 E9A5  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E9A8  7B        LD      A,E
 E9A9  C9        RET
- 
+
 ; BSAVE
 E9AA  FE2A      CP      '*'
 E9AC  2006      JR      NZ,#E9B4        ; (6)
@@ -7782,7 +7782,7 @@ E9CE  20FB      JR      NZ,#E9CB        ; (-5)
 E9D0  360D      LD      (HL),#0D
 E9D2  0606      LD      B,#06
 E9D4  C3B7C4    JP      #C4B7 ; TAPOUT
- 
+
 ;
 E9D7  E1        POP     HL
 E9D8  2B        DEC     HL
@@ -7792,7 +7792,7 @@ E9DB  FE0D      CP      #0D
 E9DD  20FA      JR      NZ,#E9D9        ; (-6)
 E9DF  3600      LD      (HL),#00
 E9E1  C9        RET
- 
+
 ; STRFN5:
 ; Armazena nome do arquivo a salvar
 ; em #018D (FILNAM).
@@ -7841,11 +7841,11 @@ EA12  13        INC     DE
 EA13  05        DEC     B
 EA14  20FB      JR      NZ,#EA11        ; (-5)
 EA16  18EE      JR      #EA06           ; (-18)
- 
+
 ;
 EA18  1E08      LD      E,#08 ; erro "PI"
 EA1A  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
- 
+
 ; BLOAD
 EA1D  FE2A      CP      '*'
 EA1F  2004      JR      NZ,#EA25        ; (4)
@@ -7938,7 +7938,7 @@ EA94  21        DB      #21
 ; BSUB
 EA95  C1        POP     BC
 EA96  D1        POP     DE
- 
+
 ; BCDEMINUSFLOAT: FLOAT = BCDE - FLOAT.
 ; {ADD4} [SUBCDE]
 EA97  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
@@ -7994,7 +7994,7 @@ EAE3  23        INC     HL
 EAE4  7E        LD      A,(HL)
 EAE5  99        SBC     A,C
 EAE6  4F        LD      C,A
- 
+
 ; {ADD9} <FNormalise>
 ; Passa de CDE,B para CDH,L*2^B.
 EAE7  DC48EB    CALL    C,#EB48 ; {ADD20} <FNegateInt>
@@ -8018,14 +8018,14 @@ EAF9  FEE0      CP      #E0 ; -32
 EAFB  20F0      JR      NZ,#EAED        ; (-16)
 ; Se B = -32 (já deslocou CDHL quatro vezes),
 ; é zero.
- 
+
 ; FLOAT0: {ADD12} <FZero> [RESZER]
 ; Carrega 0 em FLOAT.
 EAFD  AF        XOR     A
 ; {ADD13} [SAVEXP]
 EAFE  32C203    LD      (#03C2),A ; {WRA1+3} <FACCUM+3> [FPEXP]
 EB01  C9        RET
- 
+
 ; Desloca CDHL 1 bit para a esquerda e
 ; B <-- B - 1...
 EB02  05        DEC     B
@@ -8069,7 +8069,7 @@ EB26  E680      AND     #80
 EB28  A9        XOR     C
 EB29  4F        LD      C,A
 EB2A  C314ED    JP      #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
- 
+
 ; {ADD18} <FMantissaInc>
 ; Incrementa (1,C)DE (arredonda para mais).
 EB2D  1C        INC     E
@@ -8099,7 +8099,7 @@ EB44  7E        LD      A,(HL)
 EB45  89        ADC     A,C
 EB46  4F        LD      C,A
 EB47  C9        RET
- 
+
 ; {ADD20} <FNegateInt>
 ; Inverte o sinal do futuro número de ponto flutuante.
 EB48  21C303    LD      HL,#03C3 ; {SGNORS} [SGNRES]
@@ -8638,7 +8638,7 @@ ED61  CD67ED    CALL    #ED67 ; {CPOPER} <FIsEqual>
 ED64  1F        RRA
 ED65  A9        XOR     C
 ED66  C9        RET
- 
+
 ; {CPOPER} <FIsEqual>
 ; Se FLOAT e BCDE são iguais, retorna zero.
 ED67  23        INC     HL
@@ -8807,7 +8807,7 @@ EE00  4F        LD      C,A ; "decimal_point_done ($ff=não, $00=sim)"
 ; {VALNR2} <FInLoop> [MANLP]
 ; "Este é o início do laço que processa um
 ; caracter ASCII de cada vez."
- 
+
 ; "Obtém próximo caracter ASCII e se for um
 ; dígito (o que é determinado pelo carry flag)
 ; então salta para ProcessDigit."
@@ -8873,7 +8873,7 @@ EE31  0C        INC     C
 ; {VALNR4} [DPOINT]
 EE32  0C        INC     C
 EE33  28CC      JR      Z,#EE01 ; {VALNR2} <FInLoop> [MANLP] ; "Se C agora é zero"
- 
+
 ; {VALNR5} <ScaleResult> [CONEXP]
 ; "Acreditamos que já lemos todos os caracteres
 ; que compõem o número. Só falta escalar decimalmente
