@@ -321,7 +321,7 @@ C1D3  321B01    LD      (#011B),A ; KEY0
 C1D6  E9        JP      (HL)
 
 ; INTIA:
-; (HL) <-- ((HL) * #10) AND #70 OR B
+; (HL) <-- (HL) << 4 OR B.
 C1D7  7E        LD      A,(HL)
 C1D8  07        RLCA
 C1D9  07        RLCA
@@ -346,31 +346,31 @@ C1F8  213901    LD      HL,#0139 ; AVALUE
 C1FB  B6        OR      (HL)
 C1FC  CA0CC2    JP      Z,#C20C ; BBB
 C1FF  064D      LD      B,#4D
-C201  CDD7C1    CALL    #C1D7 ; INTIA
+C201  CDD7C1    CALL    #C1D7 ; INTIA ; (AVALUE) <-- (AVALUE) << 4 OR #4D.
 C204  216D01    LD      HL,#016D ; CHANA
-C207  223701    LD      (#0137),HL ; NAA
-C20A  360F      LD      (HL),#0F
+C207  223701    LD      (#0137),HL ; NAA ; (NAA) <-- CHANA.
+C20A  360F      LD      (HL),#0F ; (CHANA) <-- #0F.
 ; BBB:
 C20C  214201    LD      HL,#0142 ; BVALUE
 C20F  AF        XOR     A
 C210  B6        OR      (HL)
 C211  CA21C2    JP      Z,#C221 ; CCC
 C214  0649      LD      B,#49
-C216  CDD7C1    CALL    #C1D7 ; INTIA
+C216  CDD7C1    CALL    #C1D7 ; INTIA ; (BVALUE) <-- (BVALUE) << 4 OR #49.
 C219  217301    LD      HL,#0173 ; CHANB
-C21C  224001    LD      (#0140),HL NBB
-C21F  360D      LD      (HL),#0D
+C21C  224001    LD      (#0140),HL ; NBB ; (NBB) <-- CHANB.
+C21F  360D      LD      (HL),#0D ; (CHANB) <-- #0D.
 ; CCC:
 C221  214B01    LD      HL,#014B ; CVALUE
 C224  AF        XOR     A
 C225  B6        OR      (HL)
 C226  CA36C2    JP      Z,#C236 ; DZD
 C229  0649      LD      B,#49
-C22B  CDD7C1    CALL    #C1D7 ; INTIA
+C22B  CDD7C1    CALL    #C1D7 ; INTIA ; (CVALUE) <-- (CVALUE) << 4 OR #49.
 C22E  217901    LD      HL,#0179 ; CHANC
-C231  224901    LD      (#0149),HL ; NCC
-C234  360D      LD      (HL),#0D
-DZD:
+C231  224901    LD      (#0149),HL ; NCC ; (NCC) <-- CHANC.
+C234  360D      LD      (HL),#0D ; (CHANC) <-- #0D.
+; DZD:
 C236  CD5FC5    CALL    #C55F ; INTRUP
 C239  C9        RET
 
@@ -2769,6 +2769,7 @@ CEB4  CDFCC0    CALL    #C0FC ; BEEP
 CEB7  C3D6CE    JP      #CED6 ; BAENT0
 
 ; Inicializa som (silêncio).
+; (A retorna com 0.)
 CEBA  AF        XOR     A
 CEBB  327201    LD      (#0172),A ; TONEA
 CEBE  327801    LD      (#0178),A ; TONEB
@@ -2884,8 +2885,8 @@ CF6F  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 CF72  2C        DB      ','
 CF73  C399E9    JP      #E999 ; {ARGVL1} [GETINT]
 
-; Lê os três parâmetros de TEMPO
-; e SOUND: B, C, A.
+; Lê os três parâmetros de TEMPO/SOUND: B, C, A.
+; Retorna flags indicando número do canal (C=1, Z=2).
 CF76  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
 CF79  47        LD      B,A
 CF7A  C5        PUSH    BC
@@ -2909,37 +2910,36 @@ CF99  C9        RET
 
 ; BTEMPO
 CF9A  C8        RET     Z
-; Pega os três parâmetros.
-CF9B  CD76CF    CALL    #CF76
+CF9B  CD76CF    CALL    #CF76 ; Lê os três parâmetros de TEMPO/SOUND: B, C, A.
 ; Checa 2º parâmetro (0~3).
-CF9E  F5        PUSH    AF
-CF9F  79        LD      A,C
+CF9E  F5        PUSH    AF ; Preserva indicação do número do canal nos flags (C=1, Z=2).
+CF9F  79        LD      A,C ; Segundo parâmetro deve estar entre 0 e 3.
 CFA0  FE00      CP      #00
 CFA2  DAF6DE    JP      C,#DEF6 ; PIERRO {FCER} [FCERR]
 CFA5  FE04      CP      #04
 CFA7  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
-CFAA  F1        POP     AF
+CFAA  F1        POP     AF ; Restaura indicação do número de canal nos flags (C=1, Z=2).
 ; Forja retorno.
-CFAB  11BACE    LD      DE,#CEBA
+CFAB  11BACE    LD      DE,#CEBA ; Inicializa som (silêncio).
 CFAE  D5        PUSH    DE
 ;
-CFAF  3814      JR      C,#CFC5 ; (20)
-CFB1  2809      JR      Z,#CFBC ; (9)
+CFAF  3814      JR      C,#CFC5 ; Canal 1.
+CFB1  2809      JR      Z,#CFBC ; Canal 2.
 ; Canal 3.
 CFB3  78        LD      A,B
-CFB4  327B01    LD      (#017B),A
+CFB4  327B01    LD      (#017B),A ; CHANC+2.
 CFB7  79        LD      A,C
 CFB8  324B01    LD      (#014B),A ; CVALUE
 CFBB  C9        RET
 ; Canal 2.
 CFBC  78        LD      A,B
-CFBD  327501    LD      (#0175),A
+CFBD  327501    LD      (#0175),A ; CHANB+2.
 CFC0  79        LD      A,C
 CFC1  324201    LD      (#0142),A ; BVALUE
 CFC4  C9        RET
 ; Canal 1.
 CFC5  78        LD      A,B
-CFC6  326F01    LD      (#016F),A
+CFC6  326F01    LD      (#016F),A ; CHANA+2.
 CFC9  79        LD      A,C
 CFCA  323901    LD      (#0139),A ; AVALUE
 CFCD  C9        RET
@@ -2947,16 +2947,16 @@ CFCD  C9        RET
 ; BSOUND
 CFCE  C8        RET Z
 CFCF  E5        PUSH    HL
-CFD0  3A0100    LD      A,(#0001)
+CFD0  3A0100    LD      A,(#0001) ; Se (#0001) = 0...
 CFD3  B7        OR      A
 CFD4  2007      JR      NZ,#CFDD ; (7)
-CFD6  3C        INC     A
+CFD6  3C        INC     A ; (#0001) <-- 1
 CFD7  320100    LD      (#0001),A
-CFDA  CDE1C1    CALL    #C1E1
+CFDA  CDE1C1    CALL    #C1E1 ; VOICE
 CFDD  E1        POP     HL
-CFDE  CD76CF    CALL    #CF76
-CFE1  3820      JR      C,#D003 ; (32)
-CFE3  280F      JR      Z,#CFF4 ; (15)
+CFDE  CD76CF    CALL    #CF76 ; Lê os três parâmetros de TEMPO/SOUND: B, C, A.
+CFE1  3820      JR      C,#D003 ; Canal 1.
+CFE3  280F      JR      Z,#CFF4 ; Canal 2.
 ; Canal 3.
 ; Espera acabar a nota anterior.
 CFE5  3A7E01    LD      A,(#017E) ; TONEC
@@ -2964,10 +2964,11 @@ CFE8  B7        OR      A
 CFE9  20FA      JR      NZ,#CFE5 ; (-6)
 ; Armazena nota e duração.
 CFEB  78        LD      A,B
-CFEC  327D01    LD      (#017D),A
+CFEC  327D01    LD      (#017D),A ; TONEC-1.
 CFEF  79        LD      A,C
 CFF0  327E01    LD      (#017E),A ; TONEC
 CFF3  C9        RET
+
 ; Canal 2.
 ; Espera acabar a nota anterior.
 CFF4  3A7801    LD      A,(#0178) ; TONEB
@@ -2975,7 +2976,7 @@ CFF7  B7        OR      A
 CFF8  20FA      JR      NZ,#CFF4 ; (-6)
 ; Armazena nota e duração.
 CFFA  78        LD      A,B
-CFFB  327701    LD      (#0177),A
+CFFB  327701    LD      (#0177),A ; TONEB-1.
 CFFE  79        LD      A,C
 CFFF  327801    LD      (#0178),A ; TONEB
 D002  C9 RET
@@ -2987,7 +2988,7 @@ D006  B7        OR      A
 D007  20FA      JR      NZ,#D003        ; (-6)
 ; Armazena nota e duração.
 D009  78        LD      A,B
-D00A  327101    LD      (#0171),A
+D00A  327101    LD      (#0171),A ; TONEA-1.
 D00D  79        LD      A,C
 D00E  327201    LD      (#0172),A ; TONEA
 D011  C9        RET
@@ -5481,10 +5482,10 @@ DDF6  19        ADD     HL,DE
 DDF7  3E7C      LD      A,#7C
 DDF9  A6        AND     (HL)
 DDFA  77        LD      (HL),A
-DDFB  CDC7CE    CALL    #CEC7
+DDFB  CDC7CE    CALL    #CEC7 ; Zera período da envoltória no PSG.
 DDFE  CD06C0    CALL    #C006 ; KEY
-DE01  CD5FDE    CALL    #DE5F
-DE04  3C        INC     A
+DE01  CD5FDE    CALL    #DE5F ; Incrementa AVALUE, BVALUE e CVALUE e silencia PSG.
+DE04  3C        INC     A; (#0001) = 1.
 DE05  320100    LD      (#0001),A
 DE08  C1        POP     BC
 DE09  D1        POP     DE
@@ -5537,12 +5538,12 @@ DE38  22B503    LD      (#03B5),HL ; {LBYTER} [CONTAD]
 DE3B  AF        XOR     A
 DE3C  324403    LD      (#0344),A ; {OUTFLG} [CTLOFG]
 DE3F  3D        DEC     A
-DE40  327101    LD      (#0171),A
-DE43  327701    LD      (#0177),A
-DE46  327D01    LD      (#017D),A
+DE40  327101    LD      (#0171),A ; TONEA-1.
+DE43  327701    LD      (#0177),A ; TONEB-1.
+DE46  327D01    LD      (#017D),A ; TONEC-1.
 DE49  010600    LD      BC,#0006 ; 6ms
 DE4C  CD0EC3    CALL    #C30E ; DELAYB
-DE4F  CDC7CE    CALL    #CEC7
+DE4F  CDC7CE    CALL    #CEC7 ; Zera período da envoltória no PSG.
 DE52  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 ; Se foi STOP ou Ctrl+C, imprime mensagem
 ; "PAUSA (EM...)".
@@ -5551,7 +5552,8 @@ DE56  21EFD7    LD      HL,#D7EF ; "PAUSA" {BR} [BRMSG]
 DE59  C276D8    JP      NZ,#D876
 ; Se foi END, vai direto para o modo direto.
 DE5C  C38DD8    JP      #D88D ; {EDIT} [PRNTOK]
-;
+
+; Incrementa AVALUE, BVALUE e CVALUE e silencia PSG.
 DE5F  213901    LD      HL,#0139 ; AVALUE
 DE62  110900    LD      DE,#0009
 DE65  34        INC     (HL)
@@ -5559,12 +5561,12 @@ DE66  19        ADD     HL,DE
 DE67  34        INC     (HL)
 DE68  19        ADD     HL,DE
 DE69  34        INC     (HL)
-DE6A  CDBACE    CALL    #CEBA
+DE6A  CDBACE    CALL    #CEBA ; Inicializa som (silêncio).
 DE6D  C9        RET
 ;
 ; BCONT
-DE6E  CD5FDE    CALL    #DE5F
-DE71  3C        INC     A
+DE6E  CD5FDE    CALL    #DE5F ; Incrementa AVALUE, BVALUE e CVALUE e silencia PSG.
+DE71  3C        INC     A ; (#0001) = 1.
 DE72  320100    LD      (#0001),A
 DE75  2AB503    LD      HL,(#03B5) ; {LBYTER} [CONTAD]
 DE78  7C        LD      A,H
