@@ -65,17 +65,17 @@ C06B  223900    LD      (#0039),HL
 C06E  ED56      IM      1
 C070  310002    LD      SP,#0200
 ; Modo de texto.
-C073  3E01      LD      A,#01
+C073  3E01      LD      A,#01 ; Modo alfanumérico verde.
 C075  D380      OUT     (#80),A ; COL32
 C077  32F500    LD      (#00F5),A ; MODBUF
 ;
-C07A  CDC0C0    CALL    #C0C0
+C07A  CDC0C0    CALL    #C0C0 ; Zera AVALUE, BVALUE e CVALUE.
 C07D  FB        EI
 C07E  322F01    LD      (#012F),A ; FSHCNT
 C081  320F00    LD      (#000F),A ; C40?80
 C084  3C        INC     A
 C085  325801    LD      (#0158),A ; MODEK
-C088  CD30C1    CALL    #C130
+C088  CD30C1    CALL    #C130 ; Silencia PSG e inicializa ENABLE.
 C08B  CDFCC0    CALL    #C0FC ; BEEP
 ; Desativa hooks da leitura de teclado.
 C08E  3EC9      LD      A,#C9
@@ -104,7 +104,7 @@ C0B8  3E5A      LD      A,#5A
 C0BA  325E01    LD      (#015E),A ; CHECK
 C0BD  C395CE    JP      #CE95 ; {PRIST1}
 
-;
+; Zera AVALUE, BVALUE e CVALUE.
 C0C0  AF        XOR     A
 C0C1  323901    LD      (#0139),A ; AVALUE
 C0C4  324201    LD      (#0142),A ; BVALUE
@@ -196,6 +196,7 @@ C12B  3E7F      LD      A,#7F
 C12D  D360      OUT     (#60),A ; WR
 C12F  C9        RET
 
+; Silencia PSG e inicializa ENABLE.
 C130  CD27C1    CALL    #C127
 C133  325001    LD      (#0150),A ; ENABLE
 C136  C9        RET
@@ -1530,7 +1531,7 @@ C7C5  A0        DB      #A0
 ; R7: Vertical Sync Position <-- 25 char rows
 C7C6  19        DB      #19
 ; R6: Vertical Displayed <-- 24 char rows
-C7C7: 18        DB      #18
+C7C7  18        DB      #18
 ; R5: Vertical Total Adjust <-- scan line 2
 C7C8  02        DB      #02
 ; R4: Vertical Total <-- 26 char rows
@@ -1682,12 +1683,12 @@ C8A3  CA86C8    JP      Z,#C886 ; BANK1
 C8A6  C390C8    JP      #C890 ; BANK2
 
 ; CO0: Imprime o caracter armazenado em C (continuação).
-; Desvia se está em uma seqüência de ESCape.
+; Desvia se está em uma sequência de ESCape.
 C8A9  212D01    LD      HL,#012D ; COSW
 C8AC  7E        LD      A,(HL)
 C8AD  07        RLCA
 C8AE  DA58C9    JP      C,#C958 ; DIRECT
-; Caracter fora de seqüência de ESCape.
+; Caracter fora de sequência de ESCape.
 C8B1  79        LD      A,C
 C8B2  FE1B      CP      #1B ; É ESC?
 C8B4  CA50C9    JP      Z,#C950 ; SPECAL
@@ -1696,7 +1697,7 @@ C8B9  DAC7C8    JP      C,#C8C7 ; CNTR
 C8BC  FE3D      CP      '='
 C8BE  C2F9C8    JP      NZ,#C8F9 ; OTCH
 ; Trata impressão de '='.
-; Se não estiver em seqüência de ESCape,
+; Se não estiver em sequência de ESCape,
 ; trata como caracter imprimível normal.
 C8C1  7E        LD      A,(HL)
 C8C2  0F        RRCA
@@ -1764,10 +1765,10 @@ C925  225B01    LD      (#015B),HL ; SNPTR
 C928  CD55CB    CALL    #CB55 ; CALLUPDBM
 C92B  AF        XOR     A
 C92C  322F01    LD      (#012F),A ; FSHCNT
-; Anula seqüência de ESCape (se houver).
+; Anula sequência de ESCape (se houver).
 C92F  212D01    LD      HL,#012D ; COSW
 C932  7E        LD      A,(HL)
-C933  E602      AND     #02
+C933  E602      AND     #02 ; Desliga todos os bits de COSW, exceto o que indica a presença da placa de 80 colunas.
 C935  77        LD      (HL),A
 ; Encerra impressão.
 C936  F1        POP     AF
@@ -1792,12 +1793,12 @@ C94E  E1        POP     HL
 C94F  C9        RET
 
 ; SPECAL: Trata impressão de ESC.
-; Ativa um flag de seqüência de ESCape.
+; Ativa um flag de sequência de ESCape.
 C950  212D01    LD      HL,#012D ; COSW
 C953  CBC6      SET     0,(HL)
 C955  C336C9    JP      #C936
 
-; DIRECT: Trata seqüência de ESCape.
+; DIRECT: Trata sequência de ESCape.
 ; Já foi impresso um caracter após o ESC?
 C958  212D01    LD      HL,#012D ; COSW
 C95B  CB7E      BIT     7,(HL)
@@ -1817,16 +1818,18 @@ C970  C336C9    JP      #C936
 C973  321601    LD      (#0116),A
 C976  2A1501    LD      HL,(#0115)
 C979  7D        LD      A,L
+; Se as posições vertical e horizontal forem zero,
+; desvia para rotina que coloca cursor no início da tela.
 C97A  B4        OR      H
 C97B  CAD4C9    JP      Z,#C9D4
 ; Determina número de linhas do modo texto.
 C97E  3A0F00    LD      A,(#000F) ; C40?80
 C981  B7        OR      A
-C982  0610      LD      B,#10
+C982  0610      LD      B,#10 ; 16 linhas.
 C984  CA89C9    JP      Z,#C989
-C987  0618      LD      B,#18
+C987  0618      LD      B,#18 ; 24 linhas.
 ; Se a posição vertical excede o limite,
-; ignora seqüência de escape.
+; ignora sequência de escape.
 C989  7D        LD      A,L
 C98A  B8        CP      B
 C98B  D22FC9    JP      NC,#C92F
@@ -1836,10 +1839,9 @@ C98F  FE20      CP      #20
 C991  D2BFC9    JP      NC,#C9BF
 ; Posição horizontal < 32.
 ; (Para vídeo de 32 colunas.)
-; Aparentemente a soma abaixo é um erro,
-; pois faz o cursor cair uma linha abaixo
-; de onde deveria ficar:
-C994  C620      ADD     A,#20 ; ERRO DE PROGRAMAÇÃO
+; A soma abaixo é um erro, pois faz o cursor
+; cair uma linha abaixo de onde deveria ficar:
+C994  C620      ADD     A,#20 ; <--- ERRO DE PROGRAMAÇÃO
 C996  67        LD      H,A
 ; Recalcula variáveis de posição do cursor.
 C997  EB        EX      DE,HL
@@ -1863,7 +1865,7 @@ C9B9  325D01    LD      (#015D),A ; LCNT
 C9BC  C32FC9    JP      #C92F
 
 ; Posição horizontal >= 32.
-; Se posição horizontal >= 112, ignora seqüência de ESCape.
+; Se posição horizontal >= 112, ignora sequência de ESCape.
 C9BF  FE70      CP      #70
 C9C1  D22FC9    JP      NC,#C92F
 ; Posição horizontal >= 32 e < 112.
@@ -1871,7 +1873,7 @@ C9C1  D22FC9    JP      NC,#C92F
 ; Subtrai 32.
 C9C4  D620      SUB     #20
 ; Se posição horizontal excede o limite,
-; ignora seqüência de escape.
+; ignora sequência de escape.
 C9C6  67        LD      H,A
 C9C7  3A1301    LD      A,(#0113) ; DLNG
 C9CA  BC        CP      H
@@ -2124,7 +2126,7 @@ CB6C  C9        RET
 ; pixels em modo GR (8x5 em HGR).
 ; HL aponta para a posição do topo da
 ; figura na VRAM.
-; DE aponta para a seqüência de bytes
+; DE aponta para a sequência de bytes
 ; que compõem a figura.
 CB6D  0605      LD      B,#05
 ; D4XB
@@ -2212,7 +2214,7 @@ CBBC  C1        POP     BC
 ; (16x5 em HGR).
 ; DE aponta para a posição do topo da
 ; figura na VRAM.
-; HL aponta para a seqüência de bytes
+; HL aponta para a sequência de bytes
 ; que compõem a figura.
 ; Se a figura utiliza somente os bits
 ; ímpares de seus bytes, é possível
@@ -2408,7 +2410,7 @@ CCB9  C9        RET
 ; HL aponta para o ponto da VRAM onde
 ; o desenho vai começar.
 ; DE aponta para os dados da figura,
-; que consiste em uma seqüência de bytes:
+; que consiste em uma sequência de bytes:
 ; I0 B0 I1 B1 ... In Bn #FF
 ; Cada byte I incrementa (ou decrementa)
 ; HL. Depois disso, o byte B é colocado
@@ -2668,53 +2670,53 @@ CE2E  C9        RET
 ; Soma scores e exibe.
 ; Se HL = RECORD (#010B), soma scores do jogador 1.
 ; Se HL = RECORD+1 (#010C), soma scores do jogador 2.
-CE2F D5 PUSH DE
-CE30 110000 LD DE,#0000
-CE33 3A0901 LD A,(#0109) ; RCRDPT
-CE36 47 LD B,A
-CE37 7D LD A,L
-CE38 B8 CP B
-CE39 D248CE JP NC,#CE48
-CE3C E5 PUSH HL
-CE3D 6E LD L,(HL)
-CE3E 2600 LD H,#00
-CE40 19 ADD HL,DE
-CE41 EB EX DE,HL
-CE42 E1 POP HL
-CE43 23 INC HL
-CE44 23 INC HL
-CE45 C337CE JP #CE37
+CE2F  D5        PUSH    DE
+CE30  110000    LD      DE,#0000
+CE33  3A0901    LD      A,(#0109) ; RCRDPT
+CE36  47        LD      B,A
+CE37  7D        LD      A,L
+CE38  B8        CP      B
+CE39  D248CE    JP      NC,#CE48
+CE3C  E5        PUSH    HL
+CE3D  6E        LD      L,(HL)
+CE3E  2600      LD      H,#00
+CE40  19        ADD     HL,DE
+CE41  EB        EX      DE,HL
+CE42  E1        POP     HL
+CE43  23        INC     HL
+CE44  23        INC     HL
+CE45  C337CE    JP      #CE37
 ; Exibe total.
 ; Obtém dígitos dos milhares/centenas.
-CE48 0600 LD B,#00
-CE4A EB EX DE,HL
-CE4B 119CFF LD DE,#FF9C
-CE4E 19 ADD HL,DE
-CE4F 04 INC B
-CE50 DA4ECE JP C,#CE4E
-CE53 116400 LD DE,#0064
-CE56 19 ADD HL,DE
-CE57 05 DEC B
-CE58 CA64CE JP Z,#CE64
+CE48  0600      LD      B,#00
+CE4A  EB        EX      DE,HL
+CE4B  119CFF    LD      DE,#FF9C ; -100
+CE4E  19        ADD     HL,DE
+CE4F  04        INC     B
+CE50  DA4ECE    JP      C,#CE4E
+CE53  116400    LD      DE,#0064 ; 100
+CE56  19        ADD     HL,DE
+CE57  05        DEC     B
+CE58  CA64CE    JP      Z,#CE64
 ; Se os houver, exibe-os.
-CE5B D1 POP DE
-CE5C D5 PUSH DE
-CE5D E5 PUSH HL
-CE5E 78 LD A,B
-CE5F CD8DCB CALL #CB8D ; DISPY2
+CE5B  D1        POP     DE
+CE5C  D5        PUSH    DE
+CE5D  E5        PUSH    HL
+CE5E  78        LD      A,B
+CE5F  CD8DCB    CALL    #CB8D ; DISPY2
 ; Se houve milhares/centenas, força
 ; exibição das dezenas.
-CE62 E1 POP HL
-CE63 24 INC H
+CE62  E1        POP     HL
+CE63  24        INC     H
 ; Exibe dígitos das dezenas/unidades.
-CE64 D1 POP DE
-CE65 13 INC DE
-CE66 13 INC DE
-CE67 13 INC DE
-CE68 13 INC DE
-CE69 7D LD A,L
-CE6A CD8FCB CALL #CB8F ; DISPY
-CE6D C9 RET
+CE64  D1        POP     DE
+CE65  13        INC     DE
+CE66  13        INC     DE
+CE67  13        INC     DE
+CE68  13        INC     DE
+CE69  7D        LD      A,L
+CE6A  CD8FCB    CALL    #CB8F ; DISPY
+CE6D  C9        RET
 
 ; LSCORE: Exibe pontos da direita.
 ; (Esta descrição no manual de referência
@@ -2957,6 +2959,7 @@ CFDD  E1        POP     HL
 CFDE  CD76CF    CALL    #CF76 ; Lê os três parâmetros de TEMPO/SOUND: B, C, A.
 CFE1  3820      JR      C,#D003 ; Canal 1.
 CFE3  280F      JR      Z,#CFF4 ; Canal 2.
+
 ; Canal 3.
 ; Espera acabar a nota anterior.
 CFE5  3A7E01    LD      A,(#017E) ; TONEC
@@ -2964,7 +2967,7 @@ CFE8  B7        OR      A
 CFE9  20FA      JR      NZ,#CFE5 ; (-6)
 ; Armazena nota e duração.
 CFEB  78        LD      A,B
-CFEC  327D01    LD      (#017D),A ; TONEC-1.
+CFEC  327D01    LD      (#017D),A ; TONEC-1
 CFEF  79        LD      A,C
 CFF0  327E01    LD      (#017E),A ; TONEC
 CFF3  C9        RET
@@ -2976,7 +2979,7 @@ CFF7  B7        OR      A
 CFF8  20FA      JR      NZ,#CFF4 ; (-6)
 ; Armazena nota e duração.
 CFFA  78        LD      A,B
-CFFB  327701    LD      (#0177),A ; TONEB-1.
+CFFB  327701    LD      (#0177),A ; TONEB-1
 CFFE  79        LD      A,C
 CFFF  327801    LD      (#0178),A ; TONEB
 D002  C9 RET
@@ -2988,7 +2991,7 @@ D006  B7        OR      A
 D007  20FA      JR      NZ,#D003        ; (-6)
 ; Armazena nota e duração.
 D009  78        LD      A,B
-D00A  327101    LD      (#0171),A ; TONEA-1.
+D00A  327101    LD      (#0171),A ; TONEA-1
 D00D  79        LD      A,C
 D00E  327201    LD      (#0172),A ; TONEA
 D011  C9        RET
@@ -3664,7 +3667,7 @@ D3C8  CA52D4    JP      Z,#D452 ; PLOTTO
 D3CB  CD77D3    CALL    #D377 ; SETXY
 D3CE  E5        PUSH    HL
 D3CF  CDDAD3    CALL    #D3DA ; PLOTAB
-; Terminou seqüência de plots?
+; Terminou sequência de plots?
 D3D2  E1        POP     HL
 D3D3  2B        DEC     HL
 D3D4  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
@@ -5538,9 +5541,9 @@ DE38  22B503    LD      (#03B5),HL ; {LBYTER} [CONTAD]
 DE3B  AF        XOR     A
 DE3C  324403    LD      (#0344),A ; {OUTFLG} [CTLOFG]
 DE3F  3D        DEC     A
-DE40  327101    LD      (#0171),A ; TONEA-1.
-DE43  327701    LD      (#0177),A ; TONEB-1.
-DE46  327D01    LD      (#017D),A ; TONEC-1.
+DE40  327101    LD      (#0171),A ; TONEA-1
+DE43  327701    LD      (#0177),A ; TONEB-1
+DE46  327D01    LD      (#017D),A ; TONEC-1
 DE49  010600    LD      BC,#0006 ; 6ms
 DE4C  CD0EC3    CALL    #C30E ; DELAYB
 DE4F  CDC7CE    CALL    #CEC7 ; Zera período da envoltória no PSG.
@@ -5557,9 +5560,9 @@ DE5C  C38DD8    JP      #D88D ; {EDIT} [PRNTOK]
 DE5F  213901    LD      HL,#0139 ; AVALUE
 DE62  110900    LD      DE,#0009
 DE65  34        INC     (HL)
-DE66  19        ADD     HL,DE
+DE66  19        ADD     HL,DE ; BVALUE
 DE67  34        INC     (HL)
-DE68  19        ADD     HL,DE
+DE68  19        ADD     HL,DE ; CVALUE
 DE69  34        INC     (HL)
 DE6A  CDBACE    CALL    #CEBA ; Inicializa som (silêncio).
 DE6D  C9        RET
