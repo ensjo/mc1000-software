@@ -1006,21 +1006,24 @@ C561  E5        PUSH    HL
 ; INTRUR
 C562  D5        PUSH    DE
 C563  C5        PUSH    BC
-C564  01FE00    LD      BC,#00FE
-C567  210001    LD      HL,#0100
-C56A  110908    LD      DE,#0809
+; Trata canal 1:
+C564  01FE00    LD      BC,#00FE ; B = Offset para variáveis de sistema do canal 1. C = Valor para DEFIN.
+C567  210001    LD      HL,#0100 ; HL = Valor para REGIST (registros 0 e 1 do PSG).
+C56A  110908    LD      DE,#0809 ; DE = Valor para ONAMP.
 C56D  CDB1C5    CALL    #C5B1 ; SUB1
 C570  3A3C01    LD      A,(#013C) ; TEMPA
 C573  327201    LD      (#0172),A ; TONEA
-C576  01FD09    LD      BC,#09FD
-C579  210203    LD      HL,#0302
-C57C  111209    LD      DE,#0912
+; Trata canal 2:
+C576  01FD09    LD      BC,#09FD ; B = Offset para variáveis de sistema do canal 2. C = Valor para DEFIN.
+C579  210203    LD      HL,#0302 ; HL = Valor para REGIST (registros 2 e 3 do PSG).
+C57C  111209    LD      DE,#0912 ; DE = Valor para ONAMP.
 C57F  CDB1C5    CALL    #C5B1 ; SUB1
 C582  3A4501    LD      A,(#0145) ; TEMPB
 C585  327801    LD      (#0178),A ; TONEB
-C588  01FB12    LD      BC,#12FB
-C58B  11240A    LD      DE,#0A24
-C58E  210405    LD      HL,#0504
+; Trata canal 3:
+C588  01FB12    LD      BC,#12FB ; B = Offset para variáveis de sistema do canal 3. C = Valor para DEFIN.
+C58B  11240A    LD      DE,#0A24 ; DE = Valor para ONAMP.
+C58E  210405    LD      HL,#0504 ; HL = Valor para REGIST (registros 4 e 5 do PSG).
 C591  CDB1C5    CALL    #C5B1 ; SUB1
 C594  3A4E01    LD      A,(#014E) ; TEMPC
 C597  327E01    LD      (#017E),A ; TONEC
@@ -6478,7 +6481,7 @@ E36D  CA5FE4    JP      Z,#E45F
 E370  FEB8      CP      #B8 ; token "FN"
 E372  CA65E6    JP      Z,#E665
 E375  D6C8      SUB     #C8 ; primeiro token de função ("SGN").
-E377  302A      JR      NC,#E3A3        ; (42)
+E377  302A      JR      NC,#E3A3 ; Avalia função.
 ;
 E379  CDCCE2    CALL    #E2CC ; EVALPAR
 E37C  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
@@ -6491,7 +6494,7 @@ E383  CDD3E2    CALL    #E2D3
 E386  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR]
 E389  E5        PUSH    HL
 E38A  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
-;
+; Checa se FLOAT contém valor numérico e retorna.
 E38D  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E390  E1        POP     HL
 E391  C9        RET
@@ -6508,16 +6511,18 @@ E3A1  E1        POP     HL
 E3A2  C9        RET
 ;
 ; Avalia função do BASIC.
-E3A3  0600      LD      B,#00
+; A já contem o valor do token da função subtraído
+; de $C8 (o valor do primeiro token de função).
+E3A3  0600      LD      B,#00 ; BC = 2 * A (posição relativa do endereço da função na tabela de endereços).
 E3A5  07        RLCA
 E3A6  4F        LD      C,A
-E3A7  C5        PUSH    BC
+E3A7  C5        PUSH    BC ; Salva na pilha.
 E3A8  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E3AB  79        LD      A,C
-E3AC  FE29      CP      #29
-E3AE  3818      JR      C,#E3C8         ; (24)
+E3AC  FE29      CP      #29 ; Desvia se não for MID$, LEFT$ ou RIGHT$.
+E3AE  3818      JR      C,#E3C8
 ;
-; Avalia MID$, LEFT$, RIGHT$
+; Prepara avaliação de MID$, LEFT$, RIGHT$.
 E3B0  CDCCE2    CALL    #E2CC ; EVALPAR
 E3B3  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E3B6  2C        DB      ','
@@ -6529,17 +6534,17 @@ E3BF  E5        PUSH    HL
 E3C0  EB        EX      DE,HL
 E3C1  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
 E3C4  EB        EX      DE,HL
-E3C5  E3        EX      (SP),HL
-E3C6  1808      JR      #E3D0           ; (8)
+E3C5  E3        EX      (SP),HL ; Recupera posição relativa do endereço da função na tabela de endereços.
+E3C6  1808      JR      #E3D0
 ;
-; Avalia demais funções.
-E3C8  CD79E3    CALL    #E379
-E3CB  E3        EX      (SP),HL
-; Forja retorno.
-E3CC  118DE3    LD      DE,#E38D
+; Prepara avaliação das demais funções.
+E3C8  CD79E3    CALL    #E379 ; Avalia parâmetro seguido de ")".
+E3CB  E3        EX      (SP),HL ; Recupera posição relativa do endereço da função na tabela de endereços.
+E3CC  118DE3    LD      DE,#E38D ; Forja retorno para teste de valor numérico.
 E3CF  D5        PUSH    DE
+;
 ; Salta para rotina que interpreta a função.
-E3D0  0161D5    LD      BC,#D561
+E3D0  0161D5    LD      BC,#D561 ; {ADRTB2} <KW_INLINE_FNS>
 E3D3  09        ADD     HL,BC
 E3D4  4E        LD      C,(HL)
 E3D5  23        INC     HL
