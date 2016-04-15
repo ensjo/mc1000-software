@@ -5476,20 +5476,20 @@ DDE4  E5        PUSH    HL
 DDE5  D5        PUSH    DE
 DDE6  C5        PUSH    BC
 DDE7  213901    LD      HL,#0139 ; AVALUE
-DDEA  110900    LD      DE,#0009
-DDED  3E7C      LD      A,#7C
+DDEA  110900    LD      DE,#0009 ; Incremento para acessar BVALUE e CVALUE.
+DDED  3E7C      LD      A,#7C ; (AVALUE) = (AVALUE) AND %01111100
 DDEF  A6        AND     (HL)
 DDF0  77        LD      (HL),A
-DDF1  19        ADD     HL,DE
-DDF2  3E7C      LD      A,#7C
+DDF1  19        ADD     HL,DE ; BVALUE
+DDF2  3E7C      LD      A,#7C ; (BVALUE) = (BVALUE) AND %01111100
 DDF4  A6        AND     (HL)
 DDF5  77        LD      (HL),A
-DDF6  19        ADD     HL,DE
-DDF7  3E7C      LD      A,#7C
+DDF6  19        ADD     HL,DE ; CVALUE
+DDF7  3E7C      LD      A,#7C ; (CVALUE) = (CVALUE) AND %01111100
 DDF9  A6        AND     (HL)
 DDFA  77        LD      (HL),A
 DDFB  CDC7CE    CALL    #CEC7 ; Zera período da envoltória no PSG.
-DDFE  CD06C0    CALL    #C006 ; KEY
+DDFE  CD06C0    CALL    #C006 ; KEY ; Pausa até alguma tecla ser pressionada.
 DE01  CD5FDE    CALL    #DE5F ; Incrementa AVALUE, BVALUE e CVALUE e silencia PSG.
 DE04  3C        INC     A; (#0001) = 1.
 DE05  320100    LD      (#0001),A
@@ -5501,9 +5501,11 @@ DE0B  FE03      CP      #03 ; Ctrl+C
 ;
 ; BSTOP
 DE0D  2811      JR      Z,#DE20         ; (17)
+
+;
 DE0F  FE20      CP      ' '
 DE11  C0        RET     NZ
-; Produz pausa se estiver em modo SLOW.
+; Produz pausa se NÃO estiver em modo SLOW.
 DE12  3A6003    LD      A,(#0360)
 DE15  B7        OR      A
 DE16  C0        RET     NZ
