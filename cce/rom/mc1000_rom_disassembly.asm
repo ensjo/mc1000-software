@@ -5464,12 +5464,14 @@ DDCF  C5        PUSH    BC
 DDD0  018000    LD      BC,#0080 ; 128ms
 DDD3  CD0EC3    CALL    #C30E ; DELAYB
 DDD6  C1        POP     BC
+
+; {TESC} [TSTBRK]
 ; Retorna se nenhuma tecla estiver sendo
 ; pressionada.
 DDD7  CD09C0    CALL    #C009 ; KEY?
 DDDA  B7        OR      A
 DDDB  C8        RET     Z
-;
+; [STALL]
 DDDC  CD06C0    CALL    #C006 ; KEY
 DDDF  FE13      CP      #13 ; Ctrl+S
 DDE1  C20BDE    JP      NZ,#DE0B
