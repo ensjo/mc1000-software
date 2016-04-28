@@ -3939,7 +3939,7 @@ D55A  45522020  DB      'ER  '
 D55E  0D0A      DB      #0D,#0A; CR+LF
 D560  00        DB      #00
 
-; {ADRTB2} <KW_INLINE_FNS>
+; {ADRTB2} <KW_INLINE_FNS> [FNCTAB]
 ; Endereços das funções.
 D561  E2EC      DW      #ECE2 ; BSGN {SGN} <Sgn>
 D563  A5ED      DW      #EDA5 ; BINT {INT} <Int> [INT]
@@ -4150,7 +4150,7 @@ D751  85D0      DW      #D085 ; BINVERSE
 D753  8CD0      DW      #D08C ; BNORMAL
 D755  F4F1      DW      #F1F4 ; BDEBUG
 
-; {ADRTB3} <KW_ARITH_OP_FNS>
+; {ADRTB3} <KW_ARITH_OP_FNS> [PRITAB]
 ; Precedência e endereço do operador.
 D757  79        DB      #79
 D758  72EE      DW      #EE72 ; BADD {PLUS} <FAdd> [PADD]
@@ -4404,7 +4404,7 @@ D84D  01        DB      #01 ; Oculta a instrução seguinte.
 ; {NFER}
 D84E  1E00      LD      E,#00 ; erro "NF"
 D850  01        DB      #01 ; Oculta a instrução seguinte.
-; {DDER}
+; MRERRO {DDER} [DDERR]
 D851  1E12      LD      E,#12 ; erro "MR"
 D853  01        DB      #01 ; Oculta a instrução seguinte.
 ; {UFER}
@@ -6376,10 +6376,13 @@ E2C5  B7        OR      A
 E2C6  E8        RET     PE
 
 ; TIERRO
+; {TMER}
 E2C7  1E18      LD      E,#18 ; erro "TI"
+; {TMER1}
 E2C9  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
-;
+
 ; EVALPAR: Avalia expressão entre parênteses.
+; {SNALY6} [OPNPAR]
 E2CC  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E2CF  28        DB      '('
 ; EVAL: Avalia uma expressão.
@@ -6419,23 +6422,23 @@ E303  18E7      JR      #E2EC; {SNLY10} [RLTLP]
 ; {SNLY11} [FOPRND]
 E305  7A        LD      A,D
 E306  B7        OR      A
-E307  C200E4    JP      NZ,#E400
+E307  C200E4    JP      NZ,#E400 ; {SNLY24} [TSTRED]
 E30A  7E        LD      A,(HL)
 E30B  22A803    LD      (#03A8),HL ; {LBYTEX} [CUROPR]
-E30E  D6BE      SUB     #BE
+E30E  D6BE      SUB     #BE ; token "+"
 E310  D8        RET     C
-E311  FE07      CP      #07
+E311  FE07      CP      #07 ; É + - * / ^ AND OR?
 E313  D0        RET     NC
 E314  5F        LD      E,A
 E315  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
 E318  3D        DEC     A
 E319  B3        OR      E
 E31A  7B        LD      A,E
-E31B  CA23E8    JP      Z,#E823
+E31B  CA23E8    JP      Z,#E823 ; {STRSNA} [CONCAT]
 E31E  07        RLCA
 E31F  83        ADD     A,E
 E320  5F        LD      E,A
-E321  2157D7    LD      HL,#D757
+E321  2157D7    LD      HL,#D757 ; {ADRTB3} <KW_ARITH_OP_FNS> [PRITAB]
 E324  19        ADD     HL,DE
 E325  78        LD      A,B
 E326  56        LD      D,(HL)
@@ -6443,6 +6446,7 @@ E327  BA        CP      D
 E328  D0        RET     NC
 E329  23        INC     HL
 E32A  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
+; {SNLY12} [STKTHS]
 E32D  C5        PUSH    BC
 E32E  01DFE2    LD      BC,#E2DF ; {SNALY9} [EVAL3]
 E331  C5        PUSH    BC
@@ -6457,52 +6461,56 @@ E33B  46        LD      B,(HL)
 E33C  23        INC     HL
 E33D  C5        PUSH    BC
 E33E  2AA803    LD      HL,(#03A8) ; {LBYTEX} [CUROPR]
-E341  C3D3E2    JP      #E2D3
+E341  C3D3E2    JP      #E2D3 ; {SNALY7} [EVAL1]
 ;
 ; Tipo inicial assumido = numérico.
 ; {SNLY13} [OPRND]
 E344  AF        XOR     A
 E345  329003    LD      (#0390),A ; {DATYPE} [TYPE]
-;
 E348  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
+; {MOER}
 E34B  1E24      LD      E,#24 ; erro "FO"
 E34D  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR]
 E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; é dígito: interpreta literal numérico.
 E353  CDDCDE    CALL    #DEDC ; {CLETST} <CharIsAlpha> [CHKLTR]
-E356  D292E3    JP      NC,#E392 ; é letra: interpreta variável/matriz.
+E356  D292E3    JP      NC,#E392 ; {SNLY17} [CONVAR] ; é letra: interpreta variável/matriz.
 E359  FEBE      CP      #BE ; token "+"
 E35B  28E7      JR      Z,#E344 ; {SNLY13} [OPRND] ; operador '+' unário: ignora e recomeça do próximo caracter.
 E35D  FE2E      CP      '.'
 E35F  CAEFED    JP      Z,#EDEF ; {VALNRM} <FIn> [ASCTFP] ; é ponto: interpreta literal numérico.
 E362  FEBF      CP      #BF ; token "-"
-E364  281B      JR      Z,#E381 ; operador '-' unário.
+E364  281B      JR      Z,#E381 ; {SNLY15} [MINUS] ; operador '-' unário.
 E366  FE22      CP      '"'
 E368  CAF6E6    JP      Z,#E6F6 ; {SOPRND} [QTSTR] ; é string
 E36B  FEBB      CP      #BB ; token "NOT"
-E36D  CA5FE4    JP      Z,#E45F
+E36D  CA5FE4    JP      Z,#E45F ; {NOT} [EVNOT]
 E370  FEB8      CP      #B8 ; token "FN"
-E372  CA65E6    JP      Z,#E665
+E372  CA65E6    JP      Z,#E665 ; {FN} [DOFN]
 E375  D6C8      SUB     #C8 ; primeiro token de função ("SGN").
-E377  302A      JR      NC,#E3A3 ; Avalia função.
-;
-E379  CDCCE2    CALL    #E2CC ; EVALPAR
+E377  302A      JR      NC,#E3A3 ; {SNLY19} [FNOFST] ; Avalia função.
+; {SNLY14} [EVLPAR]
+E379  CDCCE2    CALL    #E2CC ; EVALPAR {SNALY6} [OPNPAR]
 E37C  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E37F  29        DB      ')'
 E380  C9        RET
-;
+
+; {SNLY15} [MINUS]
 ; Avalia operador "menos" unário (-expr).
-E381  167D      LD      D,#7D
-E383  CDD3E2    CALL    #E2D3
+E381  167D      LD      D,#7D ; Precedência de "-".
+E383  CDD3E2    CALL    #E2D3 ; {SNALY7} [EVAL1]
 E386  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR]
 E389  E5        PUSH    HL
 E38A  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
+; {SNLY16} [RETNUM]
 ; Checa se FLOAT contém valor numérico e retorna.
 E38D  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E390  E1        POP     HL
 E391  C9        RET
-;
+
+; {SNLY17} [CONVAR]
 ; Avalia variável/matriz.
 E392  CD84E4    CALL    #E484 ; {DIM1} <GetVar> [GETVAR]
+; {SNLY18} [FRMEVL]
 E395  E5        PUSH    HL
 E396  EB        EX      DE,HL
 E397  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG]
@@ -6511,7 +6519,8 @@ E39D  B7        OR      A
 E39E  CC11ED    CALL    Z,#ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
 E3A1  E1        POP     HL
 E3A2  C9        RET
-;
+
+; {SNLY19} [FNOFST]
 ; Avalia função do BASIC.
 ; A já contem o valor do token da função subtraído
 ; de $C8 (o valor do primeiro token de função).
@@ -6522,10 +6531,10 @@ E3A7  C5        PUSH    BC ; Salva na pilha.
 E3A8  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E3AB  79        LD      A,C
 E3AC  FE29      CP      #29 ; Desvia se não for MID$, LEFT$ ou RIGHT$.
-E3AE  3818      JR      C,#E3C8
+E3AE  3818      JR      C,#E3C8 ; {SNLY29} [FNVAL]
 ;
 ; Prepara avaliação de MID$, LEFT$, RIGHT$.
-E3B0  CDCCE2    CALL    #E2CC ; EVALPAR
+E3B0  CDCCE2    CALL    #E2CC ; EVALPAR {SNALY6} [OPNPAR]
 E3B3  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E3B6  2C        DB      ','
 E3B7  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR]
@@ -6537,16 +6546,18 @@ E3C0  EB        EX      DE,HL
 E3C1  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
 E3C4  EB        EX      DE,HL
 E3C5  E3        EX      (SP),HL ; Recupera posição relativa do endereço da função na tabela de endereços.
-E3C6  1808      JR      #E3D0
-;
+E3C6  1808      JR      #E3D0 ; {SNLY21} [GOFUNC]
+
+; {SNLY29} [FNVAL]
 ; Prepara avaliação das demais funções.
-E3C8  CD79E3    CALL    #E379 ; Avalia parâmetro seguido de ")".
+E3C8  CD79E3    CALL    #E379 ; {SNLY14} [EVLPAR] ; Avalia parâmetro seguido de ")".
 E3CB  E3        EX      (SP),HL ; Recupera posição relativa do endereço da função na tabela de endereços.
-E3CC  118DE3    LD      DE,#E38D ; Forja retorno para teste de valor numérico.
+E3CC  118DE3    LD      DE,#E38D ; {SNLY16} [RETNUM] ; Forja retorno para teste de valor numérico.
 E3CF  D5        PUSH    DE
-;
+
+; {SNLY21} [GOFUNC]
 ; Salta para rotina que interpreta a função.
-E3D0  0161D5    LD      BC,#D561 ; {ADRTB2} <KW_INLINE_FNS>
+E3D0  0161D5    LD      BC,#D561 ; {ADRTB2} <KW_INLINE_FNS> [FNCTAB]
 E3D3  09        ADD     HL,BC
 E3D4  4E        LD      C,(HL)
 E3D5  23        INC     HL
@@ -6574,40 +6585,45 @@ E3EB  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT]
 E3EE  F1        POP     AF
 E3EF  C1        POP     BC
 E3F0  79        LD      A,C
-E3F1  212FE6    LD      HL,#E62F ; FLOATAC
-E3F4  2005      JR      NZ,#E3FB        ; (5)
+E3F1  212FE6    LD      HL,#E62F ; FLOATAC {FRE2} [ACPASS]
+E3F4  2005      JR      NZ,#E3FB ; {SNLY23} [POR1]
 E3F6  A3        AND     E
 E3F7  4F        LD      C,A
 E3F8  78        LD      A,B
 E3F9  A2        AND     D
 E3FA  E9        JP      (HL)
-;
+
+; {SNLY23} [POR1]
 E3FB  B3        OR      E
 E3FC  4F        LD      C,A
 E3FD  78        LD      A,B
 E3FE  B2        OR      D
 E3FF  E9        JP      (HL)
 ;
-E400  2112E4    LD      HL,#E412
+; {SNLY24} [TSTRED]
+E400  2112E4    LD      HL,#E412 ; {SNLY25} [CMPLOG]
 E403  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
 E406  1F        RRA
 E407  7A        LD      A,D
 E408  17        RLA
 E409  5F        LD      E,A
-E40A  1664      LD      D,#64
+E40A  1664      LD      D,#64 ; 100, precedência relacional.
 E40C  78        LD      A,B
 E40D  BA        CP      D
 E40E  D0        RET     NC
-E40F  C32DE3    JP      #E32D
-;
-E412  14        INC     D
-E413  E479B7    CALL    PO,#B779
+E40F  C32DE3    JP      #E32D ; {SNLY12} [STKTHS]
+
+; {SNLY25} [CMPLOG]
+E412  14E4      DW      #E414 ; {SNLY26} [CMPLG1]
+; {SNLY26} [CMPLG1]
+E414  79        LD      A,C
+E415  B7        OR      A
 E416  1F        RRA
 E417  C1        POP     BC
 E418  D1        POP     DE
 E419  F5        PUSH    AF
 E41A  CDC1E2    CALL    #E2C1 ; {SNALY5} [CHKTYP]
-E41D  2155E4    LD      HL,#E455
+E41D  2155E4    LD      HL,#E455 ; {SNLY28} [CMPRES]
 E420  E5        PUSH    HL
 E421  CA4DED    JP      Z,#ED4D ; CPFLOATBCDE {VORZ1} <FCompare> [CMPNUM]
 E424  AF        XOR     A
@@ -6628,6 +6644,7 @@ E438  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E43B  F1        POP     AF
 E43C  57        LD      D,A
 E43D  E1        POP     HL
+; {SNLY27} [CMPSTR]
 E43E  7B        LD      A,E
 E43F  B2        OR      D
 E440  C8        RET     Z
@@ -6644,10 +6661,11 @@ E44B  0A        LD      A,(BC)
 E44C  BE        CP      (HL)
 E44D  23        INC     HL
 E44E  03        INC     BC
-E44F  28ED      JR      Z,#E43E         ; (-19)
+E44F  28ED      JR      Z,#E43E ; {SNLY27} [CMPSTR]
 E451  3F        CCF
-E452  C3DEEC    JP      #ECDE
-;
+E452  C3DEEC    JP      #ECDE ; {TSGNM2} [FLGDIF]
+
+; {SNLY28} [CMPRES]
 E455  3C        INC     A
 E456  8F        ADC     A,A
 E457  C1        POP     BC
@@ -6655,10 +6673,11 @@ E458  A0        AND     B
 E459  C6FF      ADD     A,#FF
 E45B  9F        SBC     A,A
 E45C  C3E5EC    JP      #ECE5 ; {SGN0} <FCharToFloat> [FLGREL]
-;
+
+; {NOT} [EVNOT]
 ; Avalia NOT.
 E45F  165A      LD      D,#5A
-E461  CDD3E2    CALL    #E2D3
+E461  CDD3E2    CALL    #E2D3 ; {SNALY7} [EVAL1]
 E464  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E467  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT]
 E46A  7B        LD      A,E
@@ -6666,29 +6685,33 @@ E46B  2F        CPL
 E46C  4F        LD      C,A
 E46D  7A        LD      A,D
 E46E  2F        CPL
-E46F  CD2FE6    CALL    #E62F ; FLOATAC
+E46F  CD2FE6    CALL    #E62F ; FLOATAC {FRE2} [ACPASS]
 E472  C1        POP     BC
 E473  C3DFE2    JP      #E2DF ; {SNALY9} [EVAL3]
-;
+
 ; Laço da instrução DIM. Verifica se
 ; há mais uma matriz a dimensionar.
+; {DIM0} [DIMRET]
 E476  2B        DEC     HL
 E477  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E47A  C8        RET     Z
 E47B  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E47E  2C        DB      ','
+
 ; BDIM
+; {DIM} [DIM]
 ; Forja retorno.
-E47F  0176E4    LD      BC,#E476
+E47F  0176E4    LD      BC,#E476 ; {DIM0} [DIMRET]
 E482  C5        PUSH    BC
 ; A instrução abaixo oculta a instrução
 ; {DIM1} <GetVar> [GETVAR]: ; Obtém o endereço do valor de uma variável em DE.
 ; E484  AF        XOR     A
 ; que só pode ser atingida por jump.
 E483  F6AF      OR      #AF
-E485  328F03    LD      (#038F),A ; {LOCCRE} <DIM_OR_EVAL>
+E485  328F03    LD      (#038F),A ; {LOCCRE} <DIM_OR_EVAL> [LCRFLG]
 ; Primeira letra em B.
 E488  46        LD      B,(HL)
+; {DIM2} [GTFNAM]
 ; Se não for letra, SN ERRO.
 E489  CDDCDE    CALL    #DEDC ; {CLETST} <CharIsAlpha> [CHKLTR]
 E48C  DA48D8    JP      C,#D848 ; SNERRO
@@ -6700,19 +6723,22 @@ E490  4F        LD      C,A
 E491  329003    LD      (#0390),A ; {DATYPE} [TYPE]
 ; Próximo caracter é alfanumérico?
 E494  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
-E497  3805      JR      C,#E49E         ; (5)
+E497  3805      JR      C,#E49E ; {DIM3} [SVNAM2]
 E499  CDDCDE    CALL    #DEDC ; {CLETST} <CharIsAlpha> [CHKLTR]
-E49C  380B      JR      C,#E4A9         ; (11)
+E49C  380B      JR      C,#E4A9 ; {DIM5} [CHARTY]
+; {DIM3} [SVNAM2]
 ; Sim: Armazena em C e ignora caracteres
 ; alfanuméricos seguintes.
 E49E  4F        LD      C,A
+; {DIM4} [ENDNAM]
 E49F  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
-E4A2  38FB      JR      C,#E49F         ; (-5)
+E4A2  38FB      JR      C,#E49F ; {DIM4} [ENDNAM]
 E4A4  CDDCDE    CALL    #DEDC ; {CLETST} <CharIsAlpha> [CHKLTR]
-E4A7  30F6      JR      NC,#E49F        ; (-10)
+E4A7  30F6      JR      NC,#E49F ; {DIM4} [ENDNAM]
+; {DIM5} [CHARTY]
 ; Próximo caracter é "$"?
-E4A9  D624      SUB     #24
-E4AB  200A      JR      NZ,#E4B7        ; (10)
+E4A9  D624      SUB     '$'
+E4AB  200A      JR      NZ,#E4B7 ; {DIM6} [NOTSTR]
 ; Sim: Assume tipo string e soma
 ; #80 ao código ASCII do 2º caracter.
 E4AD  3C        INC     A
@@ -6721,16 +6747,17 @@ E4B1  0F        RRCA
 E4B2  81        ADD     A,C
 E4B3  4F        LD      C,A
 E4B4  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
+; {DIM6} [NOTSTR]
 ; Desvia se matriz ($03AC contém 1).
 E4B7  3AAC03    LD      A,(#03AC) ; {FORFLG} [FORFLG]
 E4BA  3D        DEC     A
-E4BB  CA4FE5    JP      Z,#E54F
+E4BB  CA4FE5    JP      Z,#E54F ; {DIM16} [ARLDSV]
 ; Desvia se FN XX e o próximo caracter é "(".
-E4BE  F2C7E4    JP      P,#E4C7
+E4BE  F2C7E4    JP      P,#E4C7 ; {DIM7} [NSCFOR]
 E4C1  7E        LD      A,(HL)
 E4C2  D628      SUB     '('
-E4C4  CA28E5    JP      Z,#E528
-;
+E4C4  CA28E5    JP      Z,#E528 ; {DIM14} [SBSCPT]
+; {DIM7} [NSCFOR]
 E4C7  AF        XOR     A
 E4C8  32AC03    LD      (#03AC),A ; {FORFLG} [FORFLG]
 E4CB  E5        PUSH    HL
@@ -6741,33 +6768,36 @@ E4CC  2AB903    LD      HL,(#03B9) ; {DVARPT} <VAR_ARRAY_BASE> [VAREND]
 E4CF  EB        EX      DE,HL
 ; HL = início da área de variáveis.
 E4D0  2AB703    LD      HL,(#03B7) ; {SVARPT} <VAR_BASE> [PROGND]
+; {DIM8} [FNDVAR]
 E4D3  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
-E4D6  2810      JR      Z,#E4E8         ; (16)
+E4D6  2810      JR      Z,#E4E8 ; {DIM10} [CFEVAL]
 E4D8  79        LD      A,C
 E4D9  96        SUB     (HL)
 E4DA  23        INC     HL
-E4DB  2002      JR      NZ,#E4DF        ; (2)
+E4DB  2002      JR      NZ,#E4DF ; {DIM9} [FNTHR]
 E4DD  78        LD      A,B
 E4DE  96        SUB     (HL)
+; {DIM9} [FNTHR]
 E4DF  23        INC     HL
 ; Desvia se encontrou a variável.
-E4E0  2838      JR      Z,#E51A         ; (56)
+E4E0  2838      JR      Z,#E51A ; {DIM12} [RETADR]
 E4E2  23        INC     HL
 E4E3  23        INC     HL
 E4E4  23        INC     HL
 E4E5  23        INC     HL
-E4E6  18EB      JR      #E4D3           ; (-21)
+E4E6  18EB      JR      #E4D3 ; {DIM8} [FNDVAR]
 ; Terminou a busca e não encontrou o
 ; nome da variável.
-;
-; Desvia se foi chamado de #E395.
+
+; {DIM10} [CFEVAL]
+; Desvia se foi chamado de #E395 {SNLY18} [FRMEVL].
 E4E8  E1        POP     HL
 E4E9  E3        EX      (SP),HL
 E4EA  D5        PUSH    DE
-E4EB  1195E3    LD      DE,#E395
+E4EB  1195E3    LD      DE,#E395 ; {SNLY18} [FRMEVL]
 E4EE  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E4F1  D1        POP     DE
-E4F2  2829      JR      Z,#E51D ; RSTFLOAT
+E4F2  2829      JR      Z,#E51D ; RSTFLOAT {DIM13} [RETNUL]
 E4F4  E3        EX      (SP),HL
 E4F5  E5        PUSH    HL
 ; Avança a área de matrizes em 6 bytes,
@@ -6788,11 +6818,12 @@ E505  22BB03    LD      (#03BB),HL ; {FSLPTR} <VAR_TOP> [ARREND]
 E508  60        LD      H,B
 E509  69        LD      L,C
 E50A  22B903    LD      (#03B9),HL ; {DVARPT} <VAR_ARRAY_BASE> [VAREND]
+; {DIM11} [ZEROLP]
 ; Zera o novo descritor.
 E50D  2B        DEC     HL
 E50E  3600      LD      (HL),#00
 E510  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
-E513  20F8      JR      NZ,#E50D        ; (-8)
+E513  20F8      JR      NZ,#E50D ; {DIM11} [ZEROLP]
 ; Armazena o nome da variável.
 E515  D1        POP     DE
 E516  73        LD      (HL),E
@@ -6803,24 +6834,29 @@ E519  23        INC     HL
 ; byte de dados do descritor.
 ; C?B?
 ;        ^DE
+
+; {DIM12} [RETADR]
 E51A  EB        EX      DE,HL
 E51B  E1        POP     HL
 E51C  C9        RET
 
 ; RSTFLOAT: Põe em FLOAT string nula
 ; ou numérico zero.
+; {DIM13} [RETNUL]
 E51D  32C203    LD      (#03C2),A ; {WRA1+3} <FACCUM+3> [FPEXP]
 E520  21E9D7    LD      HL,#D7E9
 E523  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG]
 E526  E1        POP     HL
 E527  C9        RET
 
-; Empilha (#038F).
+; {DIM14} [SBSCPT]
+; Empilha (#038F) ; {LOCCRE} <DIM_OR_EVAL> [LCRFLG]
 E528  E5        PUSH    HL
-E529  2A8F03    LD      HL,(#038F) ; {LOCCRE} <DIM_OR_EVAL>
+E529  2A8F03    LD      HL,(#038F) ; {LOCCRE} <DIM_OR_EVAL> [LCRFLG]
 E52C  E3        EX      (SP),HL
 ; Zera D.
 E52D  57        LD      D,A
+; {DIM15} [SCPTLP]
 E52E  D5        PUSH    DE
 E52F  C5        PUSH    BC
 E530  CDE4DE    CALL    #DEE4 ; {EPRVAL} [FPSINT]
@@ -6834,16 +6870,17 @@ E539  3C        INC     A
 E53A  57        LD      D,A
 E53B  7E        LD      A,(HL)
 E53C  FE2C      CP      ','
-E53E  28EE      JR      Z,#E52E         ; (-18)
+E53E  28EE      JR      Z,#E52E ; {DIM15} [SCPTLP]
 E540  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E543  29        DB      ')'
 E544  22B103    LD      (#03B1),HL ; {NTOKPT} [NXTOPR]
 E547  E1        POP     HL
-E548  228F03    LD      (#038F),HL ; {LOCCRE} <DIM_OR_EVAL>
+E548  228F03    LD      (#038F),HL ; {LOCCRE} <DIM_OR_EVAL> [LCRFLG]
 E54B  1E00      LD      E,#00
 E54D  D5        PUSH    DE
 ; A instrução abaixo oculta as
 ; instuções
+; ; {DIM16} [ARLDSV]
 ; E54F  E5        PUSH    HL
 ; E550  F5        PUSH    AF
 ; que só podem ser atingidas por jump.
@@ -6852,6 +6889,7 @@ E54E  11E5F5    LD      DE,#F5E5
 E551  2AB903    LD      HL,(#03B9) ; {DVARPT} <VAR_ARRAY_BASE> [VAREND]
 ; A instrução abaixo oculta a
 ; instrução
+; {DIM17} [FNDARY]
 ; E555  19        ADD     HL,DE
 ; que só pode ser atingida por jump.
 E554  3E19      LD      A,#19
@@ -6861,14 +6899,15 @@ E557  2ABB03    LD      HL,(#03BB) ; {FSLPTR} <VAR_TOP> [ARREND]
 E55A  EB        EX      DE,HL
 ; Desvia se HL chegou ao fim da área de matrizes.
 E55B  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
-E55E  2824      JR      Z,#E584         ; (36)
+E55E  2824      JR      Z,#E584 ; {DIM19} [CREARY]
 ; Encontramos a matriz procurada (nome em BC)?
 E560  7E        LD      A,(HL)
 E561  B9        CP      C
 E562  23        INC     HL
-E563  2002      JR      NZ,#E567        ; (2)
+E563  2002      JR      NZ,#E567 ; {DIM18} [NXTARY]
 E565  7E        LD      A,(HL)
 E566  B8        CP      B
+; {DIM18} [NXTARY]
 E567  23        INC     HL
 ; DE contém o tamanho da matriz atual.
 E568  5E        LD      E,(HL)
@@ -6876,24 +6915,27 @@ E569  23        INC     HL
 E56A  56        LD      D,(HL)
 E56B  23        INC     HL
 ; Se não é a que procuramos, tenta a próxima.
-E56C  20E7      JR      NZ,#E555        ; (-25)
+E56C  20E7      JR      NZ,#E555 ; {DIM17} [FNDARY]
 ; Emite MR ERRO se estamos dimensionando matriz já existente.
-E56E  3A8F03    LD      A,(#038F) ; {LOCCRE} <DIM_OR_EVAL>
+E56E  3A8F03    LD      A,(#038F) ; {LOCCRE} <DIM_OR_EVAL> [LCRFLG]
 E571  B7        OR      A
-E572  C251D8    JP      NZ,#D851 ; MRERRO
+E572  C251D8    JP      NZ,#D851 ; MRERRO {DDER} [DDERR]
 ;
 E575  F1        POP     AF
 E576  44        LD      B,H
 E577  4D        LD      C,L
-E578  CA18EC    JP      Z,#EC18 ; POPHLRET
+E578  CA18EC    JP      Z,#EC18 ; POPHLRET {DIM121} [POPHRT]
 ;
 E57B  96        SUB     (HL)
-E57C  CADEE5    JP      Z,#E5DE
+E57C  CADEE5    JP      Z,#E5DE ; {DIM23} [FINDEL]
 
-; IIERRO: {BSER}
+; IIERRO:
+; {BSER} [BSERR]
+; {OMER} [OMERR]
 E57F  1E10      LD      E,#10 ; erro "II"
 E581  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
-;
+
+; {DIM19} [CREARY]
 E584  110400    LD      DE,#0004
 E587  F1        POP     AF
 E588  CAF6DE    JP      Z,#DEF6 ; PIERRO {FCER} [FCERR]
@@ -6908,37 +6950,40 @@ E594  23        INC     HL
 E595  22A803    LD      (#03A8),HL ; {LBYTEX} [CUROPR]
 E598  71        LD      (HL),C
 E599  23        INC     HL
-E59A  3A8F03    LD      A,(#038F) ; {LOCCRE} <DIM_OR_EVAL>
+E59A  3A8F03    LD      A,(#038F) ; {LOCCRE} <DIM_OR_EVAL> [LCRFLG]
 E59D  17        RLA
 E59E  79        LD      A,C
-E59F  010B00    LD      BC,#000B
-E5A2  3002      JR      NC,#E5A6        ; (2)
+; {DIM20} [CRARLP]
+E59F  010B00    LD      BC,#000B ; Default 10 + 1 dimensões.
+E5A2  3002      JR      NC,#E5A6 ; {DIM21} [DEFSIZ]
 E5A4  C1        POP     BC
 E5A5  03        INC     BC
+; {DIM21} [DEFSIZ]
 E5A6  71        LD      (HL),C
 E5A7  23        INC     HL
 E5A8  70        LD      (HL),B
 E5A9  23        INC     HL
 E5AA  F5        PUSH    AF
 E5AB  E5        PUSH    HL
-E5AC  CDBEED    CALL    #EDBE
+E5AC  CDBEED    CALL    #EDBE ; {FESRCH} [MLDEBC]
 E5AF  EB        EX      DE,HL
 E5B0  E1        POP     HL
 E5B1  F1        POP     AF
 E5B2  3D        DEC     A
-E5B3  20EA      JR      NZ,#E59F        ; (-22)
+E5B3  20EA      JR      NZ,#E59F ; {DIM20} [CRARLP]
 E5B5  F5        PUSH    AF
 E5B6  42        LD      B,D
 E5B7  4B        LD      C,E
 E5B8  EB        EX      DE,HL
 E5B9  19        ADD     HL,DE
-E5BA  DA7FE5    JP      C,#E57F ; IIERRO {BSER}
-E5BD  CD30D8    CALL    #D830
+E5BA  DA7FE5    JP      C,#E57F ; IIERRO {OMER} [OMERR]
+E5BD  CD30D8    CALL    #D830 ; {TMEMO1} [ENFMEM]
 E5C0  22BB03    LD      (#03BB),HL ; {FSLPTR} <VAR_TOP> [ARREND]
+; {DIM22} [ZERARY]
 E5C3  2B        DEC     HL
 E5C4  3600      LD      (HL),#00
 E5C6  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
-E5C9  20F8      JR      NZ,#E5C3        ; (-8)
+E5C9  20F8      JR      NZ,#E5C3 ; {DIM22} [ZERARY]
 E5CB  03        INC     BC
 E5CC  57        LD      D,A
 E5CD  2AA803    LD      HL,(#03A8) ; {LBYTEX} [CUROPR]
@@ -6954,13 +6999,16 @@ E5D8  23        INC     HL
 E5D9  72        LD      (HL),D
 E5DA  23        INC     HL
 E5DB  F1        POP     AF
-E5DC  3823      JR      C,#E601         ; (35)
-;
+E5DC  3823      JR      C,#E601 ; {DIM25} [ENDDIM]
+; {DIM23} [FINDEL]
 E5DE  47        LD      B,A
 E5DF  4F        LD      C,A
 E5E0  7E        LD      A,(HL)
 E5E1  23        INC     HL
-E5E2  16E1      LD      D,#E1
+; O byte a seguir oculta a instrução seguinte.
+E5E2  16        DB      #16
+; {DIM24} [FNDELP]
+E5E3  E1        POP     HL
 E5E4  5E        LD      E,(HL)
 E5E5  23        INC     HL
 E5E6  56        LD      D,(HL)
@@ -6968,25 +7016,27 @@ E5E7  23        INC     HL
 E5E8  E3        EX      (SP),HL
 E5E9  F5        PUSH    AF
 E5EA  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
-E5ED  D27FE5    JP      NC,#E57F ; IIERRO {BSER}
+E5ED  D27FE5    JP      NC,#E57F ; IIERRO {BSER} [BSERR]
 E5F0  E5        PUSH    HL
-E5F1  CDBEED    CALL    #EDBE
+E5F1  CDBEED    CALL    #EDBE ; {FESRCH} [MLDEBC]
 E5F4  D1        POP     DE
 E5F5  19        ADD     HL,DE
 E5F6  F1        POP     AF
 E5F7  3D        DEC     A
 E5F8  44        LD      B,H
 E5F9  4D        LD      C,L
-E5FA  20E7      JR      NZ,#E5E3        ; (-25)
+E5FA  20E7      JR      NZ,#E5E3 ; {DIM24} [FNDELP]
 E5FC  29        ADD     HL,HL
 E5FD  29        ADD     HL,HL
 E5FE  C1        POP     BC
 E5FF  09        ADD     HL,BC
 E600  EB        EX      DE,HL
+; {DIM25} [ENDDIM]
 E601  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR]
 E604  C9        RET
 
 ; BFRE
+; {FRE} [FRE]
 ; DE = início da área livre após
 ; matrizes.
 E605  2ABB03    LD      HL,(#03BB) ; {FSLPTR} <VAR_TOP> [ARREND]
@@ -6997,7 +7047,7 @@ E60C  39        ADD     HL,SP
 ; Parâmetro é numérico?
 E60D  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
 E610  B7        OR      A
-E611  280D      JR      Z,#E620         ; (13)
+E611  280D      JR      Z,#E620 ; {FRE1} [FRENUM]
 ; Não: Compacta área de strings.
 E613  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
 E616  CD75E7    CALL    #E775 ; {STROP4} [GARBGE] ; Coleta de lixo.
@@ -7006,6 +7056,7 @@ E619  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC]
 E61C  EB        EX      DE,HL
 ; HL = ponto atual da área de strings.
 E61D  2AA603    LD      HL,(#03A6) ; {SWAPTR} [STRBOT]
+; {FRE1} [FRENUM]
 ; FLOAT = HL - DE e retorna.
 E620  7D        LD      A,L
 E621  93        SUB     E
@@ -7019,8 +7070,10 @@ E62A  0698      LD      B,#80+24 ; 24 bits.
 E62C  C3EAEC    JP      #ECEA ; FLOATBADE {SGN1} <FCharToFloat+5> [RETINT]
 
 ; FLOATAC:
+; {FRE2} [ACPASS]
 E62F  41        LD      B,C
 ; FLOATAB:
+; {FRE3} [ABPASS]
 E630  50        LD      D,B
 E631  1E00      LD      E,#00
 E633  219003    LD      HL,#0390 ; {DATYPE} [TYPE]
@@ -7029,11 +7082,13 @@ E637  0690      LD      B,#80+16 ; 16 bits.
 E639  C3EAEC    JP      #ECEA ; FLOATBADE {SGN1} <FCharToFloat+5> [RETINT]
 
 ; BPOS:
+; {POS} [POS]
 E63C  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
-; FLOATA
+; FLOATA:
+; {POS1} [PASSA]
 E63F  47        LD      B,A
 E640  AF        XOR     A
-E641  18ED      JR      #E630 ; FLOATAB           ; (-19)
+E641  18ED      JR      #E630 ; FLOATAB {FRE3} [ABPASS]
 
 ; BDEF:
 E643  CDB0E6    CALL    #E6B0
@@ -7057,10 +7112,11 @@ E661  4D        LD      C,L
 E662  E3        EX      (SP),HL
 E663  1838      JR      #E69D           ; (56)
 
+; {FN} [DOFN]
 ; Avalia FN.
 E665  CDB0E6    CALL    #E6B0
 E668  D5        PUSH    DE
-E669  CD79E3    CALL    #E379
+E669  CD79E3    CALL    #E379 ; {SNLY14} [EVLPAR]
 E66C  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E66F  E3        EX      (SP),HL
 E670  5E        LD      E,(HL)
@@ -7123,7 +7179,7 @@ E6B6  32AC03    LD      (#03AC),A ; {FORFLG} [FORFLG]
 ; B = 1ª letra + #80.
 E6B9  B6        OR      (HL)
 E6BA  47        LD      B,A
-E6BB  CD89E4    CALL    #E489
+E6BB  CD89E4    CALL    #E489 ; {DIM2} [GTFNAM]
 E6BE  C3BFE2    JP      #E2BF ; STR?TI {SNALY3} [TSTNUM]
 
 ; BSTR$
@@ -7434,6 +7490,8 @@ E81D  69        LD      L,C
 E81E  60        LD      H,B
 E81F  2B        DEC     HL
 E820  C378E7    JP      #E778
+
+; {STRSNA} [CONCAT]
 E823  C5        PUSH    BC
 E824  E5        PUSH    HL
 E825  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
@@ -7536,7 +7594,7 @@ E89C  C9        RET
 
 ; BLEN
 ; Forja retorno para FLOATA.
-E89D  013FE6    LD      BC,#E63F ; FLOATA
+E89D  013FE6    LD      BC,#E63F ; FLOATA {POS1} [PASSA]
 E8A0  C5        PUSH    BC
 ; ALEN
 ; Obtém em A o comprimento da string.
@@ -7555,7 +7613,7 @@ E8AB  C9        RET
 ;
 ; BASC
 ; Forja retorno para FLOATA.
-E8AC  013FE6    LD      BC,#E63F ; FLOATA
+E8AC  013FE6    LD      BC,#E63F ; FLOATA {POS1} [PASSA]
 E8AF  C5        PUSH    BC
 ; AASC
 ; Obtém em A o código ASCII do 1º caracter
@@ -8263,7 +8321,7 @@ EC13  47        LD      B,A
 EC14  2D        DEC     L
 EC15  7C        LD      A,H
 EC16  20E1      JR      NZ,#EBF9        ; (-31)
-; POPHLRET
+; POPHLRET {DIM121} [POPHRT]
 EC18  E1        POP     HL
 EC19  C9        RET
 ;
@@ -8400,7 +8458,7 @@ EC9F  78        LD      A,B
 ECA0  F2B4EC    JP      P,#ECB4
 ECA3  C680      ADD     A,#80
 ECA5  77        LD      (HL),A
-ECA6  CA18EC    JP      Z,#EC18 ; POPHLRET
+ECA6  CA18EC    JP      Z,#EC18 ; POPHLRET {DIM121} [POPHRT]
 ; Expoentes permitem continuar o cálculo.
 ; Restaura mantissas (1,...).
 ECA9  CD38ED    CALL    #ED38 ; {VORZ} <FUnpackMantissas>
@@ -8449,7 +8507,7 @@ ECDB  FE        DB      #FE ; "CP ..." ; Oculta a instrução seguinte.
 ECDC  2F        CPL
 ; <SignToInt>
 ECDD  17        RLA
-; {TSGNM2}
+; {TSGNM2} [FLGDIF]
 ECDE  9F        SBC     A,A
 ECDF  C0        RET     NZ
 ECE0  3C        INC     A
@@ -8762,7 +8820,7 @@ EDB9  CDE7EA    CALL    #EAE7 ; {ADD9} <FNormalise>
 EDBC  F1        POP     AF
 EDBD  C9        RET
 
-; {FESRCH}
+; {FESRCH} [MLDEBC]
 EDBE  210000    LD      HL,#0000
 EDC1  78        LD      A,B
 EDC2  B1        OR      C
@@ -8770,14 +8828,14 @@ EDC3  C8        RET     Z
 EDC4  3E10      LD      A,#10
 ; {FESRH1}
 EDC6  29        ADD     HL,HL
-EDC7  DA7FE5    JP      C,#E57F ; IIERRO {BSER}
+EDC7  DA7FE5    JP      C,#E57F ; IIERRO {BSER} [BSERR]
 EDCA  EB        EX      DE,HL
 EDCB  29        ADD     HL,HL
 EDCC  EB        EX      DE,HL
 EDCD  3004      JR      NC,#EDD3 ; {FESRH2}
 EDCF  09        ADD     HL,BC
 ; {FESRH3}
-EDD0  DA7FE5    JP      C,#E57F ; IIERRO {BSER}
+EDD0  DA7FE5    JP      C,#E57F ; IIERRO {BSER} [BSERR]
 ; {FESRH2}
 EDD3  3D        DEC     A
 EDD4  20F0      JR      NZ,#EDC6 ; {FESRH1}
