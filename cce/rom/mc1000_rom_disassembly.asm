@@ -5308,7 +5308,7 @@ DD05  F9        LD      SP,HL
 ; {FOR2}
 DD06  EB        EX      DE,HL
 DD07  0E08      LD      C,#08
-DD09  CD27D8    CALL    #D827 ; {TMEMO} [CHKSTK]
+DD09  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
 DD0C  E5        PUSH    HL
 DD0D  CDC2DF    CALL    #DFC2 ; BDATA {DATA} <Data> [DATA]
 DD10  E3        EX      (SP),HL
@@ -5753,7 +5753,7 @@ DF6D  1810      JR      #DF7F           ; (16)
 
 ; BGOSUB
 DF6F  0E03      LD      C,#03
-DF71  CD27D8    CALL    #D827 ; {TMEMO} [CHKSTK]
+DF71  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
 DF74  C1        POP     BC
 DF75  E5        PUSH    HL
 DF76  E5        PUSH    HL
@@ -6400,11 +6400,11 @@ E2D1  1600      LD      D,#00 ; Valor de precedência no início da avaliação 
 ; Avalia expressão até encontrar um operador com precedência menor do que D.
 E2D3  D5        PUSH    DE ; Preserva valor de precedência.
 E2D4  0E01      LD      C,#01 ; Verifica um nível de pilha.
-E2D6  CD27D8    CALL    #D827 ; {TMEMO} [CHKSTK]
-E2D9  CD44E3    CALL    #E344 ; {SNLY13} [OPRND] ; Obtém um operando.
+E2D6  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
+E2D9  CD44E3    CALL    #E344 ; {SNLY13} <EvalTerm> [OPRND] ; Obtém um operando.
 ; {SNALY8} [EVAL2]
 E2DC  22B103    LD      (#03B1),HL ; {NTOKPT} [NXTOPR] ; Preserva endereço do próximo operador.
-; {SNALY9} [EVAL3]
+; {SNALY9} <ArithParse> [EVAL3]
 E2DF  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR] ; Restaura endereço do próximo operador.
 E2E2  C1        POP     BC ; Valor de precedência e operador.
 E2E3  78        LD      A,B ; Valor de precedência.
@@ -6461,7 +6461,7 @@ E329  23        INC     HL ; HL aponta para o endereço da rotina do operador.
 E32A  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM] ; Garante que operando é numérico.
 ; {SNLY12} [STKTHS]
 E32D  C5        PUSH    BC ; Preserva precedência e token do operador anterior.
-E32E  01DFE2    LD      BC,#E2DF ; {SNALY9} [EVAL3] ; Forja retorno para quando uma precedência menor for encontrada.
+E32E  01DFE2    LD      BC,#E2DF ; {SNALY9} <ArithParse> [EVAL3] ; Forja retorno para quando uma precedência menor for encontrada.
 E331  C5        PUSH    BC
 E332  43        LD      B,E ; Preserva operador.
 E333  4A        LD      C,D ; Preserva precedência.
@@ -6476,7 +6476,7 @@ E33D  C5        PUSH    BC ; Preserva endereço da rotina do operador.
 E33E  2AA803    LD      HL,(#03A8) ; {LBYTEX} [CUROPR] ; Restaura endereço do operador atual.
 E341  C3D3E2    JP      #E2D3 ; {SNALY7} [EVAL1] ; Laço até encontrar uma precedência menor.
 
-; {SNLY13} [OPRND]
+; {SNLY13} <EvalTerm> [OPRND]
 ; Obtém um operando em uma expressão (ou uma subexpressão entre parênteses).
 E344  AF        XOR     A ; Tipo inicial assumido = numérico.
 E345  329003    LD      (#0390),A ; {DATYPE} [TYPE]
@@ -6486,13 +6486,13 @@ E34B  1E24      LD      E,#24 ; erro "FO"
 E34D  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR] ; ?FO ERRO se instrução acabou.
 E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; É dígito: interpreta literal numérico.
 E353  CDDCDE    CALL    #DEDC ; {CLETST} <CharIsAlpha> [CHKLTR]
-E356  D292E3    JP      NC,#E392 ; {SNLY17} [CONVAR] ; é letra: interpreta variável/matriz.
+E356  D292E3    JP      NC,#E392 ; {SNLY17} <EvalVarTerm> [CONVAR] ; é letra: interpreta variável/matriz.
 E359  FEBE      CP      #BE ; token "+"
-E35B  28E7      JR      Z,#E344 ; {SNLY13} [OPRND] ; operador '+' unário: ignora e recomeça do próximo caracter.
+E35B  28E7      JR      Z,#E344 ; {SNLY13} <EvalTerm> [OPRND] ; operador '+' unário: ignora e recomeça do próximo caracter.
 E35D  FE2E      CP      '.'
 E35F  CAEFED    JP      Z,#EDEF ; {VALNRM} <FIn> [ASCTFP] ; é ponto: interpreta literal numérico.
 E362  FEBF      CP      #BF ; token "-"
-E364  281B      JR      Z,#E381 ; {SNLY15} [MINUS] ; operador '-' unário.
+E364  281B      JR      Z,#E381 ; {SNLY15} <EvalMinusTerm> [MINUS] ; operador '-' unário.
 E366  FE22      CP      '"'
 E368  CAF6E6    JP      Z,#E6F6 ; {SOPRND} [QTSTR] ; é string
 E36B  FEBB      CP      #BB ; token "NOT"
@@ -6500,15 +6500,15 @@ E36D  CA5FE4    JP      Z,#E45F ; {NOT} [EVNOT]
 E370  FEB8      CP      #B8 ; token "FN"
 E372  CA65E6    JP      Z,#E665 ; {FN} [DOFN]
 E375  D6C8      SUB     #C8 ; primeiro token de função ("SGN").
-E377  302A      JR      NC,#E3A3 ; {SNLY19} [FNOFST] ; Avalia função.
-; {SNLY14} [EVLPAR]
+E377  302A      JR      NC,#E3A3 ; {SNLY19} <EvalInlineFn> [FNOFST] ; Avalia função.
+; {SNLY14} <EvalBracketed> [EVLPAR]
 ; Avalia expressão entre parênteses.
 E379  CDCCE2    CALL    #E2CC ; EVALPAR {SNALY6} [OPNPAR]
 E37C  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E37F  29        DB      ')'
 E380  C9        RET
 
-; {SNLY15} [MINUS]
+; {SNLY15} <EvalMinusTerm> [MINUS]
 ; Avalia operador "menos" unário (-expr).
 E381  167D      LD      D,#7D ; Precedência de "-" = 125.
 E383  CDD3E2    CALL    #E2D3 ; {SNALY7} [EVAL1] ; Avalia até encontrar uma precedência menor.
@@ -6521,7 +6521,7 @@ E38D  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E390  E1        POP     HL ; Restaura endereço do próximo operador.
 E391  C9        RET
 
-; {SNLY17} [CONVAR]
+; {SNLY17} <EvalVarTerm> [CONVAR]
 ; Avalia variável/matriz.
 E392  CD84E4    CALL    #E484 ; {DIM1} <GetVar> [GETVAR] ; Obtém endereço da variável em DE.
 ; {SNLY18} [FRMEVL]
@@ -6534,7 +6534,7 @@ E39E  CC11ED    CALL    Z,#ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP] ; Sim:
 E3A1  E1        POP     HL ; Restaura ponteiro de interpretação do BASIC.
 E3A2  C9        RET
 
-; {SNLY19} [FNOFST]
+; {SNLY19} <EvalInlineFn> [FNOFST]
 ; Avalia função do BASIC.
 ; A já contem o valor do token da função subtraído
 ; de $C8 (o valor do primeiro token de função).
@@ -6564,7 +6564,7 @@ E3C6  1808      JR      #E3D0 ; {SNLY21} [GOFUNC]
 
 ; {SNLY29} [FNVAL]
 ; Prepara avaliação das demais funções.
-E3C8  CD79E3    CALL    #E379 ; {SNLY14} [EVLPAR] ; Avalia parâmetro seguido de ")".
+E3C8  CD79E3    CALL    #E379 ; {SNLY14} <EvalBracketed> [EVLPAR] ; Avalia parâmetro seguido de ")".
 E3CB  E3        EX      (SP),HL ; Recupera posição relativa do endereço da função na tabela de endereços.
 E3CC  118DE3    LD      DE,#E38D ; {SNLY16} [RETNUM] ; Forja retorno para teste de valor numérico.
 E3CF  D5        PUSH    DE
@@ -6701,7 +6701,7 @@ E46D  7A        LD      A,D
 E46E  2F        CPL
 E46F  CD2FE6    CALL    #E62F ; FLOATAC {FRE2} [ACPASS]
 E472  C1        POP     BC
-E473  C3DFE2    JP      #E2DF ; {SNALY9} [EVAL3]
+E473  C3DFE2    JP      #E2DF ; {SNALY9} <ArithParse> [EVAL3]
 
 ; Laço da instrução DIM. Verifica se
 ; há mais uma matriz a dimensionar.
@@ -6958,7 +6958,7 @@ E58C  23        INC     HL
 E58D  70        LD      (HL),B
 E58E  23        INC     HL
 E58F  4F        LD      C,A
-E590  CD27D8    CALL    #D827 ; {TMEMO} [CHKSTK]
+E590  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
 E593  23        INC     HL
 E594  23        INC     HL
 E595  22A803    LD      (#03A8),HL ; {LBYTEX} [CUROPR]
@@ -7130,7 +7130,7 @@ E663  1838      JR      #E69D           ; (56)
 ; Avalia FN.
 E665  CDB0E6    CALL    #E6B0
 E668  D5        PUSH    DE
-E669  CD79E3    CALL    #E379 ; {SNLY14} [EVLPAR]
+E669  CD79E3    CALL    #E379 ; {SNLY14} <EvalBracketed> [EVLPAR]
 E66C  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E66F  E3        EX      (SP),HL
 E670  5E        LD      E,(HL)
@@ -7510,7 +7510,7 @@ E823  C5        PUSH    BC
 E824  E5        PUSH    HL
 E825  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
 E828  E3        EX      (SP),HL
-E829  CD44E3    CALL    #E344 ; {SNLY13} [OPRND]
+E829  CD44E3    CALL    #E344 ; {SNLY13} <EvalTerm> [OPRND]
 E82C  E3        EX      (SP),HL
 E82D  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR]
 E830  7E        LD      A,(HL)
