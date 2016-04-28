@@ -4429,6 +4429,7 @@ D86D  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 D870  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 ; Imprime " ERRO"
 D873  21DDD7    LD      HL,#D7DD ; {ERR} <szError> [ERRMSG]
+; {ERROO1} [ERRIN]
 D876  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 ; Se {CULINO} <CURRENT_LINE> contém 65534, reinicia BASIC.(?)
 ; Pula se erro ao entrar na área de RAM durante a partida fria.(?)
@@ -4703,13 +4704,13 @@ D9CB  F9        LD      SP,HL
 ; temporários.
 D9CC  219603    LD      HL,#0396 ; {LSPTBG} [TMSTPL]
 D9CF  229403    LD      (#0394),HL ; {SPTPTR} [TMSTPT]
-; Inicializa...?
-D9D2  AF        XOR     A
-D9D3  6F        LD      L,A
+; Inicializa CONT, FOR e pilha do BASIC.
+D9D2  AF        XOR     A ; A = $00
+D9D3  6F        LD      L,A ; HL = $0000
 D9D4  67        LD      H,A
-D9D5  22B503    LD      (#03B5),HL ; {LBYTER} [CONTAD]
-D9D8  32AC03    LD      (#03AC),A ; {FORFLG} [FORFLG]
-D9DB  E5        PUSH    HL
+D9D5  22B503    LD      (#03B5),HL ; {LBYTER} [CONTAD] ; Sem CONTinue.
+D9D8  32AC03    LD      (#03AC),A ; {FORFLG} [FORFLG] ; Limpa flag de FOR.
+D9DB  E5        PUSH    HL ; Coloca $0000 na base da pilha.
 D9DC  C5        PUSH    BC ; Recoloca endereço de retorno na pilha.
 ; [DOAGN]
 D9DD  2AAF03    LD      HL,(#03AF) ; {CUSTMT} <PROG_PTR_TEMP> [BRKLIN]
@@ -5373,8 +5374,8 @@ DD6D  23        INC     HL
 DD6E  7E        LD      A,(HL)
 DD6F  23        INC     HL
 DD70  B6        OR      (HL)
-; Se não houver próxima linha...
-DD71  CA29DE    JP      Z,#DE29
+; Se não houver próxima linha, termina execução.
+DD71  CA29DE    JP      Z,#DE29 ; {END2} [ENDPRG]
 ; Se houver...
 DD74  23        INC     HL
 DD75  5E        LD      E,(HL)
@@ -5499,8 +5500,8 @@ DE0A  E1        POP     HL
 ;
 DE0B  FE03      CP      #03 ; Ctrl+C
 ;
-; BSTOP
-DE0D  2811      JR      Z,#DE20         ; (17)
+; BSTOP {STOP} [STOP]
+DE0D  2811      JR      Z,#DE20 ; Desvia se não houver nada depois. Se houver algo, retorna abaixo com erro de sintaxe.
 
 ;
 DE0F  FE20      CP      ' '
@@ -5518,46 +5519,50 @@ DE1F  C9        RET
 ; A instrução abaixo:
 DE20  F6C0      OR      #C0
 ; oculta a instrução:
-; ; BEND
-; DE21  C0        RET     NZ
+; ; BEND {END} [PEND]
+; DE21  C0        RET     NZ ; Erro de sintaxe se houver algo depois.
 ; que é o ponto de entrada da rotina de
 ; interpretação do comando END, e serve
 ; para uma diferenciação:
 ; Para END, o flag Z estará ligado, e
 ; para STOP (ou programa parado por Ctrl+C),
 ; o flag Z estará desligado.
+; {END0}
 DE22  22AF03    LD      (#03AF),HL ; {CUSTMT} ; <PROG_PTR_TEMP> [BRKLIN]
 ; A instrução seguinte:
 DE25  21F6FF    LD      HL,#FFF6
 ; oculta a instrução:
-; [INPBRK]
-; DE26  F6FF      OR      #FF
-DE28  C1        POP     BC
-;
-DE29  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
-DE2C  F5        PUSH    AF
-DE2D  7D        LD      A,L
+; {END1} [INPBRK]
+; DE26  F6FF      OR      #FF ; [Flag "Break" wanted]
+DE28  C1        POP     BC ; Não é mais necessário retornar.
+; {END2} [ENDPRG]
+DE29  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT] ; Número de linha atual.
+DE2C  F5        PUSH    AF ; Preserva distinção STOP/END.
+DE2D  7D        LD      A,L ; STOP/^C em modo direto?
 DE2E  A4        AND     H
-DE2F  3C        INC     A
-DE30  2809      JR      Z,#DE3B         ; (9)
-DE32  22B303    LD      (#03B3),HL
-DE35  2AAF03    LD      HL,(#03AF) ; {CUSTMT} <PROG_PTR_TEMP> [BRKLIN]
-DE38  22B503    LD      (#03B5),HL ; {LBYTER} [CONTAD]
+DE2F  3C        INC     A ; Linha é -1 se STOP/^C em modo direto.
+DE30  2809      JR      Z,#DE3B ; {END3} [NOLIN] ; Modo direto: desvia.
+DE32  22B303    LD      (#03B3),HL ; {LLNOEX} [ERRLIN] ; Preserva número de linha.
+DE35  2AAF03    LD      HL,(#03AF) ; {CUSTMT} <PROG_PTR_TEMP> [BRKLIN] ; Obtém ponto da interrupção.
+DE38  22B503    LD      (#03B5),HL ; {LBYTER} [CONTAD] ; Preserva ponto para CONTinuar.
+; {END3} [NOLIN]
 DE3B  AF        XOR     A
-DE3C  324403    LD      (#0344),A ; {OUTFLG} [CTLOFG]
+DE3C  324403    LD      (#0344),A ; {OUTFLG} [CTLOFG] ; Habilita impressão.
+; Trata som em END/STOP/^C.
 DE3F  3D        DEC     A
-DE40  327101    LD      (#0171),A ; TONEA-1
-DE43  327701    LD      (#0177),A ; TONEB-1
-DE46  327D01    LD      (#017D),A ; TONEC-1
+DE40  327101    LD      (#0171),A ; TONEA-1 ; Nota no canal 1 = $ff.
+DE43  327701    LD      (#0177),A ; TONEB-1 ; Nota no canal 2 = $ff.
+DE46  327D01    LD      (#017D),A ; TONEC-1 ; Nota no canal 3 = $ff.
 DE49  010600    LD      BC,#0006 ; 6ms
 DE4C  CD0EC3    CALL    #C30E ; DELAYB
 DE4F  CDC7CE    CALL    #CEC7 ; Zera período da envoltória no PSG.
-DE52  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
+;
+DE52  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN] ; CR+LF se necessário.
 ; Se foi STOP ou Ctrl+C, imprime mensagem
 ; "PAUSA (EM...)".
-DE55  F1        POP     AF
-DE56  21EFD7    LD      HL,#D7EF ; "PAUSA" {BR} [BRMSG]
-DE59  C276D8    JP      NZ,#D876
+DE55  F1        POP     AF ; Restaura distinção STOP/END.
+DE56  21EFD7    LD      HL,#D7EF ; {BR} [BRMSG] ; Mensagem "PAUSA".
+DE59  C276D8    JP      NZ,#D876 ; {ERROO1} [ERRIN] ; Exibe "EM" número de linha.
 ; Se foi END, vai direto para o modo direto.
 DE5C  C38DD8    JP      #D88D ; {EDIT} [PRNTOK]
 
@@ -6176,7 +6181,7 @@ E1A2  3E        DB      #3E ; Oculta a instrução seguinte.
 E1A3  E5        PUSH    HL ; Empilha ponto de interpretação.
 E1A4  CDE1D9    CALL    #D9E1 ; {OUT?} <InputLineWith?> [PROMPT]
 E1A7  C1        POP     BC ; Desempilha ponto de interpretação.
-E1A8  DA26DE    JP      C,#DE26 ; [INPBRK] ; CTRL+C: Sair.
+E1A8  DA26DE    JP      C,#DE26 ; {END1} [INPBRK] ; CTRL+C: Sair.
 E1AB  23        INC     HL ; Fim de linha adiante?
 E1AC  7E        LD      A,(HL)
 E1AD  B7        OR      A
@@ -6227,7 +6232,7 @@ E1DD  CDE1D9    CALL    #D9E1 ; {OUT?} <InputLineWith?> [PROMPT]
 ; variável.
 E1E0  D1        POP     DE ; Endereço do valor da variável.
 E1E1  C1        POP     BC ; Ponto de interpretação.
-E1E2  DA26DE    JP      C,#DE26 ; [INPBRK]
+E1E2  DA26DE    JP      C,#DE26 ; {END1} [INPBRK]
 E1E5  23        INC     HL ; Próximo byte de DATA é $00?
 E1E6  7E        LD      A,(HL)
 E1E7  B7        OR      A
@@ -6381,97 +6386,103 @@ E2C7  1E18      LD      E,#18 ; erro "TI"
 ; {TMER1}
 E2C9  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
 
-; EVALPAR: Avalia expressão entre parênteses.
+; EVALPAR: Avalia expressão iniciada com parênteses.
 ; {SNALY6} [OPNPAR]
 E2CC  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E2CF  28        DB      '('
 ; EVAL: Avalia uma expressão.
 ; {SNALY} <EvalExpression> [EVAL]
 E2D0  2B        DEC     HL
-E2D1  1600      LD      D,#00
+E2D1  1600      LD      D,#00 ; Valor de precedência no início da avaliação = 0.
 ; {SNALY7} [EVAL1]
-E2D3  D5        PUSH    DE
-E2D4  0E01      LD      C,#01 ; Verificar um nível de pilha.
+; Avalia expressão até encontrar um operador com precedência menor do que D.
+E2D3  D5        PUSH    DE ; Preserva valor de precedência.
+E2D4  0E01      LD      C,#01 ; Verifica um nível de pilha.
 E2D6  CD27D8    CALL    #D827 ; {TMEMO} [CHKSTK]
-E2D9  CD44E3    CALL    #E344 ; {SNLY13} [OPRND]
+E2D9  CD44E3    CALL    #E344 ; {SNLY13} [OPRND] ; Obtém um operando.
 ; {SNALY8} [EVAL2]
-E2DC  22B103    LD      (#03B1),HL ; {NTOKPT} [NXTOPR]
+E2DC  22B103    LD      (#03B1),HL ; {NTOKPT} [NXTOPR] ; Preserva endereço do próximo operador.
 ; {SNALY9} [EVAL3]
-E2DF  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR]
+E2DF  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR] ; Restaura endereço do próximo operador.
 E2E2  C1        POP     BC ; Valor de precedência e operador.
-E2E3  78        LD      A,B
+E2E3  78        LD      A,B ; Valor de precedência.
 E2E4  FE78      CP      #78 ; "AND" ou "OR"?
-E2E6  D4BFE2    CALL    NC,#E2BF ; STR?TI {SNALY3} [TSTNUM]
-E2E9  7E        LD      A,(HL)
-E2EA  1600      LD      D,#00
+E2E6  D4BFE2    CALL    NC,#E2BF ; STR?TI {SNALY3} [TSTNUM] ; Não: Garante que é um número.
+E2E9  7E        LD      A,(HL) ; Obtém próximo operador/função.
+; Os operadores de comparação podem ser usados isolados ("=", "<", ">")
+; ou combinados ("<=", "=<", ">=", "=>", "<>").
+; A partir daqui, enquanto houver tokens ">", "=" e "<" em sequência no programa,
+; ativa com XOR os bits 0, 1 e 2 do registrador D, que ao final conterá
+; um valor correspondente à combinação dos tokens encontrados.
+E2EA  1600      LD      D,#00 ; Zera D para iniciar combinação de operadores de comparação.
 ; {SNLY10} [RLTLP]
 E2EC  D6C5      SUB     #C5 ; token ">"
 E2EE  3815      JR      C,#E305 ; {SNLY11} [FOPRND]
-E2F0  FE03      CP      #03 ; está entre ">", "=", "<"?
+E2F0  FE03      CP      #03 ; Está entre ">", "=", "<"?
 E2F2  3011      JR      NC,#E305 ; {SNLY11} [FOPRND]
 E2F4  FE01      CP      #01 ; CF se ">", ZF se "="
-E2F6  17        RLA
-E2F7  AA        XOR     D
-E2F8  BA        CP      D
+E2F6  17        RLA     ; Bit 0 indica ">", bit 1 indica "=", bit 2 indica "<".
+E2F7  AA        XOR     D ; Aplica bit a D com XOR. Se um mesmo operador foi informado duas vezes (p.ex. "=="), um bit será desativado...
+E2F8  BA        CP      D ; ...e o valor de D vai diminuir.
 E2F9  57        LD      D,A
-E2FA  DA48D8    JP      C,#D848 ; SNERRO
-E2FD  22A803    LD      (#03A8),HL ; {LBYTEX} [CUROPR]
+E2FA  DA48D8    JP      C,#D848 ; SNERRO ; Se valor de D diminuiu, houve duplicidade: Emite erro de sintaxe.
+E2FD  22A803    LD      (#03A8),HL ; {LBYTEX} [CUROPR] ; Salva endereço do token atual.
 E300  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 E303  18E7      JR      #E2EC; {SNLY10} [RLTLP]
 
 ; {SNLY11} [FOPRND]
-E305  7A        LD      A,D
+E305  7A        LD      A,D ; Houve operadores de comparação?
 E306  B7        OR      A
-E307  C200E4    JP      NZ,#E400 ; {SNLY24} [TSTRED]
-E30A  7E        LD      A,(HL)
-E30B  22A803    LD      (#03A8),HL ; {LBYTEX} [CUROPR]
+E307  C200E4    JP      NZ,#E400 ; {SNLY24} [TSTRED] ; Sim, desvia.
+E30A  7E        LD      A,(HL) ; Obtém token do operador.
+E30B  22A803    LD      (#03A8),HL ; {LBYTEX} [CUROPR] ; Preserva endereço do operador.
 E30E  D6BE      SUB     #BE ; token "+"
 E310  D8        RET     C
 E311  FE07      CP      #07 ; É + - * / ^ AND OR?
-E313  D0        RET     NC
-E314  5F        LD      E,A
-E315  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
-E318  3D        DEC     A
-E319  B3        OR      E
+E313  D0        RET     NC ; Não: retorna.
+E314  5F        LD      E,A ; Armazena operador codificado (0 ~ 7) em E.
+E315  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE] ; Obtém tipo de dado.
+E318  3D        DEC     A ; $ff = numérico, $00 = string.
+E319  B3        OR      E ; Ativa flag Z apenas se operador for "+" e tipo de dado for string.
 E31A  7B        LD      A,E
-E31B  CA23E8    JP      Z,#E823 ; {STRSNA} [CONCAT]
-E31E  07        RLCA
+E31B  CA23E8    JP      Z,#E823 ; {STRSNA} [CONCAT] ; Se for, desvia para concatenação de strings.
+E31E  07        RLCA    ; DE = 3 * operador codificado.
 E31F  83        ADD     A,E
 E320  5F        LD      E,A
 E321  2157D7    LD      HL,#D757 ; {ADRTB3} <KW_ARITH_OP_FNS> [PRITAB]
-E324  19        ADD     HL,DE
-E325  78        LD      A,B
-E326  56        LD      D,(HL)
+E324  19        ADD     HL,DE ; Localiza endereço na tabela de operadores.
+E325  78        LD      A,B ; Precedência do operador anterior.
+E326  56        LD      D,(HL) ; Obtém precedência do operador atual.
 E327  BA        CP      D
-E328  D0        RET     NC
-E329  23        INC     HL
-E32A  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
+E328  D0        RET     NC ; Retorna se a precedência anterior for maior ou igual à atual.
+E329  23        INC     HL ; HL aponta para o endereço da rotina do operador.
+E32A  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM] ; Garante que operando é numérico.
 ; {SNLY12} [STKTHS]
-E32D  C5        PUSH    BC
-E32E  01DFE2    LD      BC,#E2DF ; {SNALY9} [EVAL3]
+E32D  C5        PUSH    BC ; Preserva precedência e token do operador anterior.
+E32E  01DFE2    LD      BC,#E2DF ; {SNALY9} [EVAL3] ; Forja retorno para quando uma precedência menor for encontrada.
 E331  C5        PUSH    BC
-E332  43        LD      B,E
-E333  4A        LD      C,D
-E334  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
-E337  58        LD      E,B
-E338  51        LD      D,C
-E339  4E        LD      C,(HL)
+E332  43        LD      B,E ; Preserva operador.
+E333  4A        LD      C,D ; Preserva precedência.
+E334  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP] ; Preserva operando.
+E337  58        LD      E,B ; Restaura operador.
+E338  51        LD      D,C ; Restaura precedência.
+E339  4E        LD      C,(HL) ; BC aponta para a rotina do operador.
 E33A  23        INC     HL
 E33B  46        LD      B,(HL)
 E33C  23        INC     HL
-E33D  C5        PUSH    BC
-E33E  2AA803    LD      HL,(#03A8) ; {LBYTEX} [CUROPR]
-E341  C3D3E2    JP      #E2D3 ; {SNALY7} [EVAL1]
-;
-; Tipo inicial assumido = numérico.
+E33D  C5        PUSH    BC ; Preserva endereço da rotina do operador.
+E33E  2AA803    LD      HL,(#03A8) ; {LBYTEX} [CUROPR] ; Restaura endereço do operador atual.
+E341  C3D3E2    JP      #E2D3 ; {SNALY7} [EVAL1] ; Laço até encontrar uma precedência menor.
+
 ; {SNLY13} [OPRND]
-E344  AF        XOR     A
+; Obtém um operando em uma expressão (ou uma subexpressão entre parênteses).
+E344  AF        XOR     A ; Tipo inicial assumido = numérico.
 E345  329003    LD      (#0390),A ; {DATYPE} [TYPE]
 E348  CDA0DD    CALL    #DDA0 ; NEXTNSPC {TCHAR} <NextChar> [GETCHR]
 ; {MOER}
 E34B  1E24      LD      E,#24 ; erro "FO"
-E34D  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR]
-E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; é dígito: interpreta literal numérico.
+E34D  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR] ; ?FO ERRO se instrução acabou.
+E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; É dígito: interpreta literal numérico.
 E353  CDDCDE    CALL    #DEDC ; {CLETST} <CharIsAlpha> [CHKLTR]
 E356  D292E3    JP      NC,#E392 ; {SNLY17} [CONVAR] ; é letra: interpreta variável/matriz.
 E359  FEBE      CP      #BE ; token "+"
@@ -6489,6 +6500,7 @@ E372  CA65E6    JP      Z,#E665 ; {FN} [DOFN]
 E375  D6C8      SUB     #C8 ; primeiro token de função ("SGN").
 E377  302A      JR      NC,#E3A3 ; {SNLY19} [FNOFST] ; Avalia função.
 ; {SNLY14} [EVLPAR]
+; Avalia expressão entre parênteses.
 E379  CDCCE2    CALL    #E2CC ; EVALPAR {SNALY6} [OPNPAR]
 E37C  CD11DC    CALL    #DC11 ; CHKSYN {CPSTX} <SyntaxCheck> [CHKSYN]
 E37F  29        DB      ')'
@@ -6496,28 +6508,28 @@ E380  C9        RET
 
 ; {SNLY15} [MINUS]
 ; Avalia operador "menos" unário (-expr).
-E381  167D      LD      D,#7D ; Precedência de "-".
-E383  CDD3E2    CALL    #E2D3 ; {SNALY7} [EVAL1]
-E386  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR]
-E389  E5        PUSH    HL
+E381  167D      LD      D,#7D ; Precedência de "-" = 125.
+E383  CDD3E2    CALL    #E2D3 ; {SNALY7} [EVAL1] ; Avalia até encontrar uma precedência menor.
+E386  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR] ; Obtém endereço do próximo operador.
+E389  E5        PUSH    HL ; Preserva endereço do próximo operador.
 E38A  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 ; {SNLY16} [RETNUM]
 ; Checa se FLOAT contém valor numérico e retorna.
 E38D  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
-E390  E1        POP     HL
+E390  E1        POP     HL ; Restaura endereço do próximo operador.
 E391  C9        RET
 
 ; {SNLY17} [CONVAR]
 ; Avalia variável/matriz.
-E392  CD84E4    CALL    #E484 ; {DIM1} <GetVar> [GETVAR]
+E392  CD84E4    CALL    #E484 ; {DIM1} <GetVar> [GETVAR] ; Obtém endereço da variável em DE.
 ; {SNLY18} [FRMEVL]
-E395  E5        PUSH    HL
-E396  EB        EX      DE,HL
-E397  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG]
+E395  E5        PUSH    HL ; Preserva ponteiro de interpretação do BASIC.
+E396  EB        EX      DE,HL ; Endereço da variável em HL.
+E397  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG] ; Preserva endereço da variável.
 E39A  3A9003    LD      A,(#0390) ; {DATYPE} [TYPE]
-E39D  B7        OR      A
-E39E  CC11ED    CALL    Z,#ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
-E3A1  E1        POP     HL
+E39D  B7        OR      A ; É tipo numérico?
+E39E  CC11ED    CALL    Z,#ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP] ; Sim: Move conteúdo para FLOAT.
+E3A1  E1        POP     HL ; Restaura ponteiro de interpretação do BASIC.
 E3A2  C9        RET
 
 ; {SNLY19} [FNOFST]
