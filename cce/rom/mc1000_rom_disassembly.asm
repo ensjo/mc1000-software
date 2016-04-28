@@ -9385,67 +9385,67 @@ F05C  18E9      JR      #F047 ; {REIHE2} [SUMLP]
 
 ; BRND:
 ; {RND} <Rnd> [RND]
-F05E  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
-F061  211903    LD      HL,#0319 ; {RNDVR3} [SEED+2]
-F064  FABEF0    JP      M,#F0BE ; {RND3} [RESEED]
-F067  213A03    LD      HL,#033A ; {RNDVR4} [LSTRND]
-F06A  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
-F06D  211903    LD      HL,#0319 ; {RNDVR3} [SEED+2]
-F070  C8        RET     Z
-F071  86        ADD     A,(HL)
-F072  E607      AND     #07
+F05E  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN] ; Testa sinal de FLOAT. (A = $01, $00 ou $ff)
+F061  211903    LD      HL,#0319 ; {RNDVR3} [SEED+2] ; Semente de número aleatório.
+F064  FABEF0    JP      M,#F0BE ; {RND3} [RESEED] ; Negativo: Semeia de novo.
+F067  213A03    LD      HL,#033A ; {RNDVR4} [LSTRND] ; Último número aleatório.
+F06A  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP] ; Move último RND para FLOAT.
+F06D  211903    LD      HL,#0319 ; {RNDVR3} [SEED+2] ; Obtém seletor da semente de número aleatório.
+F070  C8        RET     Z ; Retorna se RND(0).
+F071  86        ADD     A,(HL) ; Soma A ao seletor de semente número aleatório.
+F072  E607      AND     #07 ; Restringe a 0~7.
 F074  0600      LD      B,#00
-F076  77        LD      (HL),A
-F077  23        INC     HL
-F078  87        ADD     A,A
+F076  77        LD      (HL),A ; Atualiza seletor.
+F077  23        INC     HL ; HL aponta para a tabela de coeficientes (8 números em ponto flutuante a partir de {RNDVR3+1} [SEED+3]).
+F078  87        ADD     A,A ; BC = 4 * A.
 F079  87        ADD     A,A
 F07A  4F        LD      C,A
-F07B  09        ADD     HL,BC
+F07B  09        ADD     HL,BC ; HL aponta para o coeficiente selecionado.
 F07C  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
-F07F  CDCFEB    CALL    #EBCF ; {MUL1} [FPMULT]
-F082  3A1803    LD      A,(#0318) ; {RNDVR2} [SEED+1]
-F085  3C        INC     A
-F086  E603      AND     #03
+F07F  CDCFEB    CALL    #EBCF ; {MUL1} [FPMULT] ; Multiplica FLOAT (último número aleatório) pelo coeficiente selecionado.
+F082  3A1803    LD      A,(#0318) ; {RNDVR2} [SEED+1] ; Obtém o seletor de ...?
+F085  3C        INC     A ; Próximo elemento.
+F086  E603      AND     #03 ; Restringe a 0~3.
 F088  0600      LD      B,#00
-F08A  FE01      CP      #01
+F08A  FE01      CP      #01 ; Se for zero, muda para 1. (Agora está na faixa 1~3.)
 F08C  88        ADC     A,B
-F08D  321803    LD      (#0318),A ; {RNDVR2} [SEED+1]
-F090  21C2F0    LD      HL,#F0C2 ; {RNDL-4} [RNDTAB-4]
-F093  87        ADD     A,A
+F08D  321803    LD      (#0318),A ; {RNDVR2} [SEED+1] ; Atualiza seletor.
+F090  21C2F0    LD      HL,#F0C2 ; {RNDL-4} [RNDTAB-4] ; HL aponta para 4 bytes antes da tabela de adição (3 números em ponto flutuante).
+F093  87        ADD     A,A ; BC = 4 * A.
 F094  87        ADD     A,A
 F095  4F        LD      C,A
-F096  09        ADD     HL,BC
-F097  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL]
+F096  09        ADD     HL,BC ; HL aponta para o valor selecionado.
+F097  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL] ; Soma a FLOAT o valor selecionado.
 ; {RND1} [RND1]
-F09A  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
-F09D  7B        LD      A,E
-F09E  59        LD      E,C
-F09F  EE4F      XOR     #4F
-F0A1  4F        LD      C,A
-F0A2  3680      LD      (HL),#80
-F0A4  2B        DEC     HL
-F0A5  46        LD      B,(HL)
-F0A6  3680      LD      (HL),#80
-F0A8  211703    LD      HL,#0317 ; {RNDVR1} [SEED]
-F0AB  34        INC     (HL)
-F0AC  7E        LD      A,(HL)
-F0AD  D6AB      SUB     #AB ; 171
-F0AF  2004      JR      NZ,#F0B5 ; {RND2} [RND2]
-F0B1  77        LD      (HL),A
-F0B2  0C        INC     C
-F0B3  15        DEC     D
-F0B4  1C        INC     E
+F09A  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP] ; Copia o valor de FLOAT para BCDE.
+F09D  7B        LD      A,E ; Obtém LSB.
+F09E  59        LD      E,C ; LSB = MSB.
+F09F  EE4F      XOR     #4F ; %01001111 ; Remexe com os bits.
+F0A1  4F        LD      C,A ; Novo MSB.
+F0A2  3680      LD      (HL),#80 ; Define expoente.
+F0A4  2B        DEC     HL ; Aponta ao MSB.
+F0A5  46        LD      B,(HL) ; Obtém MSB.
+F0A6  3680      LD      (HL),#80 ; Valor = -0.5.
+F0A8  211703    LD      HL,#0317 ; {RNDVR1} [SEED] ; Semente de número aleatório.
+F0AB  34        INC     (HL) ; Conta semente.
+F0AC  7E        LD      A,(HL) ; Obtém semente.
+F0AD  D6AB      SUB     #AB ; 171 ; A = A - 171.
+F0AF  2004      JR      NZ,#F0B5 ; {RND2} [RND2] ; Se não deu 0, OK: Desvia.
+F0B1  77        LD      (HL),A ; Atualiza semente.
+F0B2  0C        INC     C ; Remexe
+F0B3  15        DEC     D ; no
+F0B4  1C        INC     E ; número.
 ; {RND2} [RND2]
-F0B5  CDEAEA    CALL    #EAEA ; {ADD10} [BNORM]
-F0B8  213A03    LD      HL,#033A ; {RNDVR4} [LSTRND]
-F0BB  C32BED    JP      #ED2B ; HLFLOAT {OPTRAN} <FCopyToMem> [FPTHL]
+F0B5  CDEAEA    CALL    #EAEA ; {ADD10} [BNORM] ; Normaliza número.
+F0B8  213A03    LD      HL,#033A ; {RNDVR4} [LSTRND] ; Preserva número aleatório gerado...
+F0BB  C32BED    JP      #ED2B ; HLFLOAT {OPTRAN} <FCopyToMem> [FPTHL] ; ...e retorna.
 
 ; {RND3} [RESEED]
-F0BE  77        LD      (HL),A
+F0BE  77        LD      (HL),A ; Reinicia {RNDVR3} [SEED+2].
 F0BF  2B        DEC     HL
-F0C0  77        LD      (HL),A
+F0C0  77        LD      (HL),A ; Reinicia {RNDVR2} [SEED+1].
 F0C1  2B        DEC     HL
-F0C2  77        LD      (HL),A
+F0C2  77        LD      (HL),A ; Reinicia {RNDVR1} [SEED].
 F0C3  C39AF0    JP      #F09A ; {RND1} [RND1]
 
 ; Dados para cálculo de RND(X).
@@ -9456,7 +9456,7 @@ F0CE  10D17568  DB      #10,#D1,#75,#68 ; 5,72337E-8
 
 ; BCOS
 ; cos x = sen (x + PI/2)
-F0D2  211CF1    LD      HL,#F11C ; PI/2
+F0D2  211CF1    LD      HL,#F11C ; {COSL} [HALFPI] ; PI/2
 F0D5  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL]
 
 ; BSIN
@@ -9473,7 +9473,7 @@ F0EC  CDA5ED    CALL    #EDA5 ; BINT {INT} <Int> [INT]
 F0EF  C1        POP     BC
 F0F0  D1        POP     DE
 F0F1  CD97EA    CALL    #EA97 ; BCDEMINUSFLOAT {ADD4} [SUBCDE]
-F0F4  2120F1    LD      HL,#F120 ; 1/4
+F0F4  2120F1    LD      HL,#F120 ; {SINL1} [QUARTR] ; 1/4
 F0F7  CD91EA    CALL    #EA91 ; HLMINUSFLOAT {ADD3} [SUBPHL]
 F0FA  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 F0FD  37        SCF
@@ -9483,16 +9483,20 @@ F104  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 F107  B7        OR      A
 F108  F5        PUSH    AF
 F109  F4FCEC    CALL    P,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
-F10C  2120F1    LD      HL,#F120 ; 1/4
+F10C  2120F1    LD      HL,#F120 ; {SINL1} [QUARTR] ; 1/4
 F10F  CD8CEA    CALL    #EA8C ; HLPLUSFLOAT {ADD2} [ADDPHL]
 F112  F1        POP     AF
 F113  D4FCEC    CALL    NC,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
-F116  2124F1    LD      HL,#F124
+F116  2124F1    LD      HL,#F124 ; {SINL} [SINTAB]
 F119  C32FF0    JP      #F02F ; {REIHE} [SUMSER]
 
+; {COSL} [HALFPI]
 F11C  DB0F4981  DB      #DB,#0F,#49,#81 ; PI/2 (1,5708)
+
+; {SINL1} [QUARTR]
 F120  0000007F  DB      #00,#00,#00,#7F ; 1/4 (0,25)
 
+; {SINL} [SINTAB]
 ; Dados para cálculo de SIN(X).
 F124  05        DB      #05
 F125  BAD71E86  DB      #BA,#D7,#1E,#86 ; 39,7107
@@ -9529,7 +9533,7 @@ F166  2191EA    LD      HL,#EA91 ; HLMINUSFLOAT {ADD3} [SUBPHL]
 F169  E5        PUSH    HL
 F16A  2174F1    LD      HL,#F174
 F16D  CD2FF0    CALL    #F02F ; {REIHE} [SUMSER]
-F170  211CF1    LD      HL,#F11C ; PI/2
+F170  211CF1    LD      HL,#F11C ; {COSL} [HALFPI] ; PI/2
 F173  C9        RET
 
 ; Dados para cálculo de ATN(X).
