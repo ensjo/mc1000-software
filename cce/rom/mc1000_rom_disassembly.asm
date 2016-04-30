@@ -6804,11 +6804,11 @@ E4E6  18EB      JR      #E4D3 ; {DIM8} [FNDVAR]
 ; nome da variável.
 
 ; {DIM10} [CFEVAL]
-; Desvia se foi chamado de #E395 {SNLY18} [FRMEVL].
+; Desvia se foi chamado de #E392 {SNLY17} <EvalVarTerm> [CONVAR].
 E4E8  E1        POP     HL
 E4E9  E3        EX      (SP),HL
 E4EA  D5        PUSH    DE
-E4EB  1195E3    LD      DE,#E395 ; {SNLY18} [FRMEVL]
+E4EB  1195E3    LD      DE,#E395 ; {SNLY17+3} <EvalVarTerm+3> [CONVAR+3].
 E4EE  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 E4F1  D1        POP     DE
 E4F2  2829      JR      Z,#E51D ; RSTFLOAT {DIM13} [RETNUL]
