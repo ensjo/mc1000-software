@@ -3957,7 +3957,7 @@ D579  D8F0      DW      #F0D8 ; BSIN {SIN} <Sin>
 D57B  39F1      DW      #F139 ; BTAN {TAN}
 D57D  4EF1      DW      #F14E ; BATN {ATN}
 D57F  D7ED      DW      #EDD7 ; BPEEK {PEEK}
-D581  9DE8      DW      #E89D ; BLEN {LEN}
+D581  9DE8      DW      #E89D ; BLEN {LEN} [LEN]
 D583  C1E6      DW      #E6C1 ; BSTR$ {STR_}
 D585  34E9      DW      #E934 ; BVAL {VAL}
 D587  ACE8      DW      #E8AC ; BASC {ASC}
@@ -7553,7 +7553,7 @@ E868  03        INC     BC
 E869  13        INC     DE
 E86A  18F8      JR      #E864
 
-;
+; {STRZSP} [GETSTR]
 E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] ; Assegura que seja string.
 ; POPTMPSTR:
 ; Faz HL apontar para o último registro
@@ -7606,15 +7606,16 @@ E898  C0        RET     NZ ; Sim
 E899  229403    LD      (#0394),HL ; {SPTPTR} [TMSTPT]
 E89C  C9        RET
 
-; BLEN
+; BLEN {LEN} [LEN]
 ; Forja retorno para FLOATA.
 E89D  013FE6    LD      BC,#E63F ; FLOATA {POS1} [PASSA]
 E8A0  C5        PUSH    BC
-; ALEN
+
+; ALEN {LEN1} [GETLEN]
 ; Obtém em A o comprimento da string.
 
 ; Checa tipo string e desempilha se possível.
-E8A1  CD6CE8    CALL    #E86C
+E8A1  CD6CE8    CALL    #E86C ; {STRZSP} [GETSTR]
 ; Define tipo numérico (e zera D).
 E8A4  AF        XOR     A
 E8A5  57        LD      D,A
@@ -7633,7 +7634,7 @@ E8AF  C5        PUSH    BC
 ; Obtém em A o código ASCII do 1º caracter
 ; da string. Se a string for vazia, produz
 ; "PI ERRO".
-E8B0  CDA1E8    CALL    #E8A1 ; ALEN
+E8B0  CDA1E8    CALL    #E8A1 ; ALEN {LEN1} [GETLEN]
 E8B3  CAF6DE    JP      Z,#DEF6 ; PIERRO {FCER} [FCERR]
 E8B6  23        INC     HL
 E8B7  23        INC     HL
@@ -7741,7 +7742,7 @@ E933  C9        RET
 
 ; BVAL:
 ; Se a string for nula retorna zero.
-E934  CDA1E8    CALL    #E8A1 ; ALEN
+E934  CDA1E8    CALL    #E8A1 ; ALEN {LEN1} [GETLEN]
 E937  CAFDEA    JP      Z,#EAFD ; FLOAT0 {ADD12} <FZero> [RESZER]
 ;
 E93A  5F        LD      E,A ; DE = tamanho da string.
