@@ -7217,7 +7217,7 @@ E6DB  46        LD      B,(HL)
 E6DC  CDE9E6    CALL    #E6E9 ; {SADTB1} [CRTMST]
 E6DF  E5        PUSH    HL
 E6E0  6F        LD      L,A
-E6E1  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA] ; Move para área de strings.
+E6E1  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA] ; ; Copia L bytes de BC para DE. (Move para área de strings.)
 E6E4  D1        POP     DE
 E6E5  C9        RET
 
@@ -7506,52 +7506,57 @@ E81F  2B        DEC     HL
 E820  C378E7    JP      #E778
 
 ; {STRSNA} [CONCAT]
-E823  C5        PUSH    BC
-E824  E5        PUSH    HL
-E825  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
-E828  E3        EX      (SP),HL
-E829  CD44E3    CALL    #E344 ; {SNLY13} <EvalTerm> [OPRND]
-E82C  E3        EX      (SP),HL
-E82D  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR]
-E830  7E        LD      A,(HL)
-E831  E5        PUSH    HL
-E832  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG]
-E835  E5        PUSH    HL
-E836  86        ADD     A,(HL)
-E837  1E1C      LD      E,#1C ; erro "CL"
+E823  C5        PUSH    BC ; Preserva valor de precedência e operador.
+E824  E5        PUSH    HL ; Preserva ponteiro de interpretação do programa BASIC.
+E825  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] ; Obtém ponteiro para registro de string atual (1º operando).
+E828  E3        EX      (SP),HL ; Preserva na pilha e restaura o ponteiro de interpretação do programa BASIC.
+E829  CD44E3    CALL    #E344 ; {SNLY13} <EvalTerm> [OPRND] ; Obtém operando seguinte ao operador "+" (ponteiro em FLOAT).
+E82C  E3        EX      (SP),HL ; Preserva ponteiro de interpretação do programa BASIC e restaura o ponteiro para o registro de string do 1º operando.
+E82D  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] ; ?TI ERRO se 2º operando não for do tipo string.
+E830  7E        LD      A,(HL) ; Obtém comprimento do 1º operando.
+E831  E5        PUSH    HL ; Preserva ponteiro para registro de string do 1º operando.
+E832  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] ; Obtém ponteiro para registro de string do 2º operando, armazenado em FLOAT.
+E835  E5        PUSH    HL ; Preserva ponteiro para registro de string do 2º operando.
+E836  86        ADD     A,(HL) ; Soma os comprimentos dos dois operandos.
+; {LSER}
+E837  1E1C      LD      E,#1C ; erro "CL" ; Emite ?CL ERRO se comprimento resultante > 255.
 E839  DA56D8    JP      C,#D856 ; ERROE {ERROO} <Error> [ERROR]
-E83C  CDE6E6    CALL    #E6E6 ; {STADTB} [MKTMST]
-E83F  D1        POP     DE
-E840  CD73E8    CALL    #E873 ; {STRZS3} [GSTRDE]
-E843  E3        EX      (SP),HL
-E844  CD72E8    CALL    #E872
-E847  E5        PUSH    HL
-E848  2AA403    LD      HL,(#03A4)
-E84B  EB        EX      DE,HL
-E84C  CD5AE8    CALL    #E85A
-E84F  CD5AE8    CALL    #E85A
-E852  21E2E2    LD      HL,#E2E2
+E83C  CDE6E6    CALL    #E6E6 ; {STADTB} [MKTMST] ; Aloca o comprimento da nova string e cria registro de string em $03A2 {STRDAT} [TMPSTR].
+E83F  D1        POP     DE ; Restaura ponteiro para registro de string do 2º operando.
+E840  CD73E8    CALL    #E873 ; {STRZS3} [GSTRDE] ; [Move to string pool if needed]
+E843  E3        EX      (SP),HL ; Preserva ponteiro para registro de string do 2º operando, restaura do 1º.
+E844  CD72E8    CALL    #E872 ; {STRZS2} [GSTRHL] ; [Move to string pool if needed]
+E847  E5        PUSH    HL ; Preserva ponteiro para registro de string do 1º operando.
+E848  2AA403    LD      HL,(#03A4) ; {STRDAT+2}, [TMPSTR+2] ; Endereço do conteúdo da string temporária...
+E84B  EB        EX      DE,HL ; ...em DE.
+E84C  CD5AE8    CALL    #E85A ; {STRMOV} [SSTSA] ; Copia conteúdo da 1ª string para nova string.
+E84F  CD5AE8    CALL    #E85A ; {STRMOV} [SSTSA] ; Copia conteúdo da 2ª string para nova string.
+E852  21E2E2    LD      HL,#E2E2 ; {SNALY8+6} [EVAL2+6] ; Forja retorno ao laço de avaliação.
 E855  E3        EX      (SP),HL
 E856  E5        PUSH    HL
-E857  C314E7    JP      #E714 ; {SLEN3} [TSTOPL]
-E85A  E1        POP     HL
+E857  C314E7    JP      #E714 ; {SLEN3} [TSTOPL] ; Move string temporária para a área de strings.
+
+; {STRMOV} [SSTSA]
+E85A  E1        POP     HL ; Retira da pilha ponteiro para registro de string sob o endereço de retorno.
 E85B  E3        EX      (SP),HL
-E85C  7E        LD      A,(HL)
+E85C  7E        LD      A,(HL) ; A = comprimento da string.
 E85D  23        INC     HL
 E85E  23        INC     HL
-E85F  4E        LD      C,(HL)
+E85F  4E        LD      C,(HL) ; BC = ponteiro para o conteúdo da string.
 E860  23        INC     HL
 E861  46        LD      B,(HL)
-E862  6F        LD      L,A
+E862  6F        LD      L,A ; L = comprimento da string.
 ; {STRMV1} [TOSTRA]
+; Copia L bytes de BC para DE.
 E863  2C        INC     L
+; {STRMV2} [TSALP]
 E864  2D        DEC     L
 E865  C8        RET     Z
 E866  0A        LD      A,(BC)
 E867  12        LD      (DE),A
 E868  03        INC     BC
 E869  13        INC     DE
-E86A  18F8      JR      #E864
+E86A  18F8      JR      #E864 ; {STRMV2} [TSALP]
 
 ;
 E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] ; Assegura que seja string.
@@ -7562,26 +7567,26 @@ E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] ; Assegura que seja str
 ; estiverem apontando para esse mesmo registro,
 ; desempilha-o.
 ; {STRZS1} [GSTRCU]
-E86F  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] ; HL aponta para registro de string temporário "atual" (apontado pelos dois primeiros bytes de FLOAT).
+E86F  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] ; HL aponta para registro de string temporário "atual" (apontado pelos dois primeiros bytes de FLOAT). [Get current string]
 ; {STRZS2} [GSTRHL]
-E872  EB        EX      DE,HL ; DE aponta para registro de string temporário "atual".
+E872  EB        EX      DE,HL ; DE aponta para registro de string temporário "atual". [Save DE]
 ; {STRZS3} [GSTRDE]
-E873  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; HL aponta para o último registro de string temporária; obtém em BC o endereço do conteúdo dessa string; se DE = HL, desempilha essa string.
-E876  EB        EX      DE,HL ; DE aponta para o último registro de string temporária (tenha sido desempilhado ou não); HL aponta para registro de string temporário "atual".
-E877  C0        RET     NZ ; Se não foi desempilhado, retorna.
+E873  CD8CE8    CALL    #E88C ; {SPTSRH} [BAKTMP] ; HL aponta para o último registro de string temporária; obtém em BC o endereço do conteúdo dessa string; se DE = HL, desempilha essa string. [Was it last tmp-str?]
+E876  EB        EX      DE,HL ; DE aponta para o último registro de string temporária (tenha sido desempilhado ou não); HL aponta para registro de string temporário "atual". [Restore DE]
+E877  C0        RET     NZ ; Se não foi desempilhado, retorna. [No - Return]
 ; Se a string desempilhada foi a última a ter
 ; área alocada, libera a área correspondente.
-E878  D5        PUSH    DE
-E879  50        LD      D,B
+E878  D5        PUSH    DE ; [Save string]
+E879  50        LD      D,B ; [String block address to DE]
 E87A  59        LD      E,C
-E87B  1B        DEC     DE
-E87C  4E        LD      C,(HL)
-E87D  2AA603    LD      HL,(#03A6) ; {SWAPTR} [STRBOT]
-E880  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
-E883  2005      JR      NZ,#E88A ; {STRZS4} [POPHL]
-E885  47        LD      B,A
-E886  09        ADD     HL,BC
-E887  22A603    LD      (#03A6),HL ; {SWAPTR} [STRBOT]
+E87B  1B        DEC     DE ; [Point to length]
+E87C  4E        LD      C,(HL) ; [Get string length]
+E87D  2AA603    LD      HL,(#03A6) ; {SWAPTR} [STRBOT] ; [Current bottom of string area]
+E880  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; [Last one in string area?]
+E883  2005      JR      NZ,#E88A ; {STRZS4} [POPHL] ; [No - Return]
+E885  47        LD      B,A ; [Clear B (A=0)]
+E886  09        ADD     HL,BC ; [Remove string from str' area]
+E887  22A603    LD      (#03A6),HL ; {SWAPTR} [STRBOT] ; [Save new bottom of str' area]
 ; {STRZS4} [POPHL]
 E88A  E1        POP     HL
 E88B  C9        RET
@@ -7648,7 +7653,7 @@ E8BC  C9        RET
 E8BD  3E01      LD      A,#01
 E8BF  CDE6E6    CALL    #E6E6 ; {STADTB} [MKTMST]
 E8C2  CD9CE9    CALL    #E99C ; {ARGVL2} [MAKINT]
-E8C5  2AA403    LD      HL,(#03A4)
+E8C5  2AA403    LD      HL,(#03A4) ; {STRDAT+2}, [TMPSTR+2]
 ;
 E8C8  73        LD      (HL),E
 ;  {CHR_1} [TOPOOL]
@@ -7690,7 +7695,7 @@ E8EC  44        LD      B,H ; BC = HL.
 E8ED  4D        LD      C,L
 E8EE  CDE9E6    CALL    #E6E9 ; {SADTB1} [CRTMST] ; Cria registro temporário.
 E8F1  6F        LD      L,A ; Comprimento da nova string.
-E8F2  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA] ; [Move string to string area.]
+E8F2  CD63E8    CALL    #E863 ; {STRMV1} [TOSTRA] ; Copia L bytes de BC para DE. (Move para a área de strings.)
 E8F5  D1        POP     DE ; Limpa pilha.
 E8F6  CD73E8    CALL    #E873 ; {STRZS3} [GSTRDE] ; [Move to string pool if needed.]
 E8F9  C314E7    JP      #E714 ; {SLEN3} [TSTOPL] ; [Temporary string to pool.]
