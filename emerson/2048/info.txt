@@ -1,0 +1,49 @@
+Jogo de tabuleiro.
+
+Inicia-se com um tabuleiro 4x4 com apenas duas casas preenchidas com 2 ou 4.
+
+A cada movimento o jogador deve escolher uma direção (cima, baixo, esquerda,
+direita) para o qual os números "cairão", percorrendo quaisquer espaços vazios
+existentes naquela direção até o limite do tabuleiro.
+
+Se dois números iguais se encontrarem na direção escolhida, eles se somarão e
+ocuparão uma única casa.
+
+Depois da movimentação um novo número (2 ou 4) será acrescentado em alguma casa
+vazia do tabuleiro.
+
+Dada a situação:
+
++--+--+--+--+
+| 2|  |  |  |
++--+--+--+--+
+|  | 4|  | 4|
++--+--+--+--+
+|  |  |  |  |
++--+--+--+--+
+|32|  |16|  |
++--+--+--+--+
+
+Movendo-se os números para a direita, a nova situação será:
+
++--+--+--+--+
+|  |  |  | 2|
++--+--+--+--+
+|  |  |  | 8|
++--+--+--+--+
+| 2|  |  |  |
++--+--+--+--+
+|  |  |32|16|
++--+--+--+--+
+
+Nota como os dois números 4 (na segunda linha) se somaram na direção do
+movimento.
+
+Depois do movimento, um número 2 foi acrescentado numa casa vazia, na terceira
+linha.
+
+O objetivo do jogo é conseguir obter uma casa com o valor 2048 sem que o
+tabuleiro se tenha obtruído (todas as casas ocupadas e sem possibilidade de
+movimento).
+
+Informação: https://en.wikipedia.org/wiki/2048_(video_game)

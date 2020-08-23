@@ -1,0 +1,9 @@
+Rotina em BASIC que imprime caracteres na tela GR. Cada caracter ocupa 4 pixels de largura por 6 de altura. No modo Color Graphics 6 a tela comporta uma grade de 32×32 caracteres.
+
+* A posição do cursor é definida com POKE 275,linha : POKE 276,coluna.
+* A string a imprimir é colocada na variável WS$.
+* GOSUB 65200 imprime a string com quebra de linha no fim.
+* GOSUB 65202 imprime uma quebra de linha.
+* GOSUB 65204 imprime a string sem quebra de linha no fim.
+* Caracteres de controle funcionam.
+* O INVERSE é levado em conta.

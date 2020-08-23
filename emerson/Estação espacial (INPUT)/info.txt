@@ -1,0 +1,5 @@
+* http://www.datassette.org/revistas/input/vol-1-fasciculo-6
+
+Reformulado a partir da versão para ZX Spectrum.
+
+Protege a estação dos mísseis da nave alienígena, ativando com as teclas "1", "2", "3" ou "4" o escudo do flanco correspondente, enquanto houver combustível.

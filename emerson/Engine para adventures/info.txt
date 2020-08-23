@@ -1,0 +1,72 @@
+﻿Este é um engine para adventures textuais para o MC1000, com interface operada por menus.
+
+O engine ocupa as linhas abaixo de 1000, isto é, de 0 a 570. O código não está muito didático por causa do foco na economia de bytes. Não há comentários, e uso linhas longas para reduzir o consumo de memória.
+
+A partir da linha 1000 fica a implementação da aventura em si. Na listagem abaixo, criei uma adaptação da aventura da revista INPUT.
+
+Para o //engine// funcionar a aventura deve fornecer as seguintes variáveis:
+* SX = "sala" — número da sala atual.
+* S$() = "salas" — nomes das salas.
+* SN() = "salas:norte" — se as salas têm saída para o norte.
+* SS() = "salas:sul" — se as salas têm saída para o sul.
+* SL() = "salas:leste" — se as salas têm saída para o leste.
+* SO() = "salas.oeste" — se as salas têm saída para o oeste.
+* SC() = "salas.cima" — se as salas têm saída para cima.
+* SB() = "salas.baixo" — se as salas têm saída para baixo.
+* OQ = "objetos:quantidade" — quantidade de objetos.
+* O$() = "objetos" — nomes dos objetos.
+* O() = "objetos" — posições dos objetos; o valor −1 significa que o objeto está com o personagem.
+
+A aventura interage com o engine por meio do comando GOSUB 9. O engine limpa a tela, exibe o nome da sala atual, as direções para as quais é possível ir e uma lista numerada (de 1 até 9) dos objetos à vista na sala. Se a sala contiver mais de 9 objetos, a tecla <.> exibe o resto da lista.
+
+O usuário pode pressionar <I> para ver os objetos de seu inventário, e <V> para voltar à lista dos objetos à vista na sala.
+
+O usuário pode escolher a tecla correspondente a uma direção, ou o número correspondente a um objeto exibido na tela. Neste caso será apresentada uma lista de ações sobre objetos que o usuário pode experimentar.
+
+Quando o usuário finalmente escolhe uma direção ou uma ação, o controle retorna à aventura, com as variáveis seguintes:
+* C$= "comando" — o comando selecionado pelo usuário:
+** "N", "S", "L", "O", "C", "B" = ir para norte, sul, leste oeste, cima ou baixo, respectivamente.
+** "OE" = examinar o objeto.
+** "OA" = ativar o objeto.
+** "OP" = pegar o objeto.
+** "OL" = largar o objeto.
+** "OI" = ir para o objeto.
+** "OU" = usar o objeto em um outro objeto.
+* OX = "objeto x" — o objeto selecionado para a ação.
+* OY = "objeto y" — um segundo objeto no qual o primeiro será usado (no caso da ação "OU").
+
+Além do comando GOSUB 9, algumas rotinas de apoio do engine que podem ser úteis para a programação da aventura são:
+* TT = 0: GOSUB 200 = apenas limpa a tela e exibe o nome do local atual. Útil para a aventura descrever em seguida o que aconteceu em resposta ao comando do usuário.
+* GOSUB 8 = Imprime "RETURN:" na base da tela e espera qualquer tecla ser pressionada.
+* GOSUB 1 = Posiciona cursor nas coordenadas X, Y.
+* GOSUB 2 = Zera o contador de caracteres impressos (verificável pela função POS()), para evitar que o MC1000 dê uma quebra de linha (geralmente indesejável para a construção da tela) quando a contagem chega a 255. Isto é dispensável em outros micros.
+* GOSUB 5 = Espera até o usuário pressionar uma tecla correspondente a um dos caracteres contidos em MO$. Retorna a tecla em T$, e também T = VAL(T$).
+
+----
+
+Internamente o engine usa as variáveis a seguir. A aventura pode até usá-las como variáveis temporárias, mas o programador deve estar ciente de que poderão ser alteradas quando alguma rotina do engine for chamada:
+* AT$ = "print at" — início da sequência de escape para posicionamento do cursor (ESC + "=").
+* I = variável temporária de uso geral.
+* IX = "inventário?" — indica se é para listar os objetos do inventário ou dos objetos à vista.
+* LP = "lista paginável?" — indica se a lista de objetos é paginável (se houver mais de 9 objetos a exibir).
+* MO$ = "menu de opções" — uma string cujos caracteres correspondem às teclas que serão esperadas por GOSUB 5.
+* MU = "menos um" — uma "constante" com o valor −1.
+* OI = "objeto:índice" — índice que percorre a matriz de objetos para montar a lista.
+* OL(9) = "objetos:lista" — lista dos índices dos (até) 9 objetos a serem exibidos na tela.
+* OP$ = "opção" — uma opção a ser exibida na tela nas coordenadas X, Y e cujo primeiro caracter será acrescentado a MO$, em GOSUB 3.
+* T = "tecla" — o valor numérico de T$.
+* T$ = "tecla" — uma tecla pressionada pelo usuário em GOSUB 5.
+* TT = "tipo de tela" — tipo de tela a ser exibida por GOSUB 200: 0 = só o nome da sala, 1 = tela de sala, 2 = tela de objeto, 3 = tela "usar em".
+* X = coluna onde o cursor será posicionado por GOSUB 1.
+* Y = linha onde o cursor será posicionado por GOSUB 1.
+
+E a função das partes do programa:
+
+* 0 = inicialização e desvio para a aventura.
+* 1~8 = rotinas de apoio.
+* 9~130 = laço principal.
+* 200~260 = monta uma tela.
+* 300~350 = exibe direções.
+* 360~400 = exibe opções para alternância entre coisas à vista/inventário.
+* 410~460 = exibe opções para objetos.
+* 500~570 = exibe lista de objetos.

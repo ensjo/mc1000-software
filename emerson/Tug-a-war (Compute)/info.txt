@@ -1,0 +1,3 @@
+Jogo para dois jogadores recriado a partir das regras descritas em: ftp://ftp.whtech.com/magazines/compute!/Compute!%208604.pdf. As versões originais eram gráficas.
+
+Temos um tabuleiro de 11 casas com uma bola na casa do meio. O objetivo de cada jogador é trazer a bola até sua extremidade do tabuleiro. Cada casa pode ter um dos valores "<2", "<1", "1>" e "2>", indicando movimentos de uma ou duas casas para a esquerda ou para a direita. Em sua vez cada jogador escolhe uma quantidade de casas a partir de sua extremidade cujos valores serão alterados. Casas com valor "<2" passam a "<1", casas com valor "<1" passam a "1>" etc. Se a casa onde está a bola for alterada, ela se move segundo o novo valor que a casa recebeu.

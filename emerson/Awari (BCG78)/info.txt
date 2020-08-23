@@ -1,0 +1,33 @@
+* http://www.atariarchives.org/basicgames/showpage.php?page=6
+
+==Regras:==
+Awari (ou oware) é um antigo jogo africano jogado com sete varetas e trinta e seis pedras  ou sementes dispostos assim:
+
+               Meu lado
+      | 6 | 5 | 4 | 3 | 2 | 1 |
+      |ooo|ooo|ooo|ooo|ooo|ooo|
+Minha |   |   |   |   |   |   | Sua
+casa  |   |   |   |   |   |   | casa
+      |ooo|ooo|ooo|ooo|ooo|ooo|
+      | 1 | 2 | 3 | 4 | 5 | 6 |
+               Seu lado
+
+O tabuleiro é dividido em seis compartimentos ou cavidades de cada lado. Há duas cavidades especiais ("casas") nas extremidades.
+
+Faz-se uma jogada pegando todas as sementes de qualquer cavidade não vazia de seu próprio lado. A partir da cavidade à direita dessa, essas sementes são "semeadas" uma em cada cavidade ao redor do tabuleiro no sentido anti-horário.
+
+Uma rodada consiste de uma ou duas jogadas. Se a última semente de sua jogada for semeada em sua própria casa você pode fazer uma segunda jogada.
+
+Se a última semente semeada em uma jogada cair em uma cavidade vazia, desde que a cavidade oposta não esteja vazia, todas as sementes da cavidade oposta, juntamente com a última semente semeada são "capturados" e transferidos para a casa do jogador.
+
+Quando um lado fica vazio, o jogo termina. O jogador com a maior quantidade de sementes em sua casa vence.
+
+Na versão em computador, o tabuleiro é impresso como 14 números representando o conteúdo das 14 cavidades.
+
+  3  3  3  3  3  3
+0                  0
+  3  3  3  3  3  3
+
+As cavidades do seu lado (inferior) são numeradas de 1 a 6 da esquerda para a direita. As cavidades do lado do computador são numeradas da (sua) direita para a (sua) esquerda.
+
+Para fazer uma jogada você digita o número da cavidade. Se a última semente cair em sua casa, o computador pergunta "DE NOVO?" e você pode digitar sua segunda jogada.

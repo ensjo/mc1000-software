@@ -1,0 +1,14 @@
+Simulador de voo da revista INPUT. Adaptado principalmente da versão para MSX.
+
+* http://www.datacassete.com.br/uploads/revistas/input/input_30.pdf
+* http://www.datacassete.com.br/uploads/revistas/input/input_31.pdf
+* http://www.datacassete.com.br/uploads/revistas/input/input_33.pdf
+
+Objetivo: Pousar o avião, que começa a 20.000 metros do centro da pista e a 2.000 metros de altitude.
+
+Comandos:
+* Q & A — Aumenta/diminui a rotação do motor.
+* Z & X — Inclina o avião para a direita/esquerda.
+* P & L — Inclina o avião para cima/baixo.
+
+Vídeo de execução do programa: https://www.youtube.com/watch?v=9qiFkhbXGRQ

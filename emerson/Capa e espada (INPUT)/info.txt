@@ -1,0 +1,28 @@
+Jogo de combate em tabuleiro.
+
+Dá ordem às tuas tropas (na parte inferior da tela) e destrói as tropas do computador (na parte superior).
+
+* http://www.datassette.org/revistas/input/vol-4-fasciculo-51
+* http://www.datassette.org/revistas/input/vol-4-fasciculo-52
+* http://www.datassette.org/revistas/input/vol-4-fasciculo-53
+* http://www.datassette.org/revistas/input/vol-4-fasciculo-54
+* http://www.datassette.org/revistas/input/vol-4-fasciculo-55
+
+Adaptado da versão para ZX Spectrum.
+
+Usa rotina em código de máquina para imprimir caracteres/sprites na tela.
+
+Como o uso de cores reduziria pela metade a quantidade de posições horizontais do mapa, optei por usar formas diferentes (espelhadas) para diferenciar as tropas do jogador e do computador.
+
+Versão alternativa para os desenhos das tropas, para que se faça melhor distinção entre os dois exércitos:
+
+2610  DATA 64,120,126,120,78,64,64,0
+2620  DATA 64,112,72,68,68,78,68,0
+2630  DATA 0,126,102,66,102,60,24,0
+2640  DATA 32,56,36,127,36,56,32,0
+2650  DATA 16,16,16,16,124,16,16,0
+2660  DATA 184,134,129,134,177,174,160,64
+2670  DATA 176,136,180,170,170,177,170,68
+2680  DATA 255,129,153,189,153,66,36,24
+2690  DATA 88,68,91,128,91,68,88,32
+2700  DATA 40,40,40,108,130,108,40,16

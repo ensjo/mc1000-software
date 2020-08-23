@@ -1,0 +1,7 @@
+Após o desenho dos padrões, seleciona o modo de vídeo usando as teclas numéricas (1–4):
+# Modo 153 (128×192, verde/amarelo/azul/vermelho)
+# Modo 155 (128×192, branco/ciano/magenta/laranja)
+# Modo 157 (256×192, verde escuro/verde claro)
+# Modo 159 (256×192, preto/branco) = HGR
+
+A tecla 0 termina o programa.

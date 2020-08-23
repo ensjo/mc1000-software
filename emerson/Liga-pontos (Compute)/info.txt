@@ -1,0 +1,9 @@
+* http://www.atarimagazines.com/compute/issue40/dots.php
+* Reformulação da versão para TRS-80 Color Computer.
+
+Teclas de controle: W, A, S, D, RETURN.
+
+Nota: Este programa faz uso da mod de blocos coloridos no modo texto, usando-os para marcar as casas tomadas pelo usuário (blocos laranjados) e pelo MC1000 (blocos vermelhos). Em um micro sem essa mod, modifica as linhas abaixo:
+
+9190 M0 = 10:C$(M0) =  CHR$ ( ASC ("X") + 128): REM MARCA DO JOGADOR 1 (USUARIO) (X INVERTIDO)
+9200 M1 = 11:C$(M1) =  CHR$ ( ASC ("O") + 128): REM MARCA DO JOGADOR 2 (COMPUTADOR) (O INVERTIDO)

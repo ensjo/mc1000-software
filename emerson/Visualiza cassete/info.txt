@@ -1,0 +1,1 @@
+Este programa BASIC chama constantemente um programa em linguagem de máquina que lê a entrada de cassete e enche a tela HGR com pontos representando os altos e baixos do som.

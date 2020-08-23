@@ -1,0 +1,7 @@
+Percorre o castelo do Drácula coletando estacas de prata que, além de valiosas, serão necessárias para matar os monstros com que te encontrares ou para escalar para fora dos fossos de visgo em que caíres. Após o pôr-do-sol o próprio Drácula deixará seu caixão e estará sempre por perto, e sempre se levantará após ser abatido. Escadas descem para níveis inferiores onde os perigos custam cada vez mais estacas, mas uma delas pode levar ao tesouro do Vampiro — e à saída.
+
+* Adaptado do jogo Dracula's Castle para VZ200: http://vzalive.bluebilby.com/downloads/ .
+* Requer 64KiB de RAM e a mod de blocos coloridos em modo texto.
+* A listagem contém strings com caracteres que não podem ser produzidos digitando-se diretamente no MC1000. É preciso inserir caracteres comuns para marcar lugar e depois substituí-los na memória com o comando DEBUG. A notação usada na listagem para indicar esses caracteres é aceita pelas funcionalidades "Inject program" e "Extract program" do emulador jsMC1000 ( http://ensjo.net/mc-1000/jsmc1000/ ): (Pretendo incluir o tratamento dessa notação nos aplicativos de cassete Bas2Bin e ListBin.)
+** ~nn representa um caracter com código hexadecimal $nn, e
+** `X representa a versão invertida do caracter ASCII X (128 + código do caracter).

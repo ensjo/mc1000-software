@@ -1,0 +1,7 @@
+* http://www.datassette.org/revistas/input/vol-1-fasciculo-4
+
+Adaptado da versão para TRS-80 Color Computer.
+
+Usa uma rotina em código de máquina para impedir que o pressionamento de teclas trave o interpretador BASIC.
+
+Usa as teclas Z, X, P, L para mover o tanque ("#") até os paraquedistas ("O"). Há uma mina escondida no terreno. O jogo termina ao colidir com a mina ou após resgatar 10 paraquedistas.

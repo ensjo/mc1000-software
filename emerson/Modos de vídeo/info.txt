@@ -1,0 +1,9 @@
+Este programa permite explorar todos os modos de vídeo do MC1000.
+
+Após um processamento inicial, este programa monta uma tela em modo HGR: um pouco de "lixo", umas linhas verticais, e finalmente o número "159", que é o número correspondente ao modo HGR.
+
+Usando as teclas VÍRGULA e PONTO, pode-se aumentar ou diminuir (de 2 em 2) o valor desse número.
+
+À medida em que se muda o número, novos modos de vídeo (de texto, gráfico ou semigráfico) aparecerão. (137 é o modo GR, 001 é o modo de texto padrão.)
+
+A tecla de ESPAÇO termina a execução do programa.

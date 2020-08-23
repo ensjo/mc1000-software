@@ -1,0 +1,3 @@
+* Código original: http://www.dunnington.u-net.com/public/startrek/TREK.BAS
+* Página com as regras (em inglês): http://www.atariarchives.org/basicgames/showpage.php?page=157
+* Outras versões do programa STAR TREK: http://www.dunnington.u-net.com/public/startrek/

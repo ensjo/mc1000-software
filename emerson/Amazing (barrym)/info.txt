@@ -1,0 +1,9 @@
+Gerador de labirinto.
+
+Modo de vídeo GR.
+
+Consulta o conteúdo da memória de vídeo durante o processamento.
+
+Adaptado de http://www.vavasour.ca/jeff/level1/entry52.html .
+
+A versão 2 roda mais rápido e tem comentários mais extensos também.

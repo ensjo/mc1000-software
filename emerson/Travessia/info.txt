@@ -1,0 +1,3 @@
+Resolve o problema do homem que quer atravessar um rio com um lobo, um carneiro e uma carga de alface, mas dispõe de um barco onde só cabem ele e um desses itens. Ele terá que fazer a travessia em várias viagens. Mas não pode deixar o lobo sozinho com o carneiro e nem o carneiro sozinho com a alface.
+
+O código poderia ser muito menor, mas quis deixá-lo bem comentado e organizado, por isso ficou grande.

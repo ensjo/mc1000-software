@@ -1,0 +1,15 @@
+Jogo de quebra-cabeças. Modo HGR.
+
+* Código original: https://archive.org/details/mycom-basic-magazine-1988-04 , pp. 118~119.
+
+Objetivo: Conduzir o pinguim pelas 10 fases, coletando as 5 chaves em cada fase.
+
+Comandos:
+* A, D: Esquerda, direita.
+	O pinguim pode empurrar um bloco se não houver nada obstruindo o caminho.
+* Q, E: Diagonais: Para cima/esquerda, para cima/direita.
+	O pinguim pode escalar um bloco a seu lado.
+	Se não houver bloco, ele apenas pula.
+* W: Para cima.
+	O pinguim pode escalar para um bloco acima de si se não houver nada obstruindo o caminho.
+	Se não houver bloco, ele apenas pula.

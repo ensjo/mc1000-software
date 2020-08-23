@@ -1,0 +1,5 @@
+* http://www.datassette.org/revistas/input/vol-2-fasciculo-26
+
+Adaptado da versão para TRS Color.
+
+Teclas: S (cima), Z (esquerda), X (baixo), C (direita)

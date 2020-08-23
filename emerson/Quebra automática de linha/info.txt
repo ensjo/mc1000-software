@@ -1,0 +1,19 @@
+A rotina entre as linhas 1-8 a imprime uma string na tela realizando a quebra
+automática de linha (word wrap).
+
+* M$: contém a string a imprimir. Ela é destruída no processo.
+* A: aponta para o caracter de M$ que, a partir da posição atual do cursor
+  cairá na última coluna da tela.
+* B: percorre a string a partir de A procurando o ponto onde quebrar a linha.
+
+Basicamente:
+
+1. Se o caracter na posição A e/ou o seguinte forem espaço, imprime-se M$ até
+   a posição A, pula-se os espaços seguintes, reduz-se M$ aos caracteres
+   restantes e reitera.
+2. Se o caracter na posição A e o seguinte não forem espaço, é preciso realizar
+   a quebra. Volta-se na linha em busca de um espaço.
+   2.1 Se um espaço for encontrado, imprime-se M$ até essa posição, reduz-se
+       M$ aos caracteres seguintes e reitera.
+   2.2 Se um espaço não for encontrado, imprime-se M$ até a posição A, reduz-se
+       M$ aos caracteres seguintes e reitera.

@@ -1,0 +1,5 @@
+* http://www.datassette.org/revistas/input/vol-3-fasciculo-42
+
+Adaptado da versão para MSX.
+
+Pousa a nave na base lunar com suavidade. Usa A e S para aumentar a velocidade horizontal para a esquerda e para a direita, respectivamente, e F para aumentar a velocidade para cima.

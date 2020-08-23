@@ -1,0 +1,29 @@
+﻿Implementa o comando DRAW expr$ do BASIC Microsoft.
+
+Onde expr$ pode conter uma combinação dos seguintes comandos:
+* U ou Un — Desenha 1 ou n pixels para cima.
+* E ou En — Desenha 1 ou n pixels para a diagonal cima/direita.
+* R ou Rn — Desenha 1 ou n pixels para a direita.
+* F ou Fn — Desenha 1 ou n pixels para a diagonal baixo/direita.
+* D ou Dn — Desenha 1 ou n pixels para baixo.
+* G ou Gn — Desenha 1 ou n pixels para a diagonal baixo/esquerda.
+* L ou Ln — Desenha 1 ou n pixels para a esquerda.
+* H ou Hn — Desenha 1 ou n pixels para a diagonal cima/esquerda.
+* Mx,y — Desenha para as coordenadas absolutas x,y. Com + ou - antes de x e y, pode desenhar relativamente às últimas coordenadas do comando anterior.
+* B — Executa o próximo comando de desenho sem desenhar, apenas atualizando as coordenadas.
+* N — Executa o próximo comando de desenho e retorna para as últimas coordenadas do comando anterior.
+* Sn — Define a escala do desenho em múltiplos de 1/4.
+* Cn — Define a cor do desenho.
+* An — Define o ângulo de rotação em múltiplos de 90° no sentido anti-horário.
+
+Partes da rotina:
+* 1—2: Rotina auxiliar. Obtém em C$ um caracter diferente de espaço a partir do início da string D$.
+* 3—6: Rotina auxiliar. Obtém em V um valor numérico inteiro sem sinal a partir do início da string D$. Retorna −1 se não houver número na string.
+* 7—42: Implementação da rotina DRAW D$.
+** 7: Salva e restaura o valor de variáveis usadas pela rotina (implementa variáveis locais).
+** 8: Inicializa flags dos comandos N e B.
+** 9—25: Laço principal da rotina, que identifica os comandos e executa os mais simples.
+** 26—27: Calcula coordenadas finais dos comandos de desenho direcionado.
+** 28—37: Calcula coordenadas finais do comando M.
+** 38—42: Desenha para as coordenadas calculadas, observando os flags dos comandos N e B e desativando-os após a execução.
+* 43: Inicialização geral da rotina (deve ser chamado uma só vez).

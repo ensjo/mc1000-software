@@ -1,0 +1,16 @@
+* Sobre: https://en.wikipedia.org/wiki/Pitman_(video_game)
+* Versão original de Isokawa em HuBasic: http://gamepreservation.derboo.de/pitman_source_original.zip
+* Versão para TRS80 MC-10 de Jim Gerrie: https://xa.yimg.com/df/TRS80MC10Club/PITMAN12.TXT?token=OohYF8ESsc3wmOYFUooVFO350R-xFPStPDA8IV12nu1K9QPuRoF14SIYv66k3ftBKmk2wWVXRSCTx2jelY2KQXemmz1x_mzUqskLMSYx-Bhu6AuUTS_Jcfg&type=download
+* Requer a mod de blocos gráficos no modo texto.
+* Utiliza rotina em código de máquina para o interpretador BASIC não parar ao se pressionar um tecla.
+* EDITOR NÃO IMPLEMENTADO.
+
+Quebra-cabeça.
+
+Movimenta o homem com as teclas W-A-S-D.
+
+Ele pode subir e descer escadas; empurrar rochas; atravessar blocos de areia horizontalmente, escavando-os.
+
+Rochas e blocos de ouro cairão se perderem sua superfície de apoio.
+
+O objetivo é pegar todos os blocos de ouro em cada nível para seguir para o próximo.

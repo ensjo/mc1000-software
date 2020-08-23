@@ -1,0 +1,3 @@
+Gerador de labirinto.
+
+Adaptado do livro BASIC Comuputer Games (1978), disponível em http://www.classicbasicgames.org/ .

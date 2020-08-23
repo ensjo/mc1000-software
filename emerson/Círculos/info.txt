@@ -1,0 +1,36 @@
+Uma rotina para desenhar círculos no MC1000.
+
+* A rotina é chamada com GOSUB 9000.
+* Use a instrução SET x,y para definir as coordenadas do centro do círculo.
+* A variável WR define o raio do círculo.
+* Use COLOR=0 para apagar ou outro valor diferente de zero para plotar (mesmo no modo HGR).
+* Use NORMAL para desenhar apenas a circunferência, ou INVERSE para preencher o círculo.
+* Variáveis modificadas pela subrotina: WA, WB, WO, WP, WX, WY.
+
+
+* Algoritmo adaptado de: http://gamebub.com/cpp_algorithms.php:
+
+//Circle Generating Algorithm
+//Bresenham's
+
+void circle(int xc, int yc, int r)
+{
+int x = 0;
+int y = r;
+int p = 3 - 2 * r;
+   while (x <= y)
+   {
+      putpixel(xc + x, yc + y, getcolor());
+      putpixel(xc - x, yc + y, getcolor());
+      putpixel(xc + x, yc - y, getcolor());
+      putpixel(xc - x, yc - y, getcolor());
+      putpixel(xc + y, yc + x, getcolor());
+      putpixel(xc - y, yc + x, getcolor());
+      putpixel(xc + y, yc - x, getcolor());
+      putpixel(xc - y, yc - x, getcolor());
+      if (p < 0)
+         p += 4 * x++ + 6;
+      else
+         p += 4 * (x++ - y--) + 10;
+   }
+}

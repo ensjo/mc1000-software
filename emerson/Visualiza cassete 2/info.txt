@@ -1,0 +1,5 @@
+Outra versão. Esta fica alternando a cor do modo de texto entre verde e laranja escuros, conforme os altos e baixos do som do cassete. A ideia é produzir algo semelhante ao efeito visto na tela do TK90X (ZX Spectrum) na leitura do cassete [*]. Mas aqui o efeito será percebido mais no centro da tela do que na borda (que é preta em ambos os casos).
+
+[*] http://yesrobot.org/zxbeepit/load_anim.gif
+
+Diferente do anterior, este não retorna ao BASIC, não dá para parar com CTRL+C, é preciso usar SHIFT+RESET para parar.

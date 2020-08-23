@@ -1,0 +1,3 @@
+Desenha uma foto de Steve Jobs (1955-2011), co-fundador da Apple Inc. na tela HGR.
+
+Programa original para Apple II: http://kildall.apana.org.au/~cjb/sj.applesoft criado por Chris Baird e adaptado para MC1000 por Giovanni Nunes.

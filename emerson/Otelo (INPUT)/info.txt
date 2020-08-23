@@ -1,0 +1,6 @@
+* http://www.datassette.org/revistas/input/vol-3-fasciculo-38
+* http://www.datassette.org/revistas/input/vol-3-fasciculo-40
+
+Reformulado a partir da versão para MSX.
+
+Tecla as coordenadas (linha, coluna) da casa onde quiseres colocar uma nova peça. Se teclares 0 na primeira coordenada, o jogo termina. Se teclares 9, passas a vez para o computador. Se errares a primeira coordenada podes teclar 0 ou 9 na segunda, para entrar um novo par de coordenadas.

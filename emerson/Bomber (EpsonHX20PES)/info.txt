@@ -1,0 +1,3 @@
+Originalmente da fita Personal Entertainment Software para Epson HX 20. http://bahamas.gestalter.at/hx20/software/
+
+Controlas um jato que passa na tela da direita para a esquerda numa altura diferente a cada passada. Um tanque se move da esquerda para a direita. Teu objetivo é atingir o tanque.

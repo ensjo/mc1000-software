@@ -1,0 +1,5 @@
+Desenha caracteres com DRAW.
+
+* QC: código ASCII do caracter.
+* QX,QY: coordenadas do canto superior esquerdo do espaço do caracter.
+* QZ: se diferente de zero, apaga o espaço 8x8 ao redor do caracter antes de desenhá-lo.

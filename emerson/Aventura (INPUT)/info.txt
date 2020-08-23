@@ -1,0 +1,10 @@
+Aventura textual publicada pela Revista INPUT.
+
+* http://www.datassette.org/revistas/input/vol-1-fasciculo-11
+* http://www.datassette.org/revistas/input/vol-1-fasciculo-12
+* http://www.datassette.org/revistas/input/vol-1-fasciculo-14
+* http://www.datassette.org/revistas/input/vol-2-fasciculo-16
+* http://www.datassette.org/revistas/input/vol-2-fasciculo-17
+* http://www.datassette.org/revistas/input/vol-2-fasciculo-20
+
+Estás em dificuldades financeiras. Encontra o olho cravejado de brilhantes e descobre como sair da cidade proibida. Movimenta-te informando o nome ou a sigla da direção em que deseja ir (p.ex., "NORTE" ou "N"). Interage com o cenário dando comandos com uma ou duas palavras (p.ex., "PEGAR TIJOLO").

@@ -1,0 +1,1 @@
+Para carregar programas BASIC salvos em fita cassete, é necessário informar o nome do programa após o comando LOAD. É provável que as pessoas acabem esquecendo os nomes com o qual os programas foram salvos e fiquem impossibilitados de carregá-los. Este programa lê a fita cassete e informa o nome dos arquivos.

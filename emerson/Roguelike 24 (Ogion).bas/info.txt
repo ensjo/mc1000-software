@@ -1,0 +1,71 @@
+* Versão original de Ogion para o aplicativo LowRes Coder: http://lowres.inutilis.com/programs/?lccpost=crx2M6KJnV
+
+Microjogo em estilo "roguelike". (O objetivo do criador era conseguir programar um jogo desse tipo em apenas 24 linhas de código!)
+
+Comandos consistem de um único caracter recebido via instrução INPUT. É preciso pressionar <ENTER>.
+
+Movimenta o aventureiro ("@") com as direções cardeais N-S-E-W e T (teleporte).
+
+As paredes ("#") impedem o movimento.
+
+Se o aventureiro for direcionado para uma posição ainda escura (":"), primeiro será revelado o que há ali antes que ele possa se mover.
+
+As letras ("A" a "Z") representam monstros. Outros símbolos representam objetos.
+
+Ao ser direcionado contra um monstro, o aventureiro o atacará.
+
+Ao ser direcionado para um objeto, o aventureiro o pegará.
+
+Alguns objetos podem ser empunhados para atacar os monstros. Para empunhar um objeto, usa o caracter desse objeto como comando. Por exemplo, após pegar a Espada ("/"), pode-se empunhá-la com o comando "/". (Atenção: O símbolo da Água Benta é a vírgula (","), que tem significado especial no comando INPUT para separar múltiplos valores fornecidos ao mesmo tempo. Nesse caso é preciso escrever a vírgula com aspas ao redor.)
+
+Alguns objetos dão uma vantagem adicional contra monstros específicos.
+
+Monstros:
+* A = Giant Ant (Formiga Gigante), força 1.
+* B = Giant Bat (Morcego Gigante, força 2.
+* C = Giant Centipede (Centopeia Gigante), força 3.
+* D = Dwarf (Anão), força 4, suscetível à Espada (/).
+* F = Firespirit (Espírito do Fogo), força 6, suscetível à Água Benta (,).
+* G = Ghost (Fantasma), força 7, suscetível à Água Benta (,).
+* H = Hobgoblin, força 8.
+* I = Imp (Diabrete), força 9.
+* K = Kobold, força 11.
+* L = Lich, força 12, suscetível à Vara de Condão (-).
+* M = Mummy (Múmia), força 13, suscetível ao Amuleto (').
+* N = Naga, força 14.
+* O = Orc, força 15.
+* R = Reaper (Ceifador), força 18, suscetível ao Amuleto (').
+* S = Skeleton (Esqueleto), força 19, suscetível à Água Benta (,).
+* T = Troll, força 20.
+* U = Undead (Morto-Vivo), força 21, suscetível à Água Benta (,).
+* V = Vampire (Vampiro), força 22, suscetível ao Crucifixo (+).
+* W = Wraith (Espectro), força 23, suscetíval ao Anel (.).
+* Z = Zombie King (Rei Zumbi), força 26, suscetível ao Pergaminho (?).
+
+Objetos:
+* ! = Poção (tesouro).
+* $ = Ouro (tesouro).
+* % = Picareta (arma), ataque 6.
+* ' = Amuleto (equipamento), afeta Múmia (M).
+* ( = Armadura (equipamento).
+* ) = Escudo (equipamento).
+* * = Gema (tesouro).
+* + = Crucifixo (equipamento), afeta Vampiro (V).
+* , = Água Benta (arma), afeta Espírito do Fogo (F), Fantasma (G), Esqueleto (S) e Morto-Vivo (U).
+* - = Vara de Condão (arma), ataque 1, afeta Lich (L).
+* . = Anel (equipamento), afeta Espectro (W).
+* / = Espada (arma), ataque 7, afeta Anão (D).
+* ; = Funda (arma), ataque 3.
+* < = Machadinha (arma), ataque 4.
+* > = Machado (arma), ataque 5.
+* ? = Pergaminho (arma), ataque 2, afeta Rei Zumbi (Z).
+
+Será que consegues matar o Rei Zumbi?
+
+- - - -
+
+NOTAS DA VERSÃO PARA MC-1000:
+
+O mapa inteiro (6 linhas x 8 colunas) é armazenado em uma única string (MAP$), cujo conteúdo é manipulado diretamente via POKEs. Na falta da função VARPTR(), usou-se o recurso de definir MAP$ como a primeira variável do programa, de modo que o descritor da string seria o primeiro item na área de variáveis, e assim se pode obter o endereço da variável MAP$, que foi armazenado na variável MAP.
+
+O jogo original roda numa pequena tela de 8x8 caracteres. Por isso o mapa é impresso com um simples comando PRINT. O mesmo efeito foi obtido no MC-1000 usando-se o comando WIDTH para restringir a largura da área imprimível e POKEs para mudar a variável do sistema DENAM para reduzir a área scrollável a 8 linhas.

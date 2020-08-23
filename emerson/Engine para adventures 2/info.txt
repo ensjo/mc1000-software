@@ -1,0 +1,108 @@
+﻿Esta é uma outra versão do programa Engine para adventures.bas. Aqui eu busquei eliminar ou atenuar dois problemas do engine original:
+
+1. Ele se baseava em variáveis e matrizes com nomes e formatos específicos que deveriam ser fornecidas pelo programa principal. Por exemplo, ele exigia que o programa principal declarasse 6 matrizes para armazenar as saídas para as salas (norte, sul, leste, oeste, cima e baixo), chamadas SN(), SS(), SL(), SO(), SC() e SB(); o número da sala atual deve armazenado em SX, etc. Isso complica a adaptação de aventuras existentes, que porventura armazenem essas informações de outro modo e em variáveis com outros nomes. Também causa desperdício de memória com aventuras que não usam as direções cima e baixo.
+
+2. As várias variáveis usadas pelo engine podem coincidir com variáveis usadas por uma aventura preexistente, exigindo reprogramação.
+
+Para reduzir o risco de coincidência de variáveis, o engine passou a trabalhar apenas com a variável AA e com as matrizes AA() e AA$().
+
+E para se tornar independente de como os dados da aventura são armazenados, o engine passou a "perguntar" à aventura qual o número da sala atual e em quais direções ela tem saída. (Isto é inspirado no padrão de projeto "delegação" — http://en.wikipedia.org/wiki/Delegation_pattern — usado em programação orientada a objetos.) As "perguntas" e as "respostas" são feitas por meio das matrizes AA() e AA$() mencionadas acima. É preciso apenas criar algumas linhas a mais para a aventura poder fornecer as informações solicitadas pelo engine.
+
+A aventura pode requisitar 3 coisas ao engine:
+
+* AA(0) = 1 : GOSUB 2
+** Significado: Exibir uma tela mostrando a sala atual, as direções de saída e os objetos à vista. O usuário pode visualizar também seu inventário. O usuário pode escolher uma direção ou uma ação sobre algum objeto presente.
+** Resposta:
+*** AA$(0)= ação escolhida:
+**** "N", "S", "L", "O", "C", "B" = andar em uma das direções possíveis.
+**** "OE" = examinar um objeto.
+**** "OA" = ativar um objeto.
+**** "OP" = pegar um objeto.
+**** "OL" = largar um objeto.
+**** "OI" = ir para um objeto.
+**** "OU" = usar um objeto em (outro objeto escolhido).
+*** AA(1) = número do objeto escolhido para a ação.
+*** AA(2) = segundo objeto (no caso da ação do primeiro objeto seja "usar em").
+
+* AA(0) = 2 : GOSUB 2
+** Significado: Apenas limpar a tela e exibir o nome da sala atual no topo.
+** Resposta: Nenhuma.
+
+* AA(0) = 3 : GOSUB 2
+** Significado: Exibir a mensagem "OK:" na base da tela e aguardar uma tecla.
+** Resposta: Nenhuma.
+
+Por sua vez, o engine pode solicitar as seguintes informações à aventura:
+
+* AA(0) = 1 : GOSUB 51
+** Significado: Fornecer os dados do 1º objeto da lista de objetos.
+** Resposta:
+*** AA$(0) = Nome do objeto.
+*** AA(1) = Número do objeto, ou −1 se não houver (mais) objetos.
+*** AA(2) = Número da sala do objeto, ou −1 se estiver com o personagem do jogador.
+
+* AA(0) = 2 : AA(1) = x : GOSUB 51
+** Significado: Fornecer os dados objeto seguinte ao objeto número x.
+** Resposta: Idem.
+
+* AA(0) = 3 : AA(1) = x : GOSUB 51
+** Significado: Fornecer os dados do objeto número x.
+** Resposta: Idem.
+
+* AA(0) = 4 : GOSUB 51
+** Significado: Fornecer os dados da sala atual.
+** Resposta:
+*** AA$(0) = Nome da sala.
+*** AA(2) = Número da sala.
+*** AA(3)= Direções possíveis, somando-se:
+**** 1 para norte,
+**** 2 para sul,
+**** 4 para leste,
+**** 8 para oeste,
+**** 16 para cima, e
+**** 32 para baixo.
+
+Internamente o engine usa:
+* AA = Variável para laços FOR—NEXT.
+
+* AA(0) = Função solicitada.
+* AA(1) = Número de objeto.
+* AA(2) = Número de sala / Número de segundo objeto.
+* AA(3) = Direções de saída de sala.
+* AA(4) = Número da sala atual.
+* AA(5) = Direções de saída da sala atual.
+* AA(6) = Tipo de tela.
+* AA(7) = Exibir inventário?
+* AA(8) = A lista é paginada? (+ de 9 elementos)
+* AA(9) = Quantidade de objetos listados na página.
+* AA(10) = Valor numérico da tecla pressionada.
+* AA(11–19) = Números dos objetos listados na página.
+* AA(20) = Número do objeto (usado ao se percorrer a matriz de objetos da aventura, para montar a lista de objetos na tela).
+* AA(21) = Número da sala do objeto (usado ao se percorrer a matriz de objetos da aventura, para montar a lista de objetos na tela).
+* AA(22) = Número do objeto selecionado pelo usuário.
+* AA(23) = Número da sala do objeto selecionado pelo usuário.
+
+* AA$(0) = Nome de objeto ou de sala / Comando selecionado pelo usuário.
+* AA$(1) = Início da sequência de escape para posicionamento do cursor (ESC + "=").
+* AA$(2) = Opção a imprimir na tela e a acrescentar à lista de teclas aceitáveis.
+* AA$(3) = Lista de teclas aceitáveis.
+* AA$(4) = Tecla pressionada pelo usuário.
+* AA$(5) = Comando selecionado pelo usuário.
+* AA$(6) = Nome da sala atual.
+* AA$(7) = Nome do objeto (usado ao se percorrer a matriz de objetos da aventura, para montar a lista de objetos na tela).
+* AA$(8) = Nome do objeto selecionado pelo usuário.
+
+As partes do engine:
+* 1 = Inicialização e desvio para a aventura.
+* 2 = Ponto de entrada para as chamadas às funções do engine.
+* 3–8 = Rotinas de apoio.
+* 9 = Função 3 do engine (exibe "OK" e aguarda tecla).
+* 10–23 = Função 1 do engine, laço principal.
+* 24 = Função 2 do engine (exibe tela em branco apenas com nome da sala).
+* 25–29 = Monta tela e recebe comando.
+* 30–35 = Exibe direções.
+* 36–37 = Exibe opções para alternância entre coisas à vista/inventário.
+* 38–41 = Exibe opções para objetos.
+* 42–49 = Exibe lista de objetos.
+
+O programa de exemplo é novamente a aventura da revista INPUT adaptada. Nas linhas 50–61 se faz a programação para a aventura poder responder às solicitações do engine.

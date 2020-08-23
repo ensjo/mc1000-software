@@ -1,0 +1,4 @@
+* Este código precisa de limpeza e ajustes para caber na tela 32x16 do MC-1000.
+* Código original: http://www.dunnington.u-net.com/public/startrek/STARTREK.BAS
+* Página com as regras (em inglês): http://www.atariarchives.org/basicgames/showpage.php?page=157
+* Outras versões do programa STAR TREK: http://www.dunnington.u-net.com/public/startrek/
