@@ -2767,7 +2767,7 @@ CE94  C9        RET
 ; {PRIST1}
 CE95  CDBACE    CALL    #CEBA ; Inicializa som (silêncio).
 CE98  322801    LD      (#0128),A ; PNTR ; Chave PR# = 0
-CE9B  325703    LD      (#0357),A ; Chave TRON/TROF = TROF
+CE9B  325703    LD      (#0357),A ; @TRCFLG ; Chave TRON/TROF = TROF
 CE9E  326003    LD      (#0360),A ; Chave FAST/SLOW = FAST
 CEA1  325803    LD      (#0358),A ; Chave TEXT/GR/HGR = TEXT
 CEA4  325203    LD      (#0352),A ; Chave NORMAL/INVERSE = NORMAL
@@ -2912,9 +2912,9 @@ CF88  2C        DB      ','
 CF89  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT]
 ; Checa valor do canal (1~3).
 CF8C  FE01      CP      #01
-CF8E  DAF6DE    JP      C,#DEF6 ; PIERRO {FCER} [FCERR]
+CF8E  DAF6DE    JP      C,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 CF91  FE04      CP      #04
-CF93  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+CF93  D2F6DE    JP      NC,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 CF96  FE02      CP      #02
 CF98  C1        POP     BC
 CF99  C9        RET
@@ -2926,9 +2926,9 @@ CF9B  CD76CF    CALL    #CF76 ; Lê os três parâmetros de TEMPO/SOUND: B, C, A
 CF9E  F5        PUSH    AF ; Preserva indicação do número do canal nos flags (C=1, Z=2).
 CF9F  79        LD      A,C ; Segundo parâmetro deve estar entre 0 e 3.
 CFA0  FE00      CP      #00
-CFA2  DAF6DE    JP      C,#DEF6 ; PIERRO {FCER} [FCERR]
+CFA2  DAF6DE    JP      C,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 CFA5  FE04      CP      #04
-CFA7  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+CFA7  D2F6DE    JP      NC,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 CFAA  F1        POP     AF ; Restaura indicação do número de canal nos flags (C=1, Z=2).
 ; Forja retorno.
 CFAB  11BACE    LD      DE,#CEBA ; Inicializa som (silêncio).
@@ -3114,9 +3114,9 @@ D090  C8        RET     Z
 D091  E5        PUSH    HL
 D092  CDFBDE    CALL    #DEFB ; {DCHEX} <LineNumberFromStr> [ATOH]
 D095  EB        EX      DE,HL
-D096  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
+D096  224703    LD      (#0347),HL ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 D099  E1        POP     HL
-D09A  110002    LD      DE,#0200 ; {INPBUF} <LINE_BUFFER> [BUFFER]
+D09A  110002    LD      DE,#0200 ; @BUF {INPBUF} <LINE_BUFFER> [BUFFER]
 D09D  0601      LD      B,#01
 D09F  7E        LD      A,(HL)
 D0A0  B7        OR      A
@@ -3130,11 +3130,11 @@ D0A9  78        LD      A,B
 D0AA  328D01    LD      (#018D),A ; FILNAM
 D0AD  EB        EX      DE,HL
 D0AE  228E01    LD      (#018E),HL ; FILNAM+1
-D0B1  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
+D0B1  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 D0B4  EB        EX      DE,HL
 D0B5  CD82D9    CALL    #D982 ; {ZPOIT} <FindProgramLine> [SRCHLN] ; Procura pelo número de linha em DE.
 D0B8  1E0E      LD      E,#0E ; LI erro
-D0BA  D256D8    JP      NC,#D856 ; ERROE {ERROO} <Error> [ERROR]
+D0BA  D256D8    JP      NC,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 D0BD  2A8E01    LD      HL,(#018E)
 D0C0  03        INC     BC
 D0C1  03        INC     BC
@@ -3176,7 +3176,7 @@ D0EC  18D6      JR      #D0C4           ; (-42)
 ; Fim da linha atingido.
 D0EE  77        LD      (HL),A
 D0EF  E1        POP     HL
-D0F0  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
+D0F0  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 D0F3  CD8BEE    CALL    #EE8B ; PRINTHL {NUMBO} <PrintInt> [PRNTHL]
 D0F6  3E20      LD      A,#20
 D0F8  CDA6F1    CALL    #F1A6
@@ -3233,7 +3233,7 @@ D15A  18EE      JR      #D14A           ; (-18)
 D15C  AF        XOR     A
 D15D  12        LD      (DE),A
 D15E  21FFFF    LD      HL,#FFFF
-D161  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
+D161  224703    LD      (#0347),HL ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 D164  2101D9    LD      HL,#D901
 D167  E5        PUSH    HL
 D168  C3C4E0    JP      #E0C4
@@ -3554,28 +3554,28 @@ D309  18F6      JR      #D301           ; (-10)
 ; BAUTO
 D30B  E5        PUSH    HL
 D30C  210000    LD      HL,#0000
-D30F  225B03    LD      (#035B),HL
+D30F  225B03    LD      (#035B),HL ; @AUTLIN
 D312  E1        POP     HL
 D313  2823      JR      Z,#D338         ; (35)
 D315  CDFBDE    CALL    #DEFB ; {DCHEX} <LineNumberFromStr> [ATOH]
 D318  E5        PUSH    HL
 D319  21F6FF    LD      HL,#FFF6
 D31C  19        ADD     HL,DE
-D31D  225B03    LD      (#035B),HL
+D31D  225B03    LD      (#035B),HL ; @AUTLIN
 D320  E1        POP     HL
 D321  2815      JR      Z,#D338         ; (21)
 D323  7E        LD      A,(HL)
 D324  FEBF      CP      #BF ; token '-'
 D326  1E02      LD      E,#02 ; SN erro
-D328  C256D8    JP      NZ,#D856 ; ERROE {ERROO} <Error> [ERROR]
+D328  C256D8    JP      NZ,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 D32B  23        INC     HL
 D32C  CDFBDE    CALL    #DEFB ; {DCHEX} <LineNumberFromStr> [ATOH]
 D32F  EB        EX      DE,HL
 D330  225E03    LD      (#035E),HL
 D333  1E02      LD      E,#02 ; SN erro
-D335  C256D8    JP      NZ,#D856 ; ERROE {ERROO} <Error> [ERROR]
+D335  C256D8    JP      NZ,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 D338  3E01      LD      A,#01
-D33A  325D03    LD      (#035D),A ; {AUTOFG}
+D33A  325D03    LD      (#035D),A ; @AUTFLG {AUTOFG}
 D33D  E1        POP     HL
 D33E  C3A4D8    JP      #D8A4 ; {LININP} <GetNonBlankLine> [GETCMD]
 
@@ -3584,22 +3584,24 @@ D341  FE46      CP      'F'
 D343  280E      JR      Z,#D353 ; DOTROF        ; (14)
 D345  FE4E      CP      'N'
 D347  1E02      LD      E,#02 ; SN erro
-D349  C256D8    JP      NZ,#D856 ; ERROE {ERROO} <Error> [ERROR]
+D349  C256D8    JP      NZ,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 ; DOTRON
 D34C  3E01      LD      A,#01
 ;
-D34E  325703    LD      (#0357),A
+D34E  325703    LD      (#0357),A ; @TRCFLG
 D351  23        INC     HL
 D352  C9        RET
 ; DOTROF
 D353  AF        XOR     A
 D354  18F8      JR      #D34E           ; (-8)
+
+;
 D356  E5        PUSH    HL
 D357  F5        PUSH    AF
-D358  3A5703    LD      A,(#0357)
+D358  3A5703    LD      A,(#0357) ; @TRCFLG
 D35B  B7        OR      A
 D35C  2816      JR      Z,#D374         ; (22)
-D35E  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
+D35E  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 D361  23        INC     HL
 D362  7C        LD      A,H
 D363  B5        OR      L
@@ -3630,10 +3632,10 @@ D386  FE01      CP      #01
 D388  78        LD      A,B
 D389  C2A1D3    JP      NZ,#D3A1
 D38C  FE40      CP      #40 ; 64
-D38E  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+D38E  D2F6DE    JP      NC,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 D391  F1        POP     AF
 D392  FE80      CP      #80 ; 128
-D394  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+D394  D2F6DE    JP      NC,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 ; SETAB: Define o último ponto plotado
 ; como (A,B).
 D397  325A03    LD      (#035A),A
@@ -3645,12 +3647,12 @@ D3A0  C9        RET
 ; Se modo gráfico = HGR, checa limite
 ; y < 192.
 D3A1  FEC0      CP      #C0 ; 192
-D3A3  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+D3A3  D2F6DE    JP      NC,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 D3A6  F1        POP     AF
 D3A7  C397D3    JP      #D397 ; SETAB
 ; TIERRO
 D3AA  1E18      LD      E,#18 ; TI erro
-D3AC  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+D3AC  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 ; BUNPLOT
 D3AF  3E00      LD      A,#00
 D3B1  1802      JR      #D3B5           ; (2)
@@ -3823,7 +3825,7 @@ D492  C9        RET
 
 ; DOPR#
 D493  FE03      CP      #03
-D495  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+D495  D2F6DE    JP      NC,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 D498  322801    LD      (#0128),A ; PNTR
 D49B  C9        RET
 
@@ -3888,7 +3890,7 @@ D4FA  FE20      CP      #20
 D4FC  2818      JR      Z,#D516         ; (24)
 ; PI ERRO se não for 80.
 D4FE  FE50      CP      #50
-D500  C2F6DE    JP      NZ,#DEF6 ; PIERRO {FCER} [FCERR]
+D500  C2F6DE    JP      NZ,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 ; 80 colunas: TI ERRO se monitor de 80
 ; colunas estiver ausente.
 D503  3A2D01    LD      A,(#012D) ; COSW
@@ -3923,9 +3925,9 @@ D525  C399E9    JP      #E999 ; {ARGVL1} [GETINT]
 D528  CD1DD5    CALL    #D51D
 ; PI ERRO se não válido (0 a 3).
 D52B  B7        OR      A
-D52C  FAF6DE    JP      M,#DEF6 ; PIERRO {FCER} [FCERR]
+D52C  FAF6DE    JP      M,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 D52F  FE04      CP      #04
-D531  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+D531  D2F6DE    JP      NC,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 D534  32F600    LD      (#00F6),A
 D537  C9        RET
 
@@ -3945,12 +3947,12 @@ D55A  45522020  DB      'ER  '
 D55E  0D0A      DB      #0D,#0A; CR+LF
 D560  00        DB      #00
 
-; {ADRTB2} <KW_INLINE_FNS> [FNCTAB]
+; @FUNDSP {ADRTB2} <KW_INLINE_FNS> [FNCTAB]
 ; Endereços das funções.
 D561  E2EC      DW      #ECE2 ; BSGN {SGN} <Sgn>
 D563  A5ED      DW      #EDA5 ; BINT {INT} <Int> [INT]
 D565  F8EC      DW      #ECF8 ; BABS {ABS} <Abs>
-D567  0303      DW      #0303 ; BUSR {USRLOC} <Usr>
+D567  0303      DW      #0303 ; BUSR @USRTAB \USRPOK {USRLOC} <Usr>
 D569  05E6      DW      #E605 ; BFRE {FRE}
 D56B  59E9      DW      #E959 ; BINP {INP}
 D56D  3CE6      DW      #E63C ; BPOS {POS}
@@ -4156,22 +4158,22 @@ D751  85D0      DW      #D085 ; BINVERSE
 D753  8CD0      DW      #D08C ; BNORMAL
 D755  F4F1      DW      #F1F4 ; BDEBUG
 
-; {ADRTB3} <KW_ARITH_OP_FNS> [PRITAB]
+; @OPTAB {ADRTB3} <KW_ARITH_OP_FNS> [PRITAB]
 ; Precedência e endereço do operador.
 D757  79        DB      #79
-D758  72EE      DW      #EE72 ; BADD {PLUS} <FAdd> [PADD]
+D758  72EE      DW      #EE72 ; BADD @FADDT {PLUS} <FAdd> [PADD]
 D75A  79        DB      #79
-D75B  95EA      DW      #EA95 ; BSUB {MINUS} <FSub>
+D75B  95EA      DW      #EA95 ; BSUB @FSUBT {MINUS} <FSub>
 D75D  7C        DB      #7C
-D75E  CDEB      DW      #EBCD ; BMUL {MUL} <FMul> [MULT]
+D75E  CDEB      DW      #EBCD ; BMUL @FMULTT {MUL} <FMul> [MULT]
 D760  7C        DB      #7C
-D761  2BEC      DW      #EC2B ; BDIV {DIV} <FDiv>
+D761  2BEC      DW      #EC2B ; BDIV @FDIVT {DIV} <FDiv>
 D763  7F        DB      #7F
-D764  8AEF      DW      #EF8A ; BPOW {EXPO1} [POWER]
+D764  8AEF      DW      #EF8A ; BPOW @FPWRT {EXPO} [POWER]
 D766  50        DB      #50
-D767  DAE3      DW      #E3DA ; BAND {AND}
+D767  DAE3      DW      #E3DA ; BAND @ANDO {AND}
 D769  46        DB      #46
-D76A  D9E3      DB      #E3D9 ; BOR {OR}
+D76A  D9E3      DB      #E3D9 ; BOR @ORO {OR}
 
 ; TABERRCOD: Tabela de códigos de erro.
 ; {ERRTAB} <ERROR_CODES> [ERRORS]
@@ -4203,8 +4205,8 @@ D790  464F      DB      'FO' ; Falta operando / MO=Missing operand.
 D792  C32DCF    JP      #CF2D
 
 ; Ponto de entrada da função USR.
-; #0303:BUSR {USRLOC} [USR]
-D795  C3F6DE    JP      #DEF6 ; PIERRO {FCER} [FCERR]
+; #0303:BUSR @USRTAB \USRPOK {USRLOC} [USR]
+D795  C3F6DE    JP      #DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 
 ; Rotina auxiliar para OUT.
 ; #0306:OUTAUX {PORTAD} [OUTSUB]
@@ -4237,7 +4239,7 @@ D7BC  53D19999  DB      #53,#D1,#99,#99 ; -2.01612E+7
 D7C0  0A1A9F98  DB      #0A,#1A,#9F,#98 ; -1.04269E+7
 D7C4  65BCCD98  DB      #65,#BC,#CD,#98 ; -1.34831E+7
 D7C8  D6773E98  DB      #D6,#77,#3E,#98 ; +1.24825E+7
-D7CC  52C74F80  DB      #52,#C7,#4F,#80 ; .811653 ; #033A:{RNDV4} [LSTRND]
+D7CC  52C74F80  DB      #52,#C7,#4F,#80 ; .811653 ; #033A: @RNDX {RNDVR4} [LSTRND]
 
 ; Rotina auxiliar para INP().
 ; #033E:[INPSUB]
@@ -4247,7 +4249,7 @@ D7D2  C9        RET
 ; #0341: Quantidade de caracteres ASCII NULL a serem impressos
 ; após um CR+LF.
 ; (O Altair BASIC tinha um comando NULL para definir este valor.)
-; {DUMMY} <TERMINAL_Y> [NULLS]
+; @NULCNT {DUMMY} <TERMINAL_Y> [NULLS]
 D7D3  01        DB      #01
 ; #0342: Limite máximo de POS(). Também recebe o valor de WIDTH.
 ; {LINLEN} [LWIDTH]
@@ -4263,10 +4265,10 @@ D7D6  00        DB      #00
 ; {STDPTR} <STACK_TOP> [STRSPC]
 D7D7  3804      DB      #0438
 ; #0346: Número de linha BASIC em execução. #FFFF após execução.
-; {CULINO} <CURRENT_LINE> [LINEAT]
+; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 D7D9  FEFF      DB      #FFFE
 ; #0348: Endereço de início do programa BASIC.
-; {PSTBEG} <PROGRAM_BASE> [BASTXT]
+; @TXTTAB {PSTBEG} <PROGRAM_BASE> [BASTXT]
 D7DB  D503      DB      #03D5 ; {PRAM}
 ; FIM DO BLOCO ([INITBE]) mais abaixo, em #D7DF.
 
@@ -4396,10 +4398,10 @@ D83D  D8        RET     C
 ; FMERRO: Produz erro "FM" (fim de memória)
 ; {OMER} <OutOfMemory>
 D83E  1E0C      LD      E,#0C ; erro "FM"
-D840  1814      JR      #D856 ; ERROE {ERROO} <Error> [ERROR]
+D840  1814      JR      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 ; {SNER0} [DATSNR]
 D842  2AAA03    LD      HL,(#03AA) ; {DATPTR} [DATLIN]
-D845  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
+D845  224703    LD      (#0347),HL ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 ; {SNER} <SyntaxError>
 D848  1E02      LD      E,#02 ; erro "SN"
 D84A  01        DB      #01 ; Oculta a instrução seguinte.
@@ -4417,7 +4419,7 @@ D853  01        DB      #01 ; Oculta a instrução seguinte.
 D854  1E22      LD      E,#22 ; erro "FI"
 
 ; ERROE: Exibe erro indicado pelo registrador E.
-; {ERROO} <Error> [ERROR]
+; @ERROR {ERROO} <Error> [ERROR]
 D856  CDC7D9    CALL    #D9C7 ; {INITR} <ResetStack> [CLREG]
 D859  324403    LD      (#0344),A ; {OUTFLG} [CTLOFG]; Habilita impressão.
 D85C  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
@@ -4437,9 +4439,9 @@ D870  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 D873  21DDD7    LD      HL,#D7DD ; {ERR} <szError> [ERRMSG]
 ; {ERROO1} [ERRIN]
 D876  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
-; Se {CULINO} <CURRENT_LINE> contém 65534, reinicia BASIC.(?)
+; Se @CURLIN {CULINO} <CURRENT_LINE> contém 65534, reinicia BASIC.(?)
 ; Pula se erro ao entrar na área de RAM durante a partida fria.(?)
-D879  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
+D879  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 D87C  11FEFF    LD      DE,#FFFE
 D87F  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 D882  CA95CE    JP      Z,#CE95 ; {PRIST1}
@@ -4454,7 +4456,7 @@ D88C  C1        POP     BC ; Descarta endereço de retorno.
 ; {EDIT} <Main> [PRNTOK]
 D88D  AF        XOR     A
 D88E  324403    LD      (#0344),A ; {OUTFLG} [CTLOFG] ; Habilita impressão de caracteres.
-D891  325D03    LD      (#035D),A ; {AUTOFG} ; Desativa AUTO.
+D891  325D03    LD      (#035D),A ; @AUTFLG {AUTOFG} ; Desativa AUTO.
 D894  CDBBE0    CALL    #E0BB ; CRLFPOSNZ {CRWDY} <NewLine> [STTLIN]
 ; Faz PR# 0, para não mandar a mensagem
 ; de erro à impressora.
@@ -4468,9 +4470,9 @@ D8A1  CD34E7    CALL    #E734 ; PRINTSTRHL {TEXTO} <PrintString> [PRS]
 ; {LININP} <GetNonBlankLine> [GETCMD]
 ; Seta {CURLINO} para #ffff, para indicar modo imediato.
 D8A4  21FFFF    LD      HL,#FFFF
-D8A7  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
+D8A7  224703    LD      (#0347),HL ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 ; Verifica status de AUTO.
-D8AA  3A5D03    LD      A,(#035D) ; {AUTOFG}
+D8AA  3A5D03    LD      A,(#035D) ; @AUTFLG {AUTOFG}
 D8AD  B7        OR      A
 D8AE  2014      JR      NZ,#D8C4
 
@@ -4494,11 +4496,11 @@ D8C1  C3ADD9    JP      #D9AD ; {NEW2} <ResetAll> [RUNFST]
 ; AUTO está ativo.
 ; Acrescenta 10 ao número de linha.
 D8C4  110A00    LD      DE,#000A ; +10
-D8C7  2A5B03    LD      HL,(#035B)
+D8C7  2A5B03    LD      HL,(#035B) ; @AUTLIN
 D8CA  19        ADD     HL,DE
-D8CB  225B03    LD      (#035B),HL
+D8CB  225B03    LD      (#035B),HL ; @AUTLIN
 ; Guarda valor no buffer de linha.
-D8CE  220002    LD      (#0200),HL ; {INPBUF} <LINE_BUFFER> [BUFFER]
+D8CE  220002    LD      (#0200),HL ; @BUF {INPBUF} <LINE_BUFFER> [BUFFER]
 ; Ultrapassou o número de linha final? Desativa AUTO.
 D8D1  EB        EX      DE,HL
 D8D2  2A5E03    LD      HL,(#035E)
@@ -4517,7 +4519,7 @@ D8E3  CDD2DA    CALL    #DAD2
 ; reiniciar entrada normal.
 D8E6  38BC      JR      C,#D8A4 ; {LININP} <GetNonBlankLine> [GETCMD]
 ;
-D8E8  2A5B03    LD      HL,(#035B)
+D8E8  2A5B03    LD      HL,(#035B) ; @AUTLIN
 D8EB  EB        EX      DE,HL
 D8EC  210102    LD      HL,#0201
 D8EF  CDA0DD    CALL    #DDA0 ; NEXTNSPC @CHRGTR {TCHAR} <NextChar> [GETCHR]
@@ -4528,7 +4530,7 @@ D8F4  1817      JR      #D90D           ; (23)
 ; {LIN2}
 ; Desativa AUTO.
 D8F6  AF        XOR     A
-D8F7  325D03    LD      (#035D),A ; {AUTOFG}
+D8F7  325D03    LD      (#035D),A ; @AUTFLG {AUTOFG}
 D8FA  18A8      JR      #D8A4 ; {LININP} <GetNonBlankLine> [GETCMD]
 
 ; {LIN4}
@@ -4642,7 +4644,7 @@ D980  18EA      JR      #D96C ; {LIN11} [PTRLP]
 ; Procura pelo número de linha em DE.
 ; Carry indica que encontrou a linha.
 ; {ZPOIT} <FindProgramLine> [SRCHLN]
-D982  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT]
+D982  2A4903    LD      HL,(#0349) ; @TXTTAB {PSTBEG} <PROGRAM_BASE> [BASTXT]
 ; {ZPOIT1} [SRCHLP]
 D985  44        LD      B,H ; Salva início da linha atual em BC.
 D986  4D        LD      C,L
@@ -4677,7 +4679,7 @@ D9A1  C0        RET     NZ
 ; NEW {NEW1} [CLRPTR]
 ; Coloca #00,#00 (fim de programa) no início
 ; da área do programa BASIC.
-D9A2  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT]
+D9A2  2A4903    LD      HL,(#0349) ; @TXTTAB {PSTBEG} <PROGRAM_BASE> [BASTXT]
 D9A5  AF        XOR     A
 D9A6  77        LD      (HL),A
 D9A7  23        INC     HL
@@ -4687,7 +4689,7 @@ D9A9  23        INC     HL
 D9AA  22B703    LD      (#03B7),HL ; @VARTAB {SVARPT} <VAR_BASE> [PROGND]
 ; {NEW2} <ResetAll> [RUNFST]
 ; Aponta para o início do programa.
-D9AD  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT]
+D9AD  2A4903    LD      HL,(#0349) ; @TXTTAB {PSTBEG} <PROGRAM_BASE> [BASTXT]
 D9B0  2B        DEC     HL
 ; Faz como um CLEAR sem parâmetros.
 ; {CLEAR2} {NEW3} [INTVAR]
@@ -4731,10 +4733,10 @@ D9EB  C3C9DA    JP      #DAC9 ; GETL {INPLOC} <InputLine> [RINPUT]
 
 ; {SCANN} <Tokenize> [CRUNCH]
 D9EE  AF        XOR     A
-D9EF  329103    LD      (#0391),A ; {DSTMNT}
+D9EF  329103    LD      (#0391),A ; @DORES {DSTMNT} [DATFLG]
 ; <Tokenize>
 D9F2  0E05      LD      C,#05
-D9F4  110002    LD      DE,#0200 ; {INPBUF} <LINE_BUFFER> [BUFFER]
+D9F4  110002    LD      DE,#0200 ; @BUF {INPBUF} <LINE_BUFFER> [BUFFER]
 ; Obtém um caracter do buffer de entrada.
 D9F7  7E        LD      A,(HL)
 ; Se espaço, não tratar.
@@ -4748,7 +4750,7 @@ DA00  CA8CDA    JP      Z,#DA8C ; {SCANND} <FreeCopy>
 DA03  B7        OR      A
 DA04  CA92DA    JP      Z,#DA92 ; {SCANNE} <Exit>
 ;
-DA07  3A9103    LD      A,(#0391) ; {DSTMNT}
+DA07  3A9103    LD      A,(#0391) ; @DORES {DSTMNT} [DATFLG]
 DA0A  B7        OR      A
 DA0B  7E        LD      A,(HL)
 DA0C  C267DA    JP      NZ,#DA67 ; {SCANN9}
@@ -4837,7 +4839,7 @@ DA6B  D63A      SUB     #3A
 DA6D  2804      JR      Z,#DA73         ; (4)
 DA6F  FE49      CP      #49
 DA71  2003      JR      NZ,#DA76        ; (3)
-DA73  329103    LD      (#0391),A ; {DSTMNT}
+DA73  329103    LD      (#0391),A ; @DORES {DSTMNT} [DATFLG]
 DA76  FE71      CP      #71
 DA78  2809      JR      Z,#DA83         ; (9)
 DA7A  FE70      CP      #70
@@ -4867,7 +4869,7 @@ DA9A  C9        RET
 ; Adicionalmente, desativa AUTO.
 DA9B  CDC7E0    CALL    #E0C7 ; PRINTCRLF [PRNTCR]
 DA9E  AF        XOR     A
-DA9F  325D03    LD      (#035D),A ; {AUTOFG}
+DA9F  325D03    LD      (#035D),A ; @AUTFLG {AUTOFG}
 DAA2  C9        RET
 
 ;
@@ -5216,7 +5218,7 @@ DC5F  D5        PUSH    DE
 DC60  7E        LD      A,(HL)
 DC61  FEBF      CP      #BF ; token '-'
 DC63  1E02      LD      E,#02 ; erro "SN"
-DC65  C256D8    JP      NZ,#D856 ; ERROE {ERROO} <Error> [ERROR]
+DC65  C256D8    JP      NZ,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 DC68  23        INC     HL
 DC69  CDFBDE    CALL    #DEFB ; {DCHEX} <LineNumberFromStr> [ATOH]
 DC6C  7B        LD      A,E
@@ -5319,7 +5321,7 @@ DD0C  E5        PUSH    HL
 DD0D  CDC2DF    CALL    #DFC2 ; BDATA {DATA} <Data> [DATA]
 DD10  E3        EX      (SP),HL
 DD11  E5        PUSH    HL
-DD12  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
+DD12  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 DD15  E3        EX      (SP),HL
 DD16  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 DD19  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN]
@@ -5389,7 +5391,7 @@ DD76  23        INC     HL
 DD77  56        LD      D,(HL)
 ; Atualiza número da linha em execução.
 DD78  EB        EX      DE,HL
-DD79  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
+DD79  224703    LD      (#0347),HL ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 DD7C  EB        EX      DE,HL
 ; {RUNMD2} <Exec> [EXCUTE]
 ; Salta espaços.
@@ -5446,7 +5448,7 @@ DDAE  C9        RET
 
 ; BRESTORE {RESTO}
 DDAF  EB        EX      DE,HL
-DDB0  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT]
+DDB0  2A4903    LD      HL,(#0349) ; @TXTTAB {PSTBEG} <PROGRAM_BASE> [BASTXT]
 DDB3  280E      JR      Z,#DDC3         ; (14)
 DDB5  EB        EX      DE,HL
 DDB6  CDFBDE    CALL    #DEFB ; {DCHEX} <LineNumberFromStr> [ATOH]
@@ -5544,7 +5546,7 @@ DE25  21F6FF    LD      HL,#FFF6
 ; DE26  F6FF      OR      #FF ; [Flag "Break" wanted]
 DE28  C1        POP     BC ; Não é mais necessário retornar.
 ; {END2} [ENDPRG]
-DE29  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT] ; Número de linha atual.
+DE29  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT] ; Número de linha atual.
 DE2C  F5        PUSH    AF ; Preserva distinção STOP/END.
 DE2D  7D        LD      A,L ; STOP/^C em modo direto?
 DE2E  A4        AND     H
@@ -5593,10 +5595,10 @@ DE75  2AB503    LD      HL,(#03B5) ; {LBYTER} [CONTAD]
 DE78  7C        LD      A,H
 DE79  B5        OR      L
 DE7A  1E20      LD      E,#20 ; erro "NC"
-DE7C  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR]
+DE7C  CA56D8    JP      Z,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 DE7F  EB        EX      DE,HL
 DE80  2AB303    LD      HL,(#03B3)
-DE83  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
+DE83  224703    LD      (#0347),HL ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 DE86  EB        EX      DE,HL
 DE87  C9        RET
 ;
@@ -5670,15 +5672,15 @@ DEE7  CDBCE2    CALL    #E2BC ; {SNALY2} [GETNUM]
 ; Converte ponto flutuante positivo em inteiro 0~32767 (DE).
 ; {EPRVL2} [DEPINT]
 DEEA  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
-DEED  FAF6DE    JP      M,#DEF6 ; PIERRO {FCER} [FCERR]
+DEED  FAF6DE    JP      M,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 ; {EPRVL3} [DEINT]
 DEF0  3AC203    LD      A,(#03C2) ; {WRA1+3} <FACCUM+3> [FPEXP]
 DEF3  C37AED    JP      #ED7A ; {INTMOV} <FAsInteger> [FPINT]
 
 ; PIERRO:
-; {FCER} [FCERR]
+; @FCERR {FCER} [FCERR]
 DEF6  1E08      LD      E,#08 ; erro "PI"
-DEF8  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+DEF8  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ; Lê um literal inteiro sem sinal (0~65535)
 ; e o armazena em DE.
@@ -5763,7 +5765,7 @@ DF71  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
 DF74  C1        POP     BC
 DF75  E5        PUSH    HL
 DF76  E5        PUSH    HL
-DF77  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
+DF77  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 DF7A  E3        EX      (SP),HL
 DF7B  3E8D      LD      A,#8D
 DF7D  F5        PUSH    AF
@@ -5775,7 +5777,7 @@ DF7F  C5        PUSH    BC
 DF80  CDFBDE    CALL    #DEFB ; {DCHEX} <LineNumberFromStr> [ATOH]
 DF83  CDC4DF    CALL    #DFC4 ; BREM
 DF86  E5        PUSH    HL
-DF87  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
+DF87  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 DF8A  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL]
 DF8D  E1        POP     HL
 DF8E  23        INC     HL
@@ -5789,7 +5791,7 @@ DF98  D8        RET     C
 ; LIERRO:
 ; {ULER} [ULERR]
 DF99  1E0E      LD      E,#0E ; erro "LI"
-DF9B  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+DF9B  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ; BRETURN:
 DF9E  C0        RET     NZ
@@ -5798,9 +5800,9 @@ DFA1  CDF5D7    CALL    #D7F5 ; {FORSR} <GetFlowPtr>
 DFA4  F9        LD      SP,HL
 DFA5  FE8D      CP      #8D ; token "GOSUB"
 DFA7  1E04      LD      E,#04 ; erro "RG"
-DFA9  C256D8    JP      NZ,#D856 ; ERROE {ERROO} <Error> [ERROR]
+DFA9  C256D8    JP      NZ,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 DFAC  E1        POP     HL
-DFAD  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
+DFAD  224703    LD      (#0347),HL ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 DFB0  23        INC     HL
 DFB1  7C        LD      A,H
 DFB2  B5        OR      L
@@ -5880,7 +5882,7 @@ DFF9  5E        LD      E,(HL) ; DE = endereço do conteúdo da string.
 DFFA  23        INC     HL
 DFFB  56        LD      D,(HL)
 ; Onde está o conteúdo da string?
-DFFC  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT] ; Endereço de início do programa BASIC.
+DFFC  2A4903    LD      HL,(#0349) ; @TXTTAB {PSTBEG} <PROGRAM_BASE> [BASTXT] ; Endereço de início do programa BASIC.
 DFFF  CD0BDC    CALL    #DC0B ; CP HL,DE {CPREG} <CompareHLDE> [CPDEHL] ; O conteúdo da string se situa antes do programa? (No buffer de linha?)
 E002  3012      JR      NC,#E016 ; {LET2} [CRESTR] ; Sim: cria registro de string.
 E004  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC] ; Início da área de strings.
@@ -6007,7 +6009,7 @@ E0C0  1805      JR      #E0C7 ; PRINTCRLF {CRWDY2} [PRNTCR]
 ; {CRWDY1}
 E0C2  3600      LD      (HL),#00
 ; {CRWDY6}
-E0C4  21FF01    LD      HL,#01FF ; {INPBUF} <LINE_BUFFER> [BUFFER-1]
+E0C4  21FF01    LD      HL,#01FF ; @BUF {INPBUF} <LINE_BUFFER> [BUFFER-1]
 ; PRINTCRLF: Imprime CR+LF, atualizando POS().
 ; {CRWDY2} [PRNTCR]
 E0C7  3E0D      LD      A,#0D ; CR
@@ -6017,9 +6019,9 @@ E0CC  3E0A      LD      A,#0A ; LF
 E0CE  CD1CDC    CALL    #DC1C ; PRINTAPOS {CHARO} <OutChar> [OUTC]
 ; POSZERO: Zera POS().
 ; Imprime a quantidade de characteres ASCII NULL
-; indicada em {DUMMY} [NULLS].
+; indicada em @NULCNT {DUMMY} [NULLS].
 ; {CRWDY3}
-E0D1  3A4103    LD      A,(#0341) ; {DUMMY} <TERMINAL_Y> [NULLS]
+E0D1  3A4103    LD      A,(#0341) ; @NULCNT {DUMMY} <TERMINAL_Y> [NULLS]
 ; {CRWDY4} [NULLP]
 E0D4  3D        DEC     A
 E0D5  328E03    LD      (#038E),A ; {CURPOS} [CURPOS]
@@ -6061,7 +6063,7 @@ E106  CA3AE1    JP      Z,#E13A ; Trata VTAB.
 ; Trata TAB.
 E109  7B        LD      A,E
 E10A  FE01      CP      #01
-E10C  DAF6DE    JP      C,#DEF6 ; PIERRO {FCER} [FCERR]
+E10C  DAF6DE    JP      C,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 E10F  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
 
 ; Trata SPC.
@@ -6093,7 +6095,7 @@ E12C  C235E1    JP      NZ,#E135
 ; O parâmetro de VTAB deve ser 0~15.
 E12F  FE10      CP      #10
 ;
-E131  D2F6DE    JP      NC,#DEF6 ; PIERRO {FCER} [FCERR]
+E131  D2F6DE    JP      NC,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 E134  C9        RET
 ; Se o modo de texto é de 80 colunas,
 ; O parâmetro de VTAB deve ser 0~23.
@@ -6314,7 +6316,7 @@ E257  7E        LD      A,(HL) ; Fim do programa? ($00 $00)
 E258  23        INC     HL
 E259  B6        OR      (HL)
 E25A  1E06      LD      E,#06 ; erro "FD"
-E25C  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR]; Sim, FD ERRO.
+E25C  CA56D8    JP      Z,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]; Sim, FD ERRO.
 E25F  23        INC     HL ; Armazena linha do item de DATA atual.
 E260  5E        LD      E,(HL)
 E261  23        INC     HL
@@ -6357,7 +6359,7 @@ E29D  90        SUB     B
 E29E  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E2A1  2809      JR      Z,#E2AC         ; (9)
 E2A3  EB        EX      DE,HL
-E2A4  224703    LD      (#0347),HL ; {CULINO} <CURRENT_LINE> [LINEAT]
+E2A4  224703    LD      (#0347),HL ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 E2A7  69        LD      L,C
 E2A8  60        LD      H,B
 E2A9  C34ADD    JP      #DD4A
@@ -6392,7 +6394,7 @@ E2C6  E8        RET     PE
 ; {TMER}
 E2C7  1E18      LD      E,#18 ; erro "TI"
 ; {TMER1}
-E2C9  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+E2C9  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ; EVALPAR: Avalia expressão iniciada com parênteses.
 ; {SNALY6} [OPNPAR]
@@ -6457,7 +6459,7 @@ E31B  CA23E8    JP      Z,#E823 ; {STRSNA} [CONCAT] ; Se for, desvia para concat
 E31E  07        RLCA    ; DE = 3 * operador codificado.
 E31F  83        ADD     A,E
 E320  5F        LD      E,A
-E321  2157D7    LD      HL,#D757 ; {ADRTB3} <KW_ARITH_OP_FNS> [PRITAB]
+E321  2157D7    LD      HL,#D757 ; @OPTAB {ADRTB3} <KW_ARITH_OP_FNS> [PRITAB]
 E324  19        ADD     HL,DE ; Localiza endereço na tabela de operadores.
 E325  78        LD      A,B ; Precedência do operador anterior.
 E326  56        LD      D,(HL) ; Obtém precedência do operador atual.
@@ -6489,7 +6491,7 @@ E345  329003    LD      (#0390),A ; @VALTYP {DATYPE} [TYPE]
 E348  CDA0DD    CALL    #DDA0 ; NEXTNSPC @CHRGTR {TCHAR} <NextChar> [GETCHR]
 ; {MOER}
 E34B  1E24      LD      E,#24 ; erro "FO"
-E34D  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR] ; ?FO ERRO se instrução acabou.
+E34D  CA56D8    JP      Z,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR] ; ?FO ERRO se instrução acabou.
 E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; É dígito: interpreta literal numérico.
 E353  CDDCDE    CALL    #DEDC ; @ISLET {CLETST} <CharIsAlpha> [CHKLTR]
 E356  D292E3    JP      NC,#E392 ; {SNLY17} <EvalVarTerm> [CONVAR] ; é letra: interpreta variável/matriz.
@@ -6577,7 +6579,7 @@ E3CF  D5        PUSH    DE
 
 ; {SNLY21} [GOFUNC]
 ; Salta para rotina que interpreta a função.
-E3D0  0161D5    LD      BC,#D561 ; {ADRTB2} <KW_INLINE_FNS> [FNCTAB]
+E3D0  0161D5    LD      BC,#D561 ; @FUNDSP {ADRTB2} <KW_INLINE_FNS> [FNCTAB]
 E3D3  09        ADD     HL,BC
 E3D4  4E        LD      C,(HL)
 E3D5  23        INC     HL
@@ -6585,9 +6587,11 @@ E3D6  66        LD      H,(HL)
 E3D7  69        LD      L,C
 E3D8  E9        JP      (HL)
 
-; BOR
+; BOR:
+; @ORO {OR}
 ; A instrução abaixo oculta a instrução
-; ; BAND
+; ; BAND:
+; ; @ANDO {AND}
 ; E3DA  AF        XOR     A
 ; que só pode ser atingida por jump.
 E3D9  F6AF      OR      #AF
@@ -6649,7 +6653,7 @@ E421  CA4DED    JP      Z,#ED4D ; CPFLOATBCDE {VORZ1} <FCompare> [CMPNUM]
 E424  AF        XOR     A
 E425  329003    LD      (#0390),A ; @VALTYP {DATYPE} [TYPE]
 E428  D5        PUSH    DE
-E429  CD6FE8    CALL    #E86F; POPTMPSTR {STRZS1} [GSTRCU]
+E429  CD6FE8    CALL    #E86F; POPTMPSTR @FREFAC {STRZS1} [GSTRCU]
 E42C  7E        LD      A,(HL)
 E42D  23        INC     HL
 E42E  23        INC     HL
@@ -6954,12 +6958,12 @@ E57C  CADEE5    JP      Z,#E5DE ; {DIM23} [FINDEL]
 ; {BSER} [BSERR]
 ; {OMER} [OMERR]
 E57F  1E10      LD      E,#10 ; erro "II"
-E581  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+E581  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ; {DIM19} [CREARY]
 E584  110400    LD      DE,#0004
 E587  F1        POP     AF
-E588  CAF6DE    JP      Z,#DEF6 ; PIERRO {FCER} [FCERR]
+E588  CAF6DE    JP      Z,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 E58B  71        LD      (HL),C
 E58C  23        INC     HL
 E58D  70        LD      (HL),B
@@ -7070,8 +7074,8 @@ E60D  3A9003    LD      A,(#0390) ; @VALTYP {DATYPE} [TYPE]
 E610  B7        OR      A
 E611  280D      JR      Z,#E620 ; {FRE1} [FRENUM]
 ; Não: Compacta área de strings.
-E613  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
-E616  CD75E7    CALL    #E775 ; {STROP4} [GARBGE] ; Coleta de lixo.
+E613  CD6FE8    CALL    #E86F ; POPTMPSTR @FREFAC {STRZS1} [GSTRCU]
+E616  CD75E7    CALL    #E775 ; @GARBA2 {STROP4} [GARBGE] ; Coleta de lixo.
 ; DE = base da área de strings - 1.
 E619  2A4503    LD      HL,(#0345) ; {STDPTR} <STACK_TOP> [STRSPC]
 E61C  EB        EX      DE,HL
@@ -7181,7 +7185,7 @@ E6A0  184D      JR      #E6EF           ; (77)
 ; Previne modo programado.
 ; [IDTEST]:
 E6A2  E5        PUSH    HL
-E6A3  2A4703    LD      HL,(#0347) ; {CULINO} <CURRENT_LINE> [LINEAT]
+E6A3  2A4703    LD      HL,(#0347) ; @CURLIN {CULINO} <CURRENT_LINE> [LINEAT]
 E6A6  23        INC     HL
 E6A7  7C        LD      A,H
 E6A8  B5        OR      L
@@ -7190,7 +7194,7 @@ E6AA  C0        RET     NZ
 
 ; DIERRO
 E6AB  1E16      LD      E,#16 ; erro "DI"
-E6AD  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+E6AD  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ;
 E6B0  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN]
@@ -7208,7 +7212,7 @@ E6BE  C3BFE2    JP      #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E6C1  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E6C4  CD96EE    CALL    #EE96 ; STRFLOAT {NUMKON} [NUMASC]
 E6C7  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST]
-E6CA  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
+E6CA  CD6FE8    CALL    #E86F ; POPTMPSTR @FREFAC {STRZS1} [GSTRCU]
 E6CD  01C9E8    LD      BC,#E8C9 ; {CHR_1} [TOPOOL] ; Forja retorno.
 E6D0  C5        PUSH    BC
 ; {STR_1} [SAVSTR]
@@ -7333,7 +7337,7 @@ E72D  C0        RET     NZ ; Retorna se tudo acabou bem.
 ; {STER}
 E72E  1E1E      LD      E,#1E ; erro "CC"
 ; {STER1}
-E730  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+E730  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ; {TEXTO0} <PrintString-1> [PRNUMS]
 E733  23        INC     HL
@@ -7343,7 +7347,7 @@ E733  23        INC     HL
 ; {TEXTO} <PrintString> [PRS]
 E734  CDF5E6    CALL    #E6F5 ; NEWSTRREC {SLEN0} [CRTST]
 ; {TEXTO1} [PRS1]
-E737  CD6FE8    CALL    #E86F ; POPTMPSTR {STRZS1} [GSTRCU]
+E737  CD6FE8    CALL    #E86F ; POPTMPSTR @FREFAC {STRZS1} [GSTRCU]
 E73A  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 E73D  1C        INC     E
 ; {TEXTO2} [PRSLP]
@@ -7389,14 +7393,14 @@ E768  C9        RET
 ; {STROP3} [TESTOS]
 E769  F1        POP     AF ; Coleta de lixo já foi feita?
 E76A  1E1A      LD      E,#1A ; Sim, não há mais espaço: erro "FC".
-E76C  CA56D8    JP      Z,#D856 ; ERROE {ERROO} <Error> [ERROR]
+E76C  CA56D8    JP      Z,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 E76F  BF        CP      A ; Indica que a coleta de lixo terá sido feita.
 E770  F5        PUSH    AF
 E771  014EE7    LD      BC,#E74E ; {STROP1} [GRBDON] ; Forja retorno para nova tentativa de alocação após a coleta de lixo.
 E774  C5        PUSH    BC
 
 ; Coleta de lixo.
-; {STROP4} [GARBGE]
+; @GARBA2 {STROP4} [GARBGE]
 E775  2A9203    LD      HL,(#0392) ; {MEMSIZ} [LSTRAM]
 E778  22A603    LD      (#03A6),HL ; {SWAPTR} [STRBOT]
 E77B  210000    LD      HL,#0000
@@ -7527,7 +7531,7 @@ E835  E5        PUSH    HL ; Preserva ponteiro para registro de string do 2º op
 E836  86        ADD     A,(HL) ; Soma os comprimentos dos dois operandos.
 ; {LSER}
 E837  1E1C      LD      E,#1C ; erro "CL" ; Emite ?CL ERRO se comprimento resultante > 255.
-E839  DA56D8    JP      C,#D856 ; ERROE {ERROO} <Error> [ERROR]
+E839  DA56D8    JP      C,#D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 E83C  CDE6E6    CALL    #E6E6 ; {STADTB} [MKTMST] ; Aloca o comprimento da nova string e cria registro de string em $03A2 {STRDAT} [TMPSTR].
 E83F  D1        POP     DE ; Restaura ponteiro para registro de string do 2º operando.
 E840  CD73E8    CALL    #E873 ; {STRZS3} [GSTRDE] ; [Move to string pool if needed]
@@ -7573,7 +7577,7 @@ E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] ; Assegura que seja str
 ; Se os dois primeiros bytes de FLOAT
 ; estiverem apontando para esse mesmo registro,
 ; desempilha-o.
-; {STRZS1} [GSTRCU]
+; @FREFAC {STRZS1} [GSTRCU]
 E86F  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] ; HL aponta para registro de string temporário "atual" (apontado pelos dois primeiros bytes de FLOAT). [Get current string]
 ; {STRZS2} [GSTRHL]
 E872  EB        EX      DE,HL ; DE aponta para registro de string temporário "atual". [Save DE]
@@ -7647,7 +7651,7 @@ E8AF  C5        PUSH    BC
 ; da string. Se a string for vazia, produz
 ; "PI ERRO".
 E8B0  CDA1E8    CALL    #E8A1 ; ALEN {LEN1} [GETLEN]
-E8B3  CAF6DE    JP      Z,#DEF6 ; PIERRO {FCER} [FCERR]
+E8B3  CAF6DE    JP      Z,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 E8B6  23        INC     HL
 E8B7  23        INC     HL
 E8B8  5E        LD      E,(HL)
@@ -7724,7 +7728,7 @@ E906  7E        LD      A,(HL) ; Obtém próximo byte "," ou ")".
 E907  CD54E9    CALL    #E954 ; {STRED1} [MIDNUM] ; Obtém número fornecido.
 E90A  04        INC     B ; [Is it character zero?]
 E90B  05        DEC     B
-E90C  CAF6DE    JP      Z,#DEF6 ; PIERRO {FCER} [FCERR] ; Sim, erro.
+E90C  CAF6DE    JP      Z,#DEF6 ; PIERRO @FCERR {FCER} [FCERR] ; Sim, erro.
 E90F  C5        PUSH    BC ; Salva posição inicial.
 E910  1EFF      LD      E,#FF ; Toda a string.
 E912  FE29      CP      ')' ; Foi fornecido comprimento?
@@ -7841,7 +7845,7 @@ E999  CDBCE2    CALL    #E2BC ; {SNALY2} [GETNUM] ; Avalia expressão numérica.
 E99C  CDEADE    CALL    #DEEA ; {EPRVL2} [DEPINT] ; Converte ponto flutuante positivo em inteiro (CDE).
 E99F  7A        LD      A,D ; Obtém MSB do número.
 E9A0  B7        OR      A ; Se não zero, emite PI ERRO.
-E9A1  C2F6DE    JP      NZ,#DEF6 ; PIERRO {FCER} [FCERR]
+E9A1  C2F6DE    JP      NZ,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 E9A4  2B        DEC     HL
 E9A5  CDA0DD    CALL    #DDA0 ; NEXTNSPC @CHRGTR {TCHAR} <NextChar> [GETCHR]
 E9A8  7B        LD      A,E
@@ -7860,7 +7864,7 @@ E9B7  E5        PUSH    HL
 E9B8  EB        EX      DE,HL
 ; Início do bloco a salvar = início
 ; do programa BASIC.
-E9B9  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT]
+E9B9  2A4903    LD      HL,(#0349) ; @TXTTAB {PSTBEG} <PROGRAM_BASE> [BASTXT]
 E9BC  22FB00    LD      (#00FB),HL ; STAR
 ; Forja retorno.
 E9BF  01D7E9    LD      BC,#E9D7
@@ -7941,7 +7945,7 @@ EA16  18EE      JR      #EA06           ; (-18)
 
 ;
 EA18  1E08      LD      E,#08 ; erro "PI"
-EA1A  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+EA1A  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ; BLOAD
 EA1D  FE2A      CP      '*'
@@ -7965,7 +7969,7 @@ EA35  20FB      JR      NZ,#EA32        ; (-5)
 EA37  360D      LD      (HL),#0D
 EA39  0606      LD      B,#06
 ; Coloca início da área do BASIC em STAR.
-EA3B  2A4903    LD      HL,(#0349) ; {PSTBEG} <PROGRAM_BASE> [BASTXT]
+EA3B  2A4903    LD      HL,(#0349) ; @TXTTAB {PSTBEG} <PROGRAM_BASE> [BASTXT]
 EA3E  22FB00    LD      (#00FB),HL ; STAR
 ; Lê cabeçalho do arquivo.
 EA41  CD62C1    CALL    #C162 ; TAPIN
@@ -8032,7 +8036,8 @@ EA94  21        DB      #21
 ; O byte acima inicia uma instrução de 3 bytes,
 ; EA94  21C1D1    LD      HL,#D1C1
 ; ocultando as duas instruções subsequentes:
-; BSUB
+; BSUB:
+; @FSUBT {MINUS} <FSub>
 EA95  C1        POP     BC
 EA96  D1        POP     DE
 
@@ -8181,7 +8186,7 @@ EB35  34        INC     (HL)
 EB36  C0        RET     NZ
 ; Gera erro "SE".
 EB37  1E0A      LD      E,#0A ; erro "SE"
-EB39  C356D8    JP      #D856 ; ERROE {ERROO} <Error> [ERROR]
+EB39  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ; {ADD19} [PLUCDE]
 EB3C  7E        LD      A,(HL)
@@ -8260,7 +8265,7 @@ EB8A  45AA3882  DB      #45,#AA,#38,#82 ; 2,88539
 ; {LOG} [LOG]
 EB8E  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
 EB91  B7        OR      A
-EB92  EAF6DE    JP      PE,#DEF6 ; PIERRO {FCER} [FCERR]
+EB92  EAF6DE    JP      PE,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
 EB95  21C203    LD      HL,#03C2 ; {WRA1+3} <FACCUM+3> [FPEXP]
 EB98  7E        LD      A,(HL)
 EB99  013580    LD      BC,#8035 ; SQR(1/2) (0,707107)
@@ -8292,7 +8297,7 @@ EBCC  21        DB      #21
 ; EBCC  21C1D1    LD      HL,#D1C1
 ; ocultando as duas instruções subsequentes.
 ; BMUL:
-; {MUL} <FMul> [MULT]
+; @FMULTT {MUL} <FMul> [MULT]
 EBCD  C1        POP     BC
 EBCE  D1        POP     DE
 ; {MUL1} [FPMULT]
@@ -8367,7 +8372,8 @@ EC1F  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 EC22  012084    LD      BC,#8420
 EC25  110000    LD      DE,#0000
 EC28  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
-; BDIV
+; BDIV:
+; @FDIVT {DIV} <FDiv>
 EC2B  C1        POP     BC
 EC2C  D1        POP     DE
 ; DIVBCDEFLOAT: Divide BDCE por FLOAT.
@@ -9052,7 +9058,7 @@ EE69  C301EE    JP      #EE01 ; {VALNR2} <FInLoop> [MANLP]
 EE6C  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 EE6F  CDE5EC    CALL    #ECE5 ; {SGN0} <FCharToFloat> [FLGREL]
 ; BADD:
-; {PLUS} <FAdd> [PADD]
+; @FADDT {PLUS} <FAdd> [PADD]
 EE72  C1        POP     BC
 EE73  D1        POP     DE
 EE74  C39AEA    JP      #EA9A ; BCDEPLUSFLOAT {ADD5} [FPADD]
@@ -9273,7 +9279,7 @@ EF87  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP]
 
 ; BPOW:
 ; Potência.
-; {EXPO1} [POWER]
+; @FPWRT {EXPO} [POWER]
 EF8A  C1        POP     BC ; Obtém a base.
 EF8B  D1        POP     DE
 EF8C  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN]
@@ -9282,7 +9288,7 @@ EF90  283C      JR      Z,#EFCE ; {EXP} [EXP]
 EF92  F299EF    JP      P,#EF99 ; {EXPO1} [POWER1]
 EF95  B7        OR      A
 EF96  CA4BD8    JP      Z,#D84B ; DZERRO {DIVER} <DivideByZero> [DZERR]
- ; {EXPO1} [POWER1]
+; {EXPO1} [POWER1]
 EF99  B7        OR      A
 EF9A  CAFEEA    JP      Z,#EAFE ; {ADD13} [SAVEXP]
 EF9D  D5        PUSH    DE
@@ -9361,7 +9367,7 @@ F02B  00000081  DB      #00,#00,#00,#81 ; +1 (+1/0! = +1/1)
 ; {Rotina para desenvolvimento de funções em série.}
 ; {REIHE} [SUMSER]
 F02F  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
-F032  11CDEB    LD      DE,#EBCD ; Forja retorno para BMUL {MUL} <FMul> [MULT]
+F032  11CDEB    LD      DE,#EBCD ; Forja retorno para BMUL @FMULTT {MUL} <FMul> [MULT]
 F035  D5        PUSH    DE
 F036  E5        PUSH    HL
 F037  CD1FED    CALL    #ED1F ; BCDEFLOAT {OPLAD0} <FCopyToBCDE> [BCDEFP]
@@ -9401,7 +9407,7 @@ F05C  18E9      JR      #F047 ; {REIHE2} [SUMLP]
 F05E  CDD3EC    CALL    #ECD3 ; SGNFLOAT {TSGNM} <FTestSign> [TSTSGN] ; Testa sinal de FLOAT. (A = $01, $00 ou $ff)
 F061  211903    LD      HL,#0319 ; {RNDVR3} [SEED+2] ; Semente de número aleatório.
 F064  FABEF0    JP      M,#F0BE ; {RND3} [RESEED] ; Negativo: Semeia de novo.
-F067  213A03    LD      HL,#033A ; {RNDVR4} [LSTRND] ; Último número aleatório.
+F067  213A03    LD      HL,#033A ; @RNDX {RNDVR4} [LSTRND] ; Último número aleatório.
 F06A  CD11ED    CALL    #ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP] ; Move último RND para FLOAT.
 F06D  211903    LD      HL,#0319 ; {RNDVR3} [SEED+2] ; Obtém seletor da semente de número aleatório.
 F070  C8        RET     Z ; Retorna se RND(0).
@@ -9450,7 +9456,7 @@ F0B3  15        DEC     D ; no
 F0B4  1C        INC     E ; número.
 ; {RND2} [RND2]
 F0B5  CDEAEA    CALL    #EAEA ; {ADD10} [BNORM] ; Normaliza número.
-F0B8  213A03    LD      HL,#033A ; {RNDVR4} [LSTRND] ; Preserva número aleatório gerado...
+F0B8  213A03    LD      HL,#033A ; @RNDX {RNDVR4} [LSTRND] ; Preserva número aleatório gerado...
 F0BB  C32BED    JP      #ED2B ; HLFLOAT {OPTRAN} <FCopyToMem> [FPTHL] ; ...e retorna.
 
 ; {RND3} [RESEED]
@@ -9528,7 +9534,7 @@ F141  CD04ED    CALL    #ED04 ; PUSHFLOAT {OPARST} <FPush> [STAKFP]
 F144  EB        EX      DE,HL
 F145  CD14ED    CALL    #ED14 ; FLOATBCDE {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 F148  CDD2F0    CALL    #F0D2 ; BCOS
-F14B  C32BEC    JP      #EC2B ; BDIV
+F14B  C32BEC    JP      #EC2B ; BDIV @FDIVT {DIV} <FDiv>
 
 ; BATN
 ; arc tg x = x - x^3/3 + x^5/5 - x^7/7 + ...
