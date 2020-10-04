@@ -1,0 +1,1817 @@
+	; NOVA BIOS DE BLUEDRIVE PARA CCE MC1000.
+	; Emerson José Silveira da Costa
+	
+	; Victor Trucco é o desenvolvedor de um periférico chamado BlueDrive
+	; para microcomputadores Sinclair ZX81 e compatíveis, permitindo
+	; carregar e salvar programas em pen-drive.
+	;
+	; Em 2015, ele adaptou o BlueDrive para o CCE MC1000:
+	;
+	; -   "CCE MC1000 carregando do pendrive USB (nova versao do BlueDrive)"
+	;     https://www.youtube.com/watch?v=XqanBFqkU2w
+	;
+	; -   "BlueDrive rodando no CCE MC1000"
+	;     https://www.youtube.com/watch?v=KAIPFog6Hjo
+	;
+	; A BIOS original modificava os comandos BASIC da ROM (LOAD, TLOAD e
+	; SAVE) oferecendo funções básicas: navegar pelas pastas, listar os
+	; arquivos na pasta atual, carregar ou salvar programas em BASIC e
+	; carregar programas em código de máquina.
+	;
+	; Não havia comandos para carregar ou salvar dados, nem para apagar
+	; arquivos. Também não há uma interface definida para programas em
+	; linguagem de máquina usarem o periférico.
+	;
+	; Por isso eu (Emerson Costa) me lancei à empreitada de elaborar uma
+	; nova versão da BIOS.
+	;
+	; Enquanto o Victor dispunha de uma placa Altera DE2 onde implementou
+	; os hardwares do MC1000 e do BlueDrive, podendo modificá-los, eu
+	; disponho apenas dos equipamentos (MC1000 e BlueDrive) físicos e
+	; imutáveis. Sem poder modificar a ROM/BIOS do conjunto, para realizar
+	; meus testes eu preciso: (1) carregar na RAM o código que deveria
+	; estar na ROM; e (2) usar o comando CALL para chamar os comandos
+	; modificados.
+	;
+	; O BASIC do MC1000 também não tem um comando para carregar bytes
+	; em um ponto qualquer da RAM. Para instalar meu código, uso o comando
+	; LOAD de carregar um programa BASIC, mas o arquivo contém, além dos
+	; bytes do programa BASIC, outros bytes que são assim carregados para a
+	; memória:
+	; 
+	;     [ A | B | C - - - - - ]
+	; 
+	; A:  Programa BASIC que reserva espaço na RAM e chama (com CALL) a
+	;     rotina instaladora B.
+	; B:  Rotina instaladora em código de máquina que copia a região C para
+	;     o topo da RAM (a partir do endereço 0xA000 = 40960).
+	;     Depois disso o programa instalador pode ser apagado (NEW).
+	; C:  O código da nova BIOS (e algum código extra para que os novos
+	;     comandos possam ser acionados).
+	;
+	; Como não posso modificar a ROM, o acionamento dos comandos é feito
+	; assim: Os comandos desejados (LOAD, SAVE, TLOAD), devem ser
+	; precedidos na mesma linha por um CALL 40967. A rotina chamada assume
+	; o papel do interpretador BASIC a partir daquele ponto, e assim pode
+	; reconhecer os comandos LOAD, SAVE e TLOAD com as novas sintaxes.
+	;
+	;     LOAD "ARQUIVO.BAS
+	;     Carrega programa segundo a BIOS original do BlueDrive.
+	;
+	;     CALL 40967:LOAD "ARQUIVO.BAS,R
+	;     Carrega (e executa) programa segundo a nova BIOS em RAM.
+	
+	; Os novos comandos estão listados no comentário intitulado
+	; "EXTENSÕES AO BASIC DO MC-1000" em meio ao código abaixo.
+
+	; ----------------------------------------------------------------------
+
+	; Para compilar este programa, uso as seguintes ferramentas:
+	; -   Assembler sdasz80 e linker sdldz80, que fazem parte do pacote do
+	;     sdcc (Small Device C Compiler).
+	;     http://sdcc.sourceforge.net
+	; -   Hex2Bin, que converte o arquivo .IHX gerado pelo sdldz80 em
+	;     arquivo .BIN.
+	;     http://hex2bin.sourceforge.net
+	; -   MC1000CasTools, que converte o arquivo .BIN em .CAS, podendo
+	;     então ser carregado pela BIOS original do BlueDrive.
+	;     https://github.com/ensjo/MC1000CasTools
+	
+	; Exemplo de shell script para a compilação:
+	
+	; #!/bin/bash
+	;
+	; echo "(1) Compila .Z80 gerando .REL."
+	; <caminho...>/sdcc-3.5.0/bin/sdasz80 -los "BlueDrive_LOAD_0xa000(2).z80"
+	;
+	; echo "(2) Linka .REL gerando .IHX."
+	; <caminho...>/sdcc-3.5.0/bin/sdldz80 -i "BlueDrive_LOAD_0xa000(2).rel"
+	;
+	; echo "(3) Converte .IHX em .BIN."
+	; <caminho...>/Hex2bin-2.0/hex2bin "BlueDrive_LOAD_0xa000(2).ihx"
+	;
+	; echo "(4) Converte .BIN em .CAS."
+	; java -cp <caminho...>/MC1000CasTools/bin MC1000CasTools -v -b "BlueDrive_LOAD_0xa000(2).bin" -cas
+	;
+	; echo "(5) Copia para BD2.CAS."
+	; cp "BlueDrive_LOAD_0xa000(2).cas" BD2.CAS
+
+	; ----------------------------------------------------------------------
+
+	.area	BASIC (ABS)
+
+	.org	0xa000 - 37
+	; .org	0x3d5
+
+	; Programa BASIC portador do programa em código de máquina:
+	; 1 CLEAR 512,32767 : CALL 1004
+
+
+	; 1º registro de linha.
+	.dw	0x03ea ; Endereço do próximo registro de linha.
+	.dw	1 ; Número da linha.
+	.db	0xa9 ; Token de CLEAR.
+	.ascii	"512,32767:"
+	.db	0xa2 ; Token de CALL.
+	.ascii	"1004" ; 0x0e3c
+	.db	0x00 ; Fim da linha.
+
+	; 2º registro de linha.
+	.dw	0x0000 ; Indica fim do programa.
+
+	.area	INSTALLER (ABS)
+
+	.org	0xa000 - 14
+	; .org	0x0e3c
+
+	; Programa em linguagem de máquina carregado na sequencia do programa em BASIC.
+
+	; Rotina inicial que instala o programa em si na parte alta da RAM:
+
+	ld	de,#_inicio
+	ld	hl,#0x03fa
+	ld	bc,#0x2000
+	ldir
+	jp	_inicio
+
+	.area	CODE (ABS)
+
+	.org	0xa000
+	; .org	0x03fa
+
+	; Rotina propriamente dita:
+
+_inicio:
+
+	; Reativa a impressão de caracteres que é desativada
+	; quando um programa BASIC sem nome (autoexecutável)
+	; é carregado.
+	xor	a
+	ld	(0x0344),a
+	jp	BD_Inicializa
+
+	; Ponto de entrada para os testes do BASIC:
+	; CALL 40967:SAVE/LOAD/TLOAD...
+
+	pop	hl
+	ex	(sp),hl
+	call	faz
+	ex	(sp),hl
+	jp	(hl)
+
+faz:
+	call	ChkSyn
+	.db	':'
+	ld	bc,#Patch_BD_SAVE
+	cp	#0xab ; Token 'SAVE'
+	jr	z,faz_0
+	ld	bc,#Patch_BD_LOAD
+	cp	#0xaa ; Token 'LOAD'
+	jr	z,faz_0
+	ld	bc,#Patch_BD_TLOAD
+	cp	#0xad ; Token 'TLOAD'
+	jr	z,faz_0
+	jp	SNErro
+
+faz_0:
+	call	NextNSpc
+	rst	0x30
+	push	bc
+	ret
+
+	; ----------------------------------------------------------------------
+
+	; Acréscimos à ROM original do MC-1000 da CCE para utilização do
+	; periférico "BlueDrive" (projetada por Victor Trucco) para acesso a um
+	; pen drive como meio de armazenamento de massa, pela utilização de um
+	; chip CH376.
+
+	; Os comandos do BASIC de acesso ao cassete (SAVE, LOAD, TLOAD) são
+	; estendidos para permitir a utilização do periférico.
+
+	; Datasheet do CH376: http://www.mpja.com/download/ch376ds1.pdf
+	; Alguma informação: https://code.google.com/p/ledshow/source/browse/trunk/+ledshow+--username+hzy1981/STM32/Usr/drv/CH376INC.H?r=203
+
+	; ======================
+	; PATCHES À ROM ORIGINAL
+	; ======================
+
+	; (1) Inicialização:
+	; Substituir:
+	; C000  C363C0    JP      ST
+	; Por:
+	; C000  C300F6    JP      PE_Patch_BD_Inicializa
+
+	; (2) Manifesto:
+	; Substituir:
+	; CF2D  315103    LD      SP,#0351
+	; Por:
+	; CF2D  C303F6    JP      PE_Patch_BD_Manifesta
+
+	; (3) Instrução SAVE:
+	; Substituir:
+	; D741  AAE9      DW      BASIC_SAVE
+	; Por:
+	; D741  06F6      DW      PE_Patch_BD_SAVE
+
+	; (4) Instrução LOAD:
+	; Substituir:
+	; D73F  1DEA      DW      BASIC_LOAD
+	; Por:
+	; D73F  09F6      DW      PE_Patch_BD_LOAD
+
+	; (5) Instrução TLOAD:
+	; Substituir:
+	; D745  19D5      DW      BASIC_TLOAD
+	; Por:
+	; D745  0CF6      DW      PE_Patch_BD_TLOAD
+
+	; =================
+	; CONSTANTES GERAIS
+	; =================
+
+NUL	.equ	0x00
+
+	; ====================
+	; ENDEREÇOS DO MC-1000
+	; ====================
+
+	; ----- RAM.
+
+BASTXT	.equ	0x0349 ; Aponta para o início da área do programa BASIC.
+Autoexec	.equ	0x0361 ; Indica execução automática.
+TYPE	.equ	0x0390 ; Indica o tipo da variável/expressão (zero = numérico).
+TMPSTR	.equ	0x03a2 ; Buffer para construção de registro temporário de string.
+FORFLG	.equ	0x03ac ; Tipo do identificador para GETVAR.
+PROGND	.equ	0x03b7 ; Aponta para a área de variáveis após o programa BASIC.
+FPREG	.equ	0x03bf ; Registrador de número em ponto flutuante.
+
+	; ----- ROM.
+
+ST	.equ	0xc000 ; Partida a frio do MC-1000.
+ExecAposTLOAD	.equ	0xc1c1 ; Prepara a execução do programa carregado com TLOAD.
+TIErro	.equ	0xd3aa ; Emite erro de tipo incompatível.
+BASIC_TLOAD	.equ	0xd519 ; Rotina original de interpretação de TLOAD.
+szOK	.equ	0xd7ea ; String "OK" (na ROM).
+SNErro	.equ	0xd848 ; Emite "SN erro".
+ErroE	.equ	0xd856 ; Exibe mensagem de erro com código em E.
+SETPTR	.equ	0xd967 ; Rotina chamada após a carga de um programa BASIC.
+NEW	.equ	0xd9a2 ; Executa comando NEW do BASIC.
+ChkSyn	.equ	0xdc11 ; Checa se caracter no ponto de interpretação do programa BASIC (HL) corresponde ao byte seguinte à chamada a esta rotina. Caso negativo, emite "SN erro".
+PrintAPos	.equ	0xdc1c ; Imprime caracter em A atualizando POS(), quebrando linha se limite atingido, com inversão, controle de impressão em tela/impressora.
+NextNSpc	.equ	0xdda0 ; Avança o ponto de interpretação do programa BASIC (HL) até encontrar um caracter diferente de espaço.
+TrataCtrlSC	.equ	0xddc9 ; Trata CTRL+S (pausa), CTRL+C (interrupção) e pausa de modo SLOW.
+FPSINT	.equ	0xdee4 ; Avança ponteiro de interpretação do BASIC, interpreta número (positivo, senão emite "PI erro") e obtém seu valor inteiro em BCDE (B=0).
+POSINT	.equ	0xdee7 ; Interpreta número (positivo, senão emite "PI erro") e obtém seu valor inteiro em BCDE (B=0).
+DEPINT	.equ	0xdeea ; Acessa o valor de ponto flutuante atual (positivo, senão emite "PI erro") e obtém seu valor inteiro em BCDE (B=0).
+PIErro	.equ	0xdef6 ; Emite "PI erro".
+LETSTR	.equ	0xdff2 ; Parte da instrução LET que atribui string a variável.
+CRLFPosNZ	.equ	0xe0bb ; Imprime CR+LF se POS() diferente de zero.
+PrintCRLF	.equ	0xe0c7 ; Imprime CR+LF zerando POS().
+GETNUM	.equ	0xe2bc ; Avalia expressão e testa se é numérico. Caso negativo, emite "TI erro".
+TSTNUM	.equ	0xe2bf ; Checa se é numérico. Caso negativo, emite "TI erro".
+TSTSTR	.equ	0xe2c0 ; Checa se é string. Caso negativo, emite "TI erro".
+EVAL	.equ	0xe2d0 ; Avalia uma expressão e armazena o resultado em FPREG.
+GETVAR	.equ	0xe484 ; Lê nome de variável e obtém endereço do descritor em DE.
+ACPASS	.equ	0xe62f ; Converte um inteiro de 2 bytes em AC para ponto flutuante em FPREG.
+MKTMST	.equ	0xe6e6 ; Aloca A bytes na área de strings e cria registro de string em TMPSTR.
+NewStrRec	.equ	0xe6f5 ; Cria em $03A2 {STRDAT} [TMPSTR] um novo registro de string temporário para a string apontada por HL, transferindo-o depois para a pilha de registros de strings temporários (3 registros de 4 bytes a partir de $0396 {LSPTBG} [TMSTPL]).
+NewStrRec0B	.equ	0xe6f8 ; Cria um novo registro temporário de string a partir da sequência de bytes apontada por HL+1 e terminada por 0 ou pelo delimitador em B.
+TSTOPL	.equ	0xe714 ; Move registro de string em TMPSTR (0x03a2) para a pilha de registros temporários de string.
+PrintStrHL	.equ	0xe734 ; Imprime uma string apontada por HL terminada por 0x00.
+Aloca	.equ	0xe74c ; Aloca A bytes na área de strings. O endereço da área alocada retorna em DE.
+PopTmpStr	.equ	0xe86f ; Faz HL apontar para o último registro na pilha de registros de string temporários. Se os dois primeiros bytes de FPREG estiverem apontando para esse mesmo registro, desempilha-o.
+VAL	.equ	0xe934 ; Se a string for nula retorna zero.
+FNDNUM	.equ	0xe996 ; Avança ponteiro de interpretação do BASIC e passa a GETINT.
+GETINT	.equ	0xe999 ; Chama GETNUM e garante que o valor se restrinja à faixa de 0 a 255. O byte volta replicado em E e A.
+BASIC_SAVE	.equ	0xe9aa ; Rotina original de interpretação de SAVE.
+BASIC_LOAD	.equ	0xea1d ; Rotina original de interpretação de LOAD.
+STAKFP	.equ	0xed04 ; Transfere o número de ponto flutuante em FPREG para a pilha do Z80.
+FPBCDE	.equ	0xed14 ; Transfere o número de ponto flutuante nos registradores BCDE para FPREG.
+BCDEFP	.equ	0xed1f ; Transfere o número de ponto flutuante em FPREG para os registradores BCDE.
+BCDEHL	.equ	0xed22 ; Copia para BCDE o número de ponto flutuante apontado por HL.
+FPTHL	.equ	0xed2b ; Transfere o número de ponto flutuante em FPREG para o endereço apontado por HL.
+ASCTFP	.equ	0xedef ; Interpreta literal numérico.
+PrintHL	.equ	0xee8b ; Imprime o número inteiro de 16 bits contido em HL.
+STRFLOAT	.equ	0xee96 ; Monta em #03C4 a representação string de FPREG.
+
+	; ================
+	; INÍCIO DO CÓDIGO
+	; ================
+
+	;.org	0xf600
+
+	; =======================
+	; PONTOS DE ENTRADA FIXOS
+	; =======================
+
+	; ----- Patches.
+
+; Lisias Toledo @ 8 abr 2016:
+; "Eu acho que estes pontos não precisam ser fixos, eles
+; fazem parte do BASIC, naõ devem ser entradas para programas LM.
+; Programas LM vão usar o que chamei de BD_KERNEL_CALL."
+
+PE_Patch_BD_Inicializa:
+	jp	Patch_BD_Inicializa
+PE_Patch_BD_Manifesta:
+	jp	Patch_BD_Manifesta
+PE_Patch_BD_SAVE:
+	jp	Patch_BD_SAVE
+PE_Patch_BD_LOAD:
+	jp	Patch_BD_LOAD
+PE_Patch_BD_TLOAD:
+	jp	Patch_BD_TLOAD
+
+	; ----- BlueDrive routines.
+
+; Lisias Toledo @ 8 abr 2016:
+; "Estes aqui já fazem sentido terem pontos fixos, mas é
+; conveniente que fiquem no final da ROM, em 0xFFFF para baixo.
+; * 0xfffd já seria o JP para BD_KERNEL_CALL
+; * 0xfffa o JP para BD_DefCaminhoNUL
+; * 0xfff7 o JP para BD_DefCaminhoNULC e por aí vai.
+; Assim, estes pontos ficam REALMENTE fixos, e podemos sair
+; movendo código pra cima e pra baixo sem mudar o endereço
+; dos pontos fixos."
+
+PE_BD_DefCaminhoNUL:
+	jp	BD_DefCaminhoNUL
+PE_BD_DefCaminhoNULC:
+	jp	BD_DefCaminhoNULC
+PE_BD_DefCaminho:
+	jp	BD_DefCaminho
+PE_BD_CriaArquivo:
+	jp	BD_CriaArquivo
+PE_BD_AbreArqDir:
+	jp	BD_AbreArqDir
+PE_BD_AbreDirRaiz:
+	jp	BD_AbreDirRaiz
+PE_BD_MovePonteiro:
+	jp	BD_MovePonteiro
+PE_BD_LeDados:
+	jp	BD_LeDados
+PE_BD_EscreveDados:
+	jp	BD_EscreveDados
+PE_BD_FechaArqDir:
+	jp	BD_FechaArqDir
+PE_BD_ApagaArqDir:
+	jp	BD_ApagaArqDir
+
+	; ====================
+	; ROTINAS PARA O CH376
+	; ====================
+
+	; ----- Portas de comunicação com o CH376.
+
+prt_CH_Comando	.equ	47 ; Porta para comandos.
+prt_CH_Dado	.equ	39 ; Porta para dados.
+
+	; ----- Comandos do CH376.
+
+CMD_RESET_ALL	.equ	0x05
+CMD_SET_USB_MODE	.equ	0x15
+CMD_GET_STATUS	.equ	0x22
+CMD_RD_USB_DATA0	.equ	0x27
+CMD_WR_REQ_DATA	.equ	0x2d
+CMD_SET_FILE_NAME	.equ	0x2f
+CMD_DISK_CONNECT	.equ	0x30
+CMD_DISK_MOUNT	.equ	0x31
+CMD_FILE_OPEN	.equ	0x32
+CMD_FILE_ENUM_GO	.equ	0x33
+CMD_FILE_CREATE	.equ	0x34
+CMD_FILE_ERASE	.equ	0x35
+CMD_FILE_CLOSE	.equ	0x36
+CMD_BYTE_LOCATE	.equ	0x39
+CMD_BYTE_READ	.equ	0x3a
+CMD_BYTE_RD_GO	.equ	0x3b
+CMD_BYTE_WRITE	.equ	0x3c
+CMD_BYTE_WR_GO	.equ	0x3d
+
+	; ----- Códigos de estado do CH376.
+
+USB_INT_SUCCESS	.equ	0x14
+USB_INT_DISK_READ	.equ	0x1d
+USB_INT_DISK_WRITE	.equ	0x1e
+ERR_OPEN_DIR	.equ	0x41
+ERR_MISS_FILE	.equ	0x42
+
+	; ---- Executa a rotina CH_EnviaSequencia consumindo os bytes seguintes à instrução CALL que chama esta rotina.
+
+CH_EnviaSequenciaDaqui:
+
+; Lisias Toledo @ 8 abr 2016:
+; "Precisa-se de um nome “profissional” para este entry-point.
+; Algo como BD_KERNEL_CALL ou algo assim. É conveniente
+; colocar estes bytes aqui em 0xFFFF-(size da procedure) e
+; nunca mais tirarmos de lá. Assim podemos mover o
+; CH_EnviaSequencia para qualquer lugar da ROM sem quebrar
+; os clientes."
+
+	ex	(sp),hl
+	call	CH_EnviaSequencia
+	ex	(sp),hl
+	ret
+
+	; ----- Envia uma sequência de comando e dados para o CH376.
+	; HL aponta para a sequência de bytes.
+	; O primeiro byte apontado por HL será enviado como comando.
+	; Bytes subsequentes serão enviados como dados, exceto:
+	; - 0xff - Termina sequência.
+	; - 0xfe - Espera interrupção, lê estado e termina sequência.
+	; ----------
+
+CH_EnviaSequencia:
+	ld	a,(hl)
+	inc	hl
+	call	CH_EnviaComandoComRetardo
+
+CH_EnviaSequencia_Laco:
+	ld	a,(hl)
+	inc	hl
+	cp	#0xff
+	ret	z ; Termina sequência.
+	cp	#0xfe
+	jr	z,CH_EsperaInterrupcao ; Espera interrupção, lê estado e termina sequência.
+	call	CH_EnviaByteComRetardo
+	jr	CH_EnviaSequencia_Laco
+
+	; ----- Envia 1 comando ao CH376, seguido de retardo.
+	; A contém o comando a enviar.
+	; ----------
+
+CH_EnviaComandoComRetardo:
+	out	(prt_CH_Comando),a ; Envia byte ao CH376 como comando.
+	jr	Retardo
+
+	; ----- Envia 1 comando ao CH376 e aguarda interrupção.
+	; A contém o comando a enviar.
+	; ----------
+
+CH_EnviaComandoComInterrupcao:
+	call	CH_EnviaComandoComRetardo
+	;jr	CH_EsperaInterrupcao
+
+	; ----- Aguarda recebimento de interrupção do CH376.
+	; Retorna em A o estado da interrupção.
+	; ----------
+
+CH_EsperaInterrupcao:
+CH_EsperaInterrucao_Laco:
+	in	a,(prt_CH_Comando) ; Aguarda interrupção do CH376.
+	or	a
+	jp	m,CH_EsperaInterrucao_Laco
+	;jr	CH_PegaEstado
+
+	; ----- Obtém byte de estado do CH376.
+
+CH_PegaEstado:
+	ld	a,#CMD_GET_STATUS
+	call	CH_EnviaComandoComRetardo
+	;jr	CH_PegaByteComRetardo
+
+	; ----- Obtém um byte de dado do CH376.
+
+CH_PegaByteComRetardo:
+	in	a,(prt_CH_Dado)
+	jr	Retardo
+
+	; ----- Envia uma palavra (2 bytes) de dado ao CH376, seguido de retardo.
+	; BC contém a palavra a enviar.
+	; ----------
+
+CH_EnviaPalavraComRetardo:
+	ld	a,c
+	call	CH_EnviaByteComRetardo
+	ld	a,b
+	;jr	CH_EnviaByteComRetardo
+
+	; ----- Envia 1 byte de dado ao CH376, seguido de retardo.
+	; A contém o byte a enviar.
+	; ----------
+
+CH_EnviaByteComRetardo:
+	out	(prt_CH_Dado),a ; Envia byte ao CH376 como dado.
+	;jr	Retardo
+
+	; ----- Gera breve retardo.
+Retardo:
+	push	bc
+	ld	b,#7 ; Valor do SO 1.0: 50.
+Retardo_Laco:
+	djnz	Retardo_Laco
+	pop	bc
+	ret
+
+	; ----- Envia ao CH376 uma sequencia de bytes de dados.
+	; HL aponta para o início dos dados.
+	; B contém a quantidade.
+	; ----------
+
+CH_EnviaDados:
+	inc	b
+	jr	CH_EnviaDados_0
+CH_EnviaDados_Laco:
+	ld	a,(hl)
+	call	CH_EnviaByteComRetardo
+	inc	hl
+CH_EnviaDados_0:
+	djnz	CH_EnviaDados_Laco
+	ret
+
+	; ----- Pega do CH376 uma sequencia de bytes de dados.
+	; HL aponta para o início do buffer de leitura.
+	; B contém a quantidade.
+	; ----------
+
+CH_PegaDados:
+	inc	b
+	jr	CH_PegaDados_0
+CH_PegaDados_Laco:
+	call	CH_PegaByteComRetardo
+	ld	(hl),a
+	inc	hl
+CH_PegaDados_0:
+	djnz	CH_PegaDados_Laco
+	ret
+
+	; ====================
+	; ROTINAS DO BLUEDRIVE
+	; ====================
+
+	; (Independentes do BASIC.)
+
+	; ----- Inicializa o BlueDrive.
+
+BD_Inicializa:
+	call	Retardo
+	call	Retardo
+	call	Retardo
+
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_RESET_ALL
+	.db	0xff
+
+	ld	b,#255
+BD_Inicializa_Laco:
+	call	Retardo
+	call	Retardo
+	call	Retardo
+	djnz	BD_Inicializa_Laco
+
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_SET_USB_MODE
+	.db	6
+	.db	0xfe
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_DISK_CONNECT
+	.db	0xfe
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_DISK_MOUNT
+	.db	0xfe
+	ret
+
+	; ------
+
+;BD_Finaliza:
+;	call	CH_EnviaSequenciaDaqui
+;	.db	CMD_FILE_CLOSE
+;	.db	1
+;	.db	0xfe
+;
+;	call	CH_EnviaSequenciaDaqui
+;	.db	CMD_RESET_ALL
+;	.db	0xff
+;
+;	ret
+
+	; ----- Define caminho para arquivo/diretório.
+	; HL aponta para o início da string do caminho.
+	; A string é terminada pelo caracter NUL.
+	; ----------
+
+BD_DefCaminhoNUL:
+	ld	c,#NUL
+	;jr	BD_DefCaminhoNULC
+
+	; ----- Define caminho para arquivo/diretório.
+	; HL aponta para o início da string do caminho.
+	; A string é terminada pelo caracter NUL ou pelo caracter em C.
+	; ----------
+
+BD_DefCaminhoNULC:
+	push	hl
+	; Percorre a string até encontrar um terminador, calculando o tamanho.
+	ld	b,#0 ; Tamanho inicial = 0.
+BD_DefCaminhoNULC_0:
+	ld	a,(hl)
+	or	a
+	jr	z,BD_DefCaminhoNULC_1
+	cp	c
+	jr	z,BD_DefCaminhoNULC_1
+	inc	b
+	inc	hl
+	jr	BD_DefCaminhoNULC_0
+BD_DefCaminhoNULC_1:
+	pop	hl
+;	jr	BD_DefCaminho
+
+	; ----- Define caminho para arquivo/diretório.
+	; HL aponta para o início da string.
+	; B contém a quantidade de caracteres.
+	; ----------
+
+BD_DefCaminho:
+	; Divide o caminho contido na string em
+	; partes, enviando sucessivos comandos
+	; CMD_SET_FILE_NAME e CMD_FILE_OPEN ao
+	; CH376.
+	; Se o caminho começa com barra, ela é
+	; conservada.
+	; Barras sucessivas são ignoradas.
+	; O sinal de igual é substituído pelo til.
+	; Uma string vazia não gera nenhum comando.
+
+	; Exemplo: Uma string
+	; "/CAMINHO/PARA///ARQUIV=1.EXT"
+	; resulta nos comandos:
+	; 1. CMD_SET_FILE("/CAMINHO",NUL)
+	; 2. CMD_FILE_OPEN
+	; 3. CMD_SET_FILE("PARA",NUL)
+	; 4. CMD_FILE_OPEN
+	; 5. CMD_SET_FILE("ARQUIV~1.EXT",NUL)
+
+BD_DefCaminho_e0:
+	; Início da string.
+	inc	b
+	dec	b
+	ret	z ; String vazia?
+BD_DefCaminho_e1:
+	; Início de parte do caminho.
+	ld	a,#CMD_SET_FILE_NAME
+	call	CH_EnviaComandoComRetardo
+BD_DefCaminho_e2:
+	; Parte do caminho. Envia caracter
+	ld	a,(hl)
+	call	BD_Aux_IgualParaTil ; Substitui '=' por '~'.
+	call	CH_EnviaByteComRetardo
+	inc	hl
+	dec	b
+	jr	z,BD_DefCaminho_e3 ; Acabou a string?
+	ld	a,(hl)
+	cp	#'/'
+	jr	nz,BD_DefCaminho_e2 ; Não '/'?
+BD_DefCaminho_e3:
+	; Final de parte do caminho.
+	; Envia caracter NUL.
+	xor	a
+	call	CH_EnviaByteComRetardo
+	or	b
+BD_DefCaminho_e4:
+	; Descarta barras ao final de parte do caminho.
+	ret	z ; Acabou a string?
+	ld	a,(hl)
+	cp	#'/'
+	jr	nz,BD_DefCaminho_e5 ; Não '/'?
+	inc	hl
+	dec	b
+	jr	BD_DefCaminho_e4
+BD_DefCaminho_e5:
+	; Início de nova parte do caminho.
+	; Abrir a parte do caminho anterior.
+	call	BD_AbreArqDir
+	cp	#ERR_OPEN_DIR ; Emite erro "parâmetro ilegal" se não era diretório e não abriu corretamente.
+	jp	nz,PIErro
+	jr	BD_DefCaminho_e1
+
+	; ----- Abre o diretório raiz.
+	; Retorno como em BD_AbreArqDir.
+	; ----------
+	
+BD_AbreDirRaiz:
+	ld	hl,#str_Raiz ; Reabre diretório raiz.
+	call	BD_DefCaminhoNUL
+	;jr	BD_AbreArqDir
+
+	; ----- Abre arquivo/diretório especificado no caminho definido.
+	; Retorna em A o código de estado do CH376.
+	; Retorna Z se abriu arquivo ou diretório com sucesso.
+	; ----------
+
+BD_AbreArqDir:
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_FILE_OPEN
+	.db	0xfe
+	cp	#USB_INT_SUCCESS ; Retorna Z se abriu arquivo.
+	ret	z
+	cp	#ERR_OPEN_DIR ; Retorna Z se abriu diretório.
+	ret
+
+	; ----- Cria arquivo/diretório especificado no caminho definido.
+	; Retorna em A o código de estado do CH376.
+	; ----------
+
+BD_CriaArquivo:
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_FILE_CREATE
+	.db	0xfe
+	cp	#USB_INT_SUCCESS ; Retorna Z se criou o arquivo.
+	ret
+
+	; ----- Move o ponteiro para o fim do arquivo.
+
+BD_MovePonteiroFim:
+	push	de
+	push	bc
+	ld	bc,#0xffff
+	ld	e,c
+	ld	d,b
+	call	BD_MovePonteiro
+	pop	bc
+	pop	de
+	ret
+
+	; ----- Move o ponteiro do arquivo.
+	; Os registradores BCDE compõem o endereço de 4 bytes.
+	; 0x00000000 é o início do arquivo.
+	; 0xFFFFFFFF pode ser usado para indicar o fim do arquivo.
+	; Retorna Z se a operação teve sucesso.
+	; ----------
+BD_MovePonteiro:
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_BYTE_LOCATE
+	.db	0xff
+	push	bc
+	ld	c,e
+	ld	b,d
+	call	CH_EnviaPalavraComRetardo
+	pop	bc
+	call	CH_EnviaPalavraComRetardo
+	call	CH_EsperaInterrupcao
+	cp	#USB_INT_SUCCESS
+	ret
+
+	; ----- Fecha o arquivo aberto.
+
+BD_FechaArqDir:
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_FILE_CLOSE
+	.db	1
+	.db	0xfe
+	cp	#USB_INT_SUCCESS
+	ret
+
+	; ----- Apaga arquivo/diretório especificado no caminho definido.
+	; Retorna em A o código de estado do CH376.
+	; ----------
+
+BD_ApagaArqDir:
+	call	BD_AbreArqDir
+	ret	nz ; Retorna se não conseguiu abrir o arquivo/diretório.
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_FILE_ERASE
+	.db	0xfe
+	cp	#USB_INT_SUCCESS
+	ret
+
+	; ----- Lê um bloco de dados do arquivo aberto.
+	; HL apota para o início do buffer de leitura.
+	; BC contém a quantidade de bytes a transferir.
+	; ----------
+
+BD_LeDados:
+	ld	a,#CMD_BYTE_READ
+	call	CH_EnviaComandoComRetardo
+	call	CH_EnviaPalavraComRetardo
+	ld	a,b ; Termina se quantidade for zero.
+	or	c
+	ret	z
+BD_LeDados_Laco:
+	call	CH_EsperaInterrupcao ; Espera interupção do CH376.
+	cp	#USB_INT_DISK_READ ; Se não for mais transferir dados, terminar.
+	ret	nz
+	ld	a,#CMD_RD_USB_DATA0 ; Pega quantidade parcial de dados a transferir.
+	call	CH_EnviaComandoComRetardo
+	call	CH_PegaByteComRetardo
+	or	a ; Se for zero, terminar.
+	ret	z
+	ld	b,a ; Transfere dados.
+	call	CH_PegaDados
+
+	ld	a,#CMD_BYTE_RD_GO ; Prepara para passar ao próximo bloco de dados.
+	call	CH_EnviaComandoComRetardo
+	jr	BD_LeDados_Laco
+
+	; ----- Escreve um bloco de dados no arquivo aberto.
+	; HL apota para o início dos dados.
+	; BC contém a quantidade de bytes a transferir.
+	; Se BC = 0, o comando tem o efeito de atualizar
+	; o tamanho do arquivo no dispositivo.
+	; ----------
+
+BD_EscreveDados:
+	ld	a,#CMD_BYTE_WRITE
+	call	CH_EnviaComandoComRetardo
+	call	CH_EnviaPalavraComRetardo
+	ld	a,b ; Termina se quantidade for zero.
+	or	c
+	ret	z
+	; Inicia laço para transferências parciais.
+BD_EscreveDados_Laco:
+	call	CH_EsperaInterrupcao ; Espera interrupção do CH376.
+	cp	#USB_INT_DISK_WRITE ; Se não pedir mais dados, terminar.
+	ret	nz
+	ld	a,#CMD_WR_REQ_DATA ; Pega quantidade parcial de bytes a transferir.
+	call	CH_EnviaComandoComRetardo
+	call	CH_PegaByteComRetardo
+	or	a ; Se for zero, terminar.
+	ret	z
+	ld	b,a ; Transfere dados.
+	call	CH_EnviaDados
+
+	;A leitura abaixo é necessária para limpar o buffer de saída do CH376.
+	call	CH_PegaByteComRetardo ; Lê quantos bytes foram transferidos.
+
+	ld	a,#CMD_BYTE_WR_GO ; Prepara para passar ao próximo bloco de dados.
+	call	CH_EnviaComandoComRetardo
+	jr	BD_EscreveDados_Laco
+
+	; ----- Se A contiver o caracter '~', substitui-o por '='.
+
+BD_Aux_TilParaIgual:
+	cp	#'~'
+	ret	nz
+	ld	a,#'='
+	ret
+
+	; ----- Se A contiver o caracter '=', substitui-o por '~'.
+
+BD_Aux_IgualParaTil:
+	cp	#'='
+	ret	nz
+	ld	a,#'~'
+	ret
+
+	; =======
+	; PATCHES
+	; =======
+
+	; ----- Inicialização.
+	; [PATCH: A instrução em 0xc000 (jp ST) foi substituída por um jump
+	; para o ponto de entrada desta rotina.]
+
+Patch_BD_Inicializa:
+	im	1
+	ld	sp,#0x0200 ; A RAM começa em 0x0000, logo já temos que definir o SP.
+
+	di
+	push	hl
+	call	BD_Inicializa
+	pop	hl
+	;ei
+
+	; Retorna à programação normal.
+	jp	ST ; Continua a partida a frio do MC-1000.
+
+	; ----- Imprime mensagem de OS e continua execução da partida a frio.
+	; [PATCH: A instrução em 0xcf2d (ld sp,0x0351) foi substituída por um jump
+	; para o ponto de entrada desta rotina.]
+
+Patch_BD_Manifesta:
+	ld	hl,#str_BLUEDRIVE
+	call	PrintStrHL
+
+	; Retorna à programação normal.
+	ld	sp,#0x0351 ; Executa instrução substituída.
+	jp	0xcf30 ; Retoma sequência original de inicialização.
+
+
+	; =============================
+	; EXTENSÕES AO BASIC DO MC-1000
+	; =============================
+
+	; Propostas:
+
+	; LOAD ? -- Lista diretório atual ("CAT").
+	; LOAD "/ -- Muda para o diretório raiz.
+	; LOAD "subdir -- Muda para o subdiretório.
+	; LOAD "programa.bas -- Carrega programa em BASIC.
+	; LOAD "programa.bas,R -- Carrega e executa programa em BASIC.
+	; LOAD "matriz.dat,*aa -- Carrega matriz numérica aa() em BASIC.
+	; LOAD "?aa$ -- Nome do arquivo/diretório indicado na variável string $aa.
+	; LOAD ",Pposição -- Posiciona o ponteiro do arquivo.
+	; LOAD ",Mendereço[:comprimento] -- Carrega dados para a memória.
+	; LOAD ",Saa$[:comprimento] -- Carrega dados para a variável string aa$.
+	; LOAD ",Saa[:comprimento] -- Carrega string, converte em numérico e armazena na variável numérica aa.
+	; LOAD ",Baa -- Carrega byte para a variável numérica aa.
+	; LOAD ",Waa -- Carrega palavra (2 bytes) para a variável numérica aa.
+	; LOAD ",Faa -- Carrega número de ponto flutuante (4 bytes) para a variável numérica aa.
+	; LOAD ",E -- Posiciona o ponteiro no fim do arquivo.
+	; Se a sequência de comandos terminar com ",", o arquivo continuará aberto para instruções subsequentes.
+	; LOAD " -- Sem nada após as aspas fecha o arquivo aberto.
+
+	; SAVE "programa.bas -- Salva programa em BASIC.
+	; SAVE "matriz.dat,*aa -- Salva matriz numérica aa() em BASIC.
+	; SAVE "?aa$ -- Nome do arquivo/diretório indicado na variável string $aa.
+	; SAVE ",Pposição -- Posiciona o ponteiro do arquivo.
+	; SAVE ",Mendereço:comprimento -- Salva dados da memória.
+	; SAVE ",Saa$[:comprimento] -- Salva conteúdo da string aa$.
+	; SAVE ",Saa[:comprimento] -- Salva valor da variável numérica aa convertido em string.
+	; SAVE ",S"caracteres" -- Salva os caracteres entre aspas.
+	; SAVE ",Baa -- Salva byte correspondente ao valor da variável numérica aa.
+	; SAVE ",Waa -- Salva palavra (2 bytes) correspondente ao valor da variável numérica aa.
+	; SAVE ",Faa -- Salva número de ponto flutuante (4 bytes) correspondente ao valor da variável numérica aa.
+	; SAVE ",E -- Posiciona o ponteiro no fim do arquivo.
+	; Se a sequência de comandos terminar com ",", o arquivo continuará aberto para instruções subsequentes.
+	; SAVE " -- Sem nada após as aspas fecha o arquivo aberto.
+	; SAVE ",D -- Deleta o arquivo ou diretório aberto.
+
+	; TLOAD "programa.bin -- Carrega e executa programa em código de máquina.
+	; TLOAD "?aa$ -- Nome do arquivo indicado na variável string $aa.
+	
+	; ----------
+	
+	; Indicador do comando selecionado, a armazenar no registrador D:
+	
+	IndComSAVE	.equ	0b00000001 ; Bit 0 indica SAVE.
+	IndComLOAD	.equ	0b00000010 ; Bit 1 indica LOAD.
+	IndComTLOAD	.equ	0b00000100 ; Bit 2 indica TLOAD.
+
+	; ----- [ LOAD <?> ]
+
+Patch_BD_LOAD:
+	cp	#'?' ; Se após o token "LOAD" vier "?", lista o diretório atual.
+	jp	z,BD_CAT
+	cp	#'"' ; Se não vierem aspas, retoma a interpretação original de LOAD.
+	jp	nz,BASIC_LOAD
+
+	ld	d,#IndComLOAD ; Indica comando LOAD.
+	jr	BD_CMD
+
+	; ----- [ TLOAD <?> ]
+
+Patch_BD_TLOAD:
+	jp	z,BASIC_TLOAD ; Se não houver parâmetro, retoma a interpretação original de TLOAD.
+	cp	#'"' ; Se não vierem aspas, termina comando (dará erro de sintaxe).
+	ret	nz
+
+	ld	d,#IndComTLOAD ; Indica comando TLOAD.
+	jr	BD_CMD
+
+	; ----- [ SAVE <?> ]
+
+Patch_BD_SAVE:
+	cp	#'"' ; Se não vierem aspas, retoma a interpretação original de SAVE.
+	jp	nz,BASIC_SAVE
+
+	ld	d,#IndComSAVE ; Indica comando SAVE.
+	;jr	BD_CMD
+
+	; ----- [ <comando> " <?> ]
+
+BD_CMD:
+	call	NextNSpc ; Qual o caracter após as aspas?
+	jr	z,BD_CMD_SemCaminho ; Fim da linha ou vírgula?
+	cp	#','
+	jr	z,BD_CMD_SemCaminho
+
+	push	de ; Preserva indicador de comando.
+
+	cp	#'?'
+	jr	z,BD_CMD_CaminhoVar
+
+	; ----- [ <comando> " <caminholiteral> <?> ]
+	; Caminho literal.
+	; ----------
+
+	ld	c,#',' ; Delimitador do fim da string (além de NUL).
+	call	BD_DefCaminhoNULC
+	jr	BD_CMD_AposCaminho
+
+	; ----- [ <comando> "? <variável$> <?> ]
+	; Caminho em variável string.
+	; ----------
+
+BD_CMD_CaminhoVar:
+	call	NextNSpc
+	call	GETVAR ; Obtém ponteiro para o conteúdo da variável (4 bytes) em DE.
+	call	TSTSTR ; Emite "TI erro" se não string.
+
+	push	hl ; Salva ponto de interpretação do BASIC.
+	ex	de,hl
+	ld	b,(hl) ; Tamanho da string.
+	inc	hl
+	inc	hl
+	ld	e,(hl) ; Endereço do conteúdo da string.
+	inc	hl
+	ld	d,(hl)
+	ex	de,hl
+	call	BD_DefCaminho
+	pop	hl ; Restaura ponto de interpretação do BASIC.
+
+	; ----- [ <comando> " <caminho> <?> ]
+
+BD_CMD_AposCaminho:
+	pop	de ; Restaura indicador de comando.
+	dec	hl
+	call	NextNSpc
+	jr	nz,BD_CMD_VirgulaAposCaminho
+
+	; ----- [ <comando> " <caminho> <NUL> ]
+
+BD_CMD_NULAposCaminho:
+	bit	0,d
+	jr	nz,BD_SAVE
+	bit	1,d
+	jr	nz,BD_LOAD
+	jp	BD_TLOAD
+
+	; ----- [ <comando> " <caminho> , <?> ]
+
+BD_CMD_VirgulaAposCaminho:
+	; O comando TLOAD não admite outros argumentos além do caminho do arquivo.
+
+	bit	2,d ; Emite "SN erro" se o comando é TLOAD.
+	jp	nz,SNErro
+	
+	; A partir daqui o comando só pode ser SAVE ou LOAD.
+
+	call	ChkSyn
+	.db	','
+
+	cp	#'*'
+	jp	z,BD_CMD_Asterisco
+
+	cp	#'R'
+	jp	z,BD_CMD_R
+
+	cp	#'D'
+	jp	z,BD_CMD_D
+
+	; Se não foi nenhum desses subcomandos,
+	; vamos passar aos subcomandos sequenciáveis.
+	; Para isso, devemos abrir o arquivo.
+	; Se ele não existir e o comando foi SAVE,
+	; devemos criá-lo.
+
+	call	BD_AbreArqDir
+	cp	#USB_INT_SUCCESS ; Era arquivo e abriu com sucesso? Desvia.
+	jr	z,BD_CMD_VirgulaAposCaminho_0
+
+	cp	#ERR_OPEN_DIR ; Era diretório e abriu com sucesso? Nada mais se pode fazer. Termina deixando-o aberto.
+	ret	z
+
+	bit	1,d ; Se não abriu e comando foi LOAD...
+	jp	nz,PIErro ; ...emite "PI erro".
+
+	cp	#ERR_MISS_FILE ; Se era SAVE... arquivo inexistente?
+	call	z,BD_CriaArquivo ; Tenta criar arquivo.
+	jp	nz,PIErro ; Emite "PI erro" se arquivo não foi criado.
+
+BD_CMD_VirgulaAposCaminho_0:
+	; O arquivo foi aberto/criado com sucesso.
+	dec	hl ; Recua ponteiro de interpretação do BASIC para NextNSpc.
+	jr	BD_CMD_Virgula
+
+	; ----- [ <comando> " <?> ]
+	; Não foi fornecido caminho após as aspas.
+	; ----------
+
+BD_CMD_SemCaminho:
+	bit	2,d
+	jp	nz,SNErro ; Emite "SN erro" se não foi informado caminho para TLOAD.
+
+	; ----- [ <comando> " <...> <?> ]
+	; Fim da linha ou vírgula introduzindo subcomando sequenciável.
+	; ----------
+
+BD_CMD_NULOuVirgula:
+	ld	a,(hl)
+	cp	#','
+	jp	z,BD_CMD_Virgula
+
+	or	a
+	jp	nz,SNErro ; Emite "SN erro" se caracter atual não é NUL nem  vírgula.
+
+	; ----- [ <comando> " <...> <NUL> ]
+	; Fim da linha: Termina fechando arquivo.
+	; ----------
+
+	push	hl ; Preserva ponto de interpretação do BASIC.
+	call	BD_FechaArqDir
+	call	BD_AbreDirRaiz ; Reabre o diretório raiz após o fechamento para o CAT poder funcionar.
+	pop	hl ; Restaura ponto de interpretação do BASIC.
+	ret
+
+	; ----- [ <comando> " <...> , <?> ]
+	; Vírgula: Segue-se fim de linha ou subcomando sequenciável.
+	; ----------
+
+BD_CMD_Virgula:
+	call	NextNSpc
+
+	; ----- [ <comando> " <...> , <NUL> ]
+	; Fim de linha após vírgula: Termina mantendo arquivo aberto.
+	; ----------
+	ret	z
+
+	; ----- [ <comando> " <...> , <...> ]
+
+BD_CMD_Sequenciaveis:
+	push	de ; Preserva indicador de comando.
+	call	BD_CMD_Sequenciaveis_0
+	pop	de ; Restaura indicador de comando.
+	call	NextNSpc
+	jr	BD_CMD_NULOuVirgula
+
+	; ----- [ SAVE " <caminho> ]
+	; Salva programa BASIC e termina.
+	; -----------
+
+BD_SAVE:
+	push	hl ; Preserva ponto de interpretação do BASIC.
+
+	call	BD_CriaArquivo
+	cp	#USB_INT_SUCCESS
+	jp	nz,PIErro
+
+	ld	hl,(PROGND)
+	ld	de,(BASTXT)
+	or	a
+	sbc	hl,de
+	ld	c,l
+	ld	b,h
+	ex	de,hl
+
+	call	BD_EscreveDados
+	call	BD_FechaArqDir
+	call	BD_AbreDirRaiz ; Reabre o diretório raiz após o fechamento para o CAT poder funcionar.
+	
+	pop	hl ; Restaura ponteiro de interpretação do BASIC.
+	ret
+
+	; ----- [ LOAD " <caminho> ]
+
+BD_LOAD:
+	call	BD_AbreArqDir
+	jp	nz,PIErro ; Erro se não abriu arquivo nem diretório com sucesso.
+	
+	cp	#ERR_OPEN_DIR ; Se abriu diretório com sucesso, termina.
+	ret	z
+
+	; Carrega programa BASIC.
+	call	NEW ; Apaga programa e variáveis.
+
+	ld	hl,(BASTXT)
+	ld	bc,#0xffff
+	call	BD_LeDados
+
+	ld	(PROGND),hl
+
+	call	PrintCRLF
+	ld	hl,#szOK
+	call	PrintStrHL
+
+	jp	SETPTR
+
+	; ----- [ TLOAD " <caminho> ]
+
+BD_TLOAD:
+	call	BD_AbreArqDir
+	cp	#USB_INT_SUCCESS ; Erro se não abriu o arquivo com sucesso.
+	jp	nz,PIErro
+
+	di
+
+	ld	sp,#0x0100 ; Reposiciona pilha durante a carga.
+
+	ld	hl,#0x0100
+	ld	bc,#0xffff
+	call	BD_LeDados
+
+	jp	ExecAposTLOAD
+
+	; ----- [ <comando> "<caminho> , * <matriz> ]
+
+BD_CMD_Asterisco:
+	call	NextNSpc ; Avança ponteiro de interpretação do BASIC.
+
+	push	de ; Preserva indicador de comando.
+
+	bit	1,d ; Checa se comando é LOAD...
+	push	af ; ...e preserva o flag Z resultante.
+
+	ld	a,#1 ; Indica busca por matriz.
+	ld	(FORFLG),a
+	call	GETVAR ; BC=Endereço da matriz, DE=Tamanho da matriz.
+	ld	(FORFLG),a ; Restaura busca por variável simples.
+	call	TSTNUM ; Se matriz string, emite "TI erro".
+
+	; Informação apontada por BC:
+	; - quantidade de dimensões (1 byte)
+	; - sequência de índices máximos (2 bytes para cada dimensão)
+	; - sequência de dados (4 bytes para cada valor)
+
+	; Os comandos SAVE* e LOAD* só transferem os dados puros,
+	; sem as metainformações de tamanho de matriz.
+
+	push	hl ; Preserva ponteiro de interpretação do BASIC.
+
+	ld	h,b ; DE=Endereço de fim da matriz + 1.
+	ld	l,c
+	ex	de,hl
+	add	hl,de
+	ex	de,hl
+
+	ld	c,(hl) ; HL=Endereço do início dos dados (=endereço da matriz + 1 + 2 x quantidade de dimensões).
+	ld	b,#0
+	add	hl,bc
+	add	hl,bc
+	inc	hl
+
+	or	a ; BC=Quantidade de bytes de dados (HL-DE).
+	ex	de,hl
+	sbc	hl,de
+	ld	c,l
+	ld	b,h
+	ex	de,hl
+
+	pop	de ; Restaura ponteiro de interpretação do BASIC em DE.
+	pop	af ; Restaura flag Z resultante de checagem de indicador de comando acima.
+	push	de ; Preserva ponteiro de interpretação de novo.
+
+	jr	nz,BD_LOAD_Asterisco
+
+	; ----- [ SAVE " <caminho> , * <matriz> ]
+	; Salva matriz do BASIC.
+	; ----------
+
+BD_SAVE_Asterisco:
+	call	BD_CriaArquivo
+	jp	nz,PIErro ; Erro se não criou arquivo com sucesso.
+	call	BD_EscreveDados
+	jr	BD_CMD_Asterisco_0
+
+	; ----- [ LOAD " <caminho> , * <matriz> ]
+	; Carrega matriz do BASIC.
+	; ----------
+
+BD_LOAD_Asterisco:
+	call	BD_AbreArqDir
+	cp	#USB_INT_SUCCESS ; Erro se não abriu o arquivo com sucesso.
+	jp	nz,PIErro
+	call	BD_LeDados
+
+BD_CMD_Asterisco_0:
+	call	BD_FechaArqDir
+	call	BD_AbreDirRaiz ; Reabre o diretório raiz após o fechamento para o CAT poder funcionar.
+	
+	pop	hl ; Restaura ponteiro de interpretação do BASIC.
+	pop	de ; Restaura indicador de comando.
+	ret
+
+	; ----- [ <comando> " <caminho> , R ]
+
+BD_CMD_R:
+	bit	1,d ; Emite "SN erro" se não for LOAD.
+	jp	z,SNErro
+
+	; ----- [ LOAD " <caminho> , R ]
+	; Carrega programa BASIC e executa.
+	; ----------
+
+BD_LOAD_R:
+	call	NextNSpc
+
+	ld	a,#1 ; Indica execução automática após a carga.
+	ld	(Autoexec),a
+
+	jp	BD_LOAD
+
+	; ----- [ <comando> " <caminho> , D ]
+
+BD_CMD_D:
+	bit	0,d ; Emite "SN erro" se não for SAVE.
+	jp	z,SNErro
+
+	; ----- [ SAVE " <caminho> , D ]
+	; Deleta arquivo e termina.
+	; ----------
+
+BD_SAVE_D:
+	call	NextNSpc
+	call	BD_ApagaArqDir
+	jp	BD_AbreDirRaiz ; Reabre o diretório raiz após a deleção para o CAT poder funcionar.
+
+	; ----- Interpretação dos subcomandos sequenciáveis.
+
+BD_CMD_Sequenciaveis_0:
+	ld	a,(hl) ; A = caracter no ponteiro de interpretação do BASIC.
+
+	cp	#'E'
+	jr	z,BD_CMD_E
+
+	cp	#'P'
+	jr	z,BD_CMD_P
+
+	cp	#'M'
+	jr	z,BD_CMD_M
+
+	cp	#'S'
+	jr	z,BD_CMD_S
+
+	cp	#'B'
+	jp	z,BD_CMD_B
+
+	cp	#'W'
+	jp	z,BD_CMD_W
+
+	cp	#'F'
+	jp	z,BD_CMD_F
+
+	jp	SNErro
+
+	; ----- [ <comando> " <...> , E <?> ]
+	; Move o ponteiro para o fim do arquivo.
+	; ----------
+
+BD_CMD_E:
+	jp	BD_MovePonteiroFim
+
+	; ----- [ <comando> " <...> , P <posição> <?> ]
+	; Move o ponteiro do arquivo.
+	; <posição> deve ser um inteiro positivo de 24 bits (0 a 16.777.215).
+	; Pode ser um literal numérico ou uma variável.
+	; ----------
+
+BD_CMD_P:
+	call	FPSINT ; Avança ponteiro de interpretação do BASIC, interpreta número (positivo, senão emite "PI erro") e obtém seu valor inteiro em BCDE (B=0).
+	call	BD_MovePonteiro
+	dec	hl ; Recua ponteiro de interpretação do BASIC.
+	ret
+
+	; ----- [ <comando> " <...> , M <endereço> [ : <comprimento> ] <?> ]
+	; Transfere um bloco de dados de/para a memória.
+	; <endereço> e <comprimento> devem ser inteiros positivos de 16 bits (0 a 65.535).
+	; Podem ser literais numéricos ou variáveis.
+	; Se o parâmetro <comprimento> for omitido, assume-se 0xffff.
+	; ----------
+
+BD_CMD_M:
+	bit	1,d ; Checa se indicador de comando é LOAD...
+	push	af ; ...e preserva o bit Z resultante.
+	call	FPSINT ; Avança ponteiro de interpretação do BASIC, interpreta número (positivo, senão emite "PI erro") e obtém seu valor inteiro em BCDE (B=0).
+	ld	bc,#0xffff ; Comprimento default.
+	ld	a,(hl)
+	cp	#':' ; Parâmetro <comprimento> foi especificado?
+	jr	nz,BD_CMD_M_0 ; Não: desvia.
+	push	de ; Preserva parâmetro <endereço>.
+	call	FPSINT ; Avança ponteiro de interpretação do BASIC, interpreta número (positivo, senão emite "PI erro") e obtém seu valor inteiro em BCDE (B=0).
+	ld	c,e ; Parâmetro <comprimento> em BC.
+	ld	b,d
+	pop	de ; Restaura parâmetro <endereço> em DE.
+BD_CMD_M_0:
+	pop	af ; Restaura flag Z indicando comando.
+	push	hl ; Preserva ponteiro de interpretação do BASIC.
+	ex	de,hl ; Parâmetro <endereço> em HL.
+	jr	nz,BD_LOAD_M
+
+	; ----- [ SAVE " <...> , M <endereço> [ : <comprimento> ] <?> ]
+
+BD_SAVE_M:
+	call	BD_EscreveDados
+	jr	BD_CMD_M_1
+
+	; ----- [ LOAD " <...> , M <endereço> [ : <comprimento> ] <?> ]
+
+BD_LOAD_M:
+	call	BD_LeDados
+
+BD_CMD_M_1:
+BD_CMD_S_1:
+	pop	hl ; Restaura ponteiro de interpretação do BASIC.
+	dec	hl ; ...e recua. (NextNSpc começa incrementando.)
+	ret
+
+	; ----- [ <comando> " <...> , S <variável$> [ : <comprimento> ] <?> ]
+	; Transfere dados entre uma variável string e o arquivo aberto.
+	; ----------
+
+BD_CMD_S:
+	call	NextNSpc ; Avança ponteiro de interpretação do BASIC.
+	bit	1,d ; Checa se comando é LOAD...
+	push	af ; ...e preserva flag Z resultante.
+	push	af ; De novo.
+	call	z,EVAL ; Se comando é SAVE, avalia expressão e coloca valor em FPREG.
+	pop	af ; Restaura flag Z que indica se comando é LOAD.
+	call	nz,GETVAR ; Se comando é LOAD, obtém ponteiro para o conteúdo da variável (4 bytes) em DE.
+
+	; ----- Obtém parâmetro opcional comprimento.
+
+	ld	a,(hl) ; Caracter no ponto de interpretação do BASIC é dois-pontos?
+	cp	#':'
+	ld	b,#0x00
+	jr	nz,BD_CMD_S_0 ; Não: Parâmetro comprimento não foi informado. Desvia com B = 0.
+	push	de ; Preserva ponteiro para o conteúdo da variável.
+	ld	a,(TYPE)
+	push	af ; Preserva tipo do valor/variável.
+	call	STAKFP ; Preserva conteúdo de FPREG na pilha do Z80.
+	call	FNDNUM ; Avança ponteiro de interpretação do BASIC, interpreta número (0 ~ 255, senão emite "PI ERRO") e obtém seu valor inteiro em A.
+	pop	bc ; Restaura conteúdo de FPREG preservado na pilha.
+	pop	de
+	call	FPBCDE
+	pop	bc ; Restaura tipo do valor/variável.
+	pop	de ; Restaura ponteiro para o conteúdo da variável.
+	ld	c,a ; Parâmetro comprimento em C.
+	ld	a,b ; Repõe tipo do valor/variável.
+	ld	(TYPE),a
+	ld	b,#0xff ; Indica que o parâmetro foi informado.
+
+BD_CMD_S_0:
+	pop	af ; Restaura flag Z que indica se comando é LOAD.
+	push	hl ; Preserva ponteiro de execução do BASIC.
+	jr	nz,BD_LOAD_S
+
+	; ----- [ SAVE " <...> , S <variável/valor> [ : <comprimento> ] <?> ]
+
+BD_SAVE_S:
+	push	bc ; Preserva parâmetro comprimento.
+	ld	a,(TYPE) ; Variável é string?
+	or	a
+	jr	nz,BD_SAVE_S_Str ; Sim, desvia.
+BD_SAVE_S_Num:
+	call	STRFLOAT ; Cria representação string de FPREG em PBUFF.
+	call	NewStrRec ; Cria string temporária e coloca endereço em FPREG.
+BD_SAVE_S_Str:
+	call	PopTmpStr ; Desempilha registro temporário de string. (A partir daqui o espaço usado pelo conteúdo da string vai estar disponível para a coleta de lixo.)
+	call	BCDEHL ; Copia para BCDE os 4 bytes apontados por HL. E = tamanho da string, BC = endereço do conteúdo da string.
+	ld	h,b ; HL aponta para o conteúdo da string.
+	ld	l,c
+	pop	bc ; Restaura parâmetro comprimento.
+	xor	a ; Parâmetro comprimento foi informado?
+	cp	b
+	ld	b,a ; Zera B para que BC seja o comprimento.
+	ld	d,a ; Zera quantidade de espaços a transferir depois da string.
+	jr	z,BD_SAVE_S_Str_0 ; Não: Transfere string com seu comprimento original, sem espaços depois.
+	ld	a,c ; Parâmetro comprimento é maior que o tamanho da string?
+	sub	e
+	jr	c,BD_SAVE_S_Str_1 ; Não: Transfere apenas os caracteres indicados pelo parâmetro comprimento, sem espaços depois.
+	ld	d,a ; Sim: Transfere string com seu comprimento original + diferença em espaços.
+BD_SAVE_S_Str_0:
+	ld	c,e ; Transfere string com seu comprimento original.
+BD_SAVE_S_Str_1:
+	; Neste ponto:
+	; HL = endereço do conteúdo da string.
+	; BC = quantidade de bytes da string a transferir.
+	; D = quantidade de espaços a transferir após a string.
+	call	BD_EscreveDados ; Transfere string.
+	ld	a,d ; Termina se a quantidade de espaços a transferir for 0.
+	or 	a
+	jr	z,BD_CMD_S_1
+	; Cria uma string de espaços para transferir.
+	call	Aloca ; Aloca A bytes na área de strings. (Não vamos ancorar essa área em nenhum registro de string, o espaço será recuperado pela próxima coleta de lixo.)
+	ld	h,d ; Preserva endereço do conteúdo da string em HL.
+	ld	l,e
+	ld	b,a ; Comprimento da string em B.
+	ld	c,a ; Comprimento da string em C.
+	ld	a,#' ' ; Preenche string com espaços.
+BD_SAVE_Str_Espacos_Laco:
+	ld	(de),a
+	inc	de
+	djnz	BD_SAVE_Str_Espacos_Laco ; Ao final do laço, B = 0 então BC contém o comprimento da string de espaços.
+	call	BD_EscreveDados ; Transfere string de espaços e termina.
+	jr	BD_CMD_S_1
+
+	; ----- [ LOAD " <...> , S <variável> [ : <comprimento> ] <?> ]
+
+BD_LOAD_S:
+	push	de ; Preserva endereço do conteúdo da variável.
+	ld	a,(TYPE) ; Preserva o tipo da variável.
+	push	af
+	ld	a,b ; Parâmetro comprimento foi informado (B=0xff) ou não (B=0)?
+	cpl
+	or	c ; Sim: Usa esse valor. Não: Assume comprimento máximo para string (255 caracteres).
+	call	MKTMST ; Aloca A bytes na área de strings e cria registro de string em TMPSTR.
+	ld	h,d ; Endereço do conteúdo da string em HL (e DE).
+	ld	l,e
+	ld	b,#0 ; Comprimento da string em BC.
+	ld	c,a
+	call	BD_LeDados
+	or	a ; Quantidade de bytes efetivamente transferidos em A.
+	sbc	hl,de
+	ld	a,l
+	ld	(TMPSTR),a ; Modifica o registro de string corrigindo ou confirmando o comprimento da string. O pedaço que ficou órfão será reaproveitado pela coleta de lixo.
+
+	; Prepara chamada a TSTOPL para transferir o registro
+	; de string em TMPSTR à pilha de registros temporários
+	; de string.
+	ld	hl,#BD_LOAD_S_0 ; Forja retorno.
+	push	hl
+	push	hl ; TSTOPL faz um POP HL antes de RET. Empilhamos mais alguma informação qualquer irrelevante.
+	jp	TSTOPL ; Acrescenta o registro de string em TMPSTR à pilha de registros temporários de strings.
+
+BD_LOAD_S_0:
+	pop	af ; Restaura tipo da variável.
+	or	a
+	jr	nz,BD_LOAD_S_Str
+BD_LOAD_S_Num:
+	call	VAL ; Converte string em numérico em FPREG.
+	pop	hl ; Restaura endereço do conteúdo da variável.
+	call	FPTHL ; Transfere o número de ponto flutuante em FPREG para o endereço do conteúdo da variável.
+	jp	BD_CMD_S_1 ; Termina.
+
+BD_LOAD_S_Str:
+	; Prepara chamada a LETSTR
+	; para atribuir o registro de string à variável.
+	pop	hl ; Restaura endereço do conteúdo da variável.
+	ld	de,#BD_CMD_S_1 ; Forja retorno.
+	push	de
+	push	de ; LETSTR faz um POP HL antes de RET. Empilhamos mais alguma informação qualquer irrelevante.
+	jp	LETSTR ; Atribui registro de string apontado por FPREG à variável cujo conteúdo está apontado por HL.
+
+	; ----- [ <comando> " <...> , B <?> ]
+
+BD_CMD_B:
+	ld	bc,#1 ; Quantidade de bytes a transferir.
+	jr	BD_CMD_B_0
+
+	; ----- [ <comando> " <...> , W <?> ]
+
+BD_CMD_W:
+	ld	bc,#2 ; Quantidade de bytes a transferir.
+BD_CMD_B_0:
+	bit	1,d ; Desvia se comando for LOAD.
+	jr	nz,BD_LOAD_W
+
+	; ----- [ SAVE " <...> , B <valor> <?> ]
+	; ----- [ SAVE " <...> , W <valor> <?> ]
+	; Transfere um inteiro de um ou dois bytes para o arquivo.
+	; ----------
+
+BD_SAVE_B:
+BD_SAVE_W:
+	push	bc ; Preserva quantidade de bytes a transferir.
+	call	FPSINT ; Avança ponteiro de interpretação do BASIC, interpreta número (positivo, senão emite "PI erro") e obtém seu valor inteiro em BCDE (B=0).
+	ex	(sp),hl ; Preserva ponteiro do BASIC; restaura quantidade de bytes a transferir...
+	push	hl ; ...e preserva de novo.
+	call	FPBCDE ; Armazena valor em BCDE em FPREG.
+	pop	bc ; Restaura quantidade de bytes a transferir.
+BD_SAVE_F_0:
+	ld	hl,#FPREG
+	call	BD_EscreveDados
+	pop	hl ; Restaura ponteiro de interpretação do BASIC.
+	dec	hl ; ...e recua. (NextNSpc começa incrementando.)
+	ret
+
+	; ----- [ LOAD " <...> , B <variável> <?> ]
+	; ----- [ LOAD " <...> , W <variável> <?> ]
+	; Transfere um inteiro de um ou dois bytes para uma variável.
+	; ----------
+
+BD_LOAD_B:
+BD_LOAD_W:
+	push	hl ; Salva ponteiro de interpretação do BASIC.
+	ld	hl,#FPREG+1 ; Zera segundo byte no buffer de leitura (para o caso de só se ler um).
+	ld	(hl),#0
+	dec	hl ; Lê BC bytes do arquivo para FPREG.
+	call	BD_LeDados
+	ld	bc,(FPREG) ; Obtém byte/palavra lida em AC.
+	ld	a,b
+	call	ACPASS ; Converte um inteiro de 2 bytes em AC para ponto flutuante em FPREG.
+BD_LOAD_F_0:
+	pop	hl ; Restaura ponteiro de interpretação do BASIC.
+	call	NextNSpc ; Avança ponteiro de interpretação do BASIC.
+	call	GETVAR ; Obtém ponteiro para o conteúdo da variável (4 bytes) em DE.
+	call	TSTNUM ; Emite "TI erro" se não numérico.
+	push	hl ; Preserva ponteiro de interpretação do BASIC.
+	ex	de,hl ; Endereço do conteúdo da variável em HL.
+	call	FPTHL ; Copia FFREG para a variável.
+	pop	hl ; Restaura ponteiro de interpretação do BASIC.
+	dec	hl ; ...e recua. (NextNSpc começa incrementando.)
+	ret
+
+	; ----- [ <comando> " <...> , F <?> ]
+
+BD_CMD_F:
+	bit	1,d ; Desvia se comando for LOAD.
+	jr	nz,BD_LOAD_F
+
+	; ----- [ SAVE " <...> , F <valor> <?> ]
+	; Transfere um número de ponto flutuante (4 bytes) para o arquivo.
+	; ----------
+
+BD_SAVE_F:
+	call	NextNSpc ; Avança ponteiro de interpretação do BASIC.
+	call	GETNUM ; Avalia expressão e testa se é numérico. Caso negativo, emite "TI erro".
+	push	hl ; Preserva ponteiro de interpretação do BASIC.
+	ld	bc,#4 ; Quantidade de bytes a transferir.
+	jr	BD_SAVE_F_0
+
+	; ----- [ LOAD " <...> , F <variável> <?> ]
+	; Transfere um número de ponto flutuante (4 bytes) para uma variável.
+	; ----------
+
+BD_LOAD_F:
+	push	hl ; Preserva ponteiro de interpretação do BASIC.
+	ld	hl,#FPREG
+	ld	bc,#4
+	call	BD_LeDados
+	jr	BD_LOAD_F_0
+
+	; ----- [ LOAD ? ]
+	; Lista diretório com paginação ("CAT").
+	; ----------
+
+BD_CAT:
+	; Avança e preserva ponteiro de interpretação do programa BASIC.
+	call	NextNSpc
+	push	hl
+
+BD_CAT_Todos:
+	; Abre arquivo "*".
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_SET_FILE_NAME
+	.ascii	"*"
+	.db	NUL
+	.db	0xff
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_FILE_OPEN
+	.db	0xfe
+
+	; O ponteiro já fica posicionado no primeiro item de diretório.
+	; Basta pegarmos os dados.
+
+BD_CAT_Laco:
+	; Termina CAT se não há o que ler.
+	cp	#USB_INT_DISK_READ
+	jr	nz,BD_CAT_Termina
+
+	; Obtém dados do item de diretório.
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_RD_USB_DATA0
+	.db	0xff
+
+	; Conteúdo obtido a cada vez (registro de diretório FAT, 32 bytes):
+	; UINT8	DIR_Name[8+3]
+	; UINT8	DIR_Attr
+	; UINT8	DIR_NTRes
+	; UINT8	DIR_CrtTimeTenth
+	; UINT16	DIR_CrtTime
+	; UINT16	DIR_CrtDate
+	; UINT16	DIR_LstAccDate
+	; UINT16	DIR_FstAccDate
+	; UINT16	DIR_WrtTime
+	; UINT16	DIR_WrtDate
+	; UINT16	DIR_FstClusLO
+	; UINT32	DIR_FileSize
+
+	; Os bits de DIR_Attr significam:
+	; 0 = Read only
+	; 1 = Hidden
+	; 2 = System
+	; 3 = Volume ID
+	; 4 = Directory
+	; 5 = Archive
+	; 0+1+2+3 = Long name
+	; 0+1+2+3+4+5 = Long name mask
+
+	call	CH_PegaByteComRetardo ; Pega quantos bytes vai transferir. Deve ser 32.
+	or	a ; Termina CAT se forem 0 bytes.
+	jr	nz,BD_CAT_Transfere
+
+BD_CAT_Termina:
+	pop	hl ; Restaura ponteiro de interpretação do programa BASIC.
+	ret ; Retorna ao interpretador BASIC.
+
+BD_CAT_Transfere:
+	ld	b,a ; Preserva em B a quantidade de bytes a transferir.
+BD_CAT_Transfere_Laco:
+	call	CH_PegaByteComRetardo
+	ld	c,a ; Preserva em C o byte lido.
+	; Em que ponto dos dados estamos?
+	ld	a,b
+	cp	#32 - 11
+	jr	z,BD_CAT_Transfere_Atributo
+	jr	c,BD_CAT_Transfere_Resto
+
+BD_CAT_Transfere_NomeExtensao:
+	; Nome de arquivo / extensão: Imprime caracter.
+	ld	a,c
+	call	BD_Aux_TilParaIgual ; Substitui caracter '~' por '='.
+	call	PrintAPos
+	; Imprime espaço entre o nome e a a extensão.
+	ld	a,b
+	cp	#32 - 7
+	jr	nz,BD_CAT_Transfere_NomeExtensao_0
+	ld	a,#' '
+	call	PrintAPos
+BD_CAT_Transfere_NomeExtensao_0:
+	djnz	BD_CAT_Transfere_Laco
+	; O fim deste DJNZ não é atingido aqui.
+
+BD_CAT_Transfere_Atributo:
+	; Byte de atributo.
+	; Checa no se o item de diretório é diretório e preserva flag.
+	bit	4,c
+	push	af
+	djnz	BD_CAT_Transfere_Laco
+	; O fim deste DJNZ não é atingido aqui.
+
+BD_CAT_Transfere_Resto:
+	; Avança nos dados preservando sempre os quatro últimos em DEHL (no final será o tamanho do arquivo).
+	ld	l,h
+	ld	h,e
+	ld	e,d
+	ld	d,c
+	djnz	BD_CAT_Transfere_Laco
+
+BD_CAT_DirOuTamanho:
+	; Imprime dois espaços após nome do arquivo / extensão.
+	ld	a,#' '
+	call	PrintAPos
+	call	PrintAPos
+	pop	af ; Restaura flag indicando se o item de diretório é diretório.
+	jr	z,BD_CAT_Tamanho
+
+BD_CAT_Dir:
+	; Item de diretório é diretório.
+	; Imprime "<DIR>".
+	ld	hl,#str_DIR
+	call	PrintStrHL
+	jr	BD_CAT_CRLF
+
+BD_CAT_Tamanho:
+	; Item de diretório é arquivo.
+	; Imprime tamanho armazenado em DEHL (até 4 GB).
+	; Como não há na ROM uma rotina que imprima um inteiro de 32 bits,
+	; a partir de 65535 o tamanho será impresso em termos de KB, MB ou GB,
+	; desprezando-se a parte fracionária.
+	; A divisão será feita deslocando-se bits para a direita,
+	; até que a porção inteira esteja contida em HL.
+	ld	a,d
+	or	a
+	jr	nz,BD_CAT_Tamanho_1
+	; Tamanho = 0000.0000:____.____:____.____:____.____.
+	or	e
+	jr	nz,BD_CAT_Tamanho_0
+	; Tamanho = 0000.0000:0000.0000:____.____:____.____ (0 ~ 65535 bytes).
+	ld	bc,#0x0020 ; B = 0 bits a deslocar; C = ' '.
+	jr	BD_CAT_Tamanho_3
+BD_CAT_Tamanho_0:
+	; Tamanho = 0000.0000:XXXX.XXXX:____.____:____.____ (64 KB ~ 16 MB).
+	and	#0b11110000
+	jr	nz,BD_CAT_Tamanho_2
+	; Tamanho = 0000.0000:0000.XXXX:____.____:____.____ (64 KB ~ 1 MB).
+	ld	bc,#0x0a4b ; B = 10 bits a deslocar; C = 'K'.
+	jr	BD_CAT_Tamanho_3
+BD_CAT_Tamanho_1:
+	; Tamanho = XXXX.XXXX:____.____:____.____:____.____ (16 MB ~ 4 GB).
+	and	#0b11000000
+	jr	z,BD_CAT_Tamanho_2
+	; Tamanho = XX__:____:____.____:____.____:____.____ (1 GB ~ 4 GB).
+	ld	bc,#0x1e47 ; B = 30 bits a deslocar; C = 'G'.
+	jr	BD_CAT_Tamanho_3
+BD_CAT_Tamanho_2:
+	; Tamanho = 00XX.XXXX:XXXX.XXXX:____.____:____.____ (1 MB ~ 1 GB).
+	ld	bc,#0x144d ; B = 20 bits a deslocar; C = 'M'.
+	; jr	BD_CAT_Tamanho_3
+BD_CAT_Tamanho_3:
+	; Realiza DEHL >> B.
+	inc	b
+	jr	BD_CAT_Tamanho_4
+BD_CAT_Tamanho_Laco:
+	srl	d
+	rr	e
+	rr	h
+	rr	l
+BD_CAT_Tamanho_4:
+	djnz	BD_CAT_Tamanho_Laco
+	; Imprime tamanho.
+	push	bc ; Preserva unidade.
+	call	PrintHL
+	pop	bc
+	; Imprime unidade.
+	ld	a,c
+	call	PrintAPos
+
+BD_CAT_CRLF:
+	call	TrataCtrlSC
+	call	PrintCRLF
+
+	; Avança para o próximo item de diretório.
+	call	CH_EnviaSequenciaDaqui
+	.db	CMD_FILE_ENUM_GO
+	.db	0xfe
+
+	jp	BD_CAT_Laco
+
+	; =======
+	; STRINGS
+	; =======
+
+str_BLUEDRIVE:	.ascii	"BLUEDRIVE OS V1.0"
+	.db	0x0d,0x0a,0x0a,NUL
+str_DIR:	.ascii	"<DIR>"
+	.db	NUL
+str_Raiz:	.ascii "/"
+	.db	NUL
