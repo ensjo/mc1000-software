@@ -2,7 +2,9 @@ SAMURAIS VS. YOUKAIS
 
 Jogo de tabuleiro, 1 jogador (contra o computador) ou 2 jogadores. Modo HGR.
 
-* Código original: https://archive.org/details/micomBASIC19841994, https://archive.org/download/micomBASIC19841994/%E3%83%9E%E3%82%A4%E3%82%B3%E3%83%B3BASIC%201988-04.pdf, pp. 135-137.
+* Código original: https://archive.org/details/micomBASIC19841994,
+  https://archive.org/download/micomBASIC19841994/%E3%83%9E%E3%82%A4%E3%82%B3%E3%83%B3BASIC%201988-04.pdf,
+  pp. 135-137.
 
 Objetivo: Derrotar o time adversário, matando seu general (Xogum ou Shinigami).
 
@@ -12,8 +14,10 @@ As unidades de cada time iniciam o jogo nas respectivas bases. Um caminho de 64 
 
 Cada jogador, em sua vez, escolhe uma unidade, lança o dado para saber quantas casas vai andar e decide se avança ou recua no caminho.
 
-A unidade mata as unidades adversárias mais fracas pelas quais passar. As mais fortes permanecem.
-
-Uma unidade mais fraca pode matar uma unidade de força igual ou maior se o movimento terminar exatamente na casa onde essa unidade está.
+Ao recuar, uma unidade pode entrar de volta à sua base. Ao avançar, uma unidade não pode entrar na base adversária.
 
 Há dois atalhos no caminho, um pode ser percorrido pelo Ninja, o outro pela Bruxa.
+
+Ao andar, uma unidade mata as unidades adversárias mais fracas pelas quais passar. As mais fortes permanecem.
+
+Uma unidade mais fraca pode matar uma unidade de força igual ou maior se o movimento terminar exatamente na casa onde essa unidade está.
