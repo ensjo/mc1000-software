@@ -26,3 +26,5 @@ A versão 4 (2021-07-29) é uma adaptação desta versão de Jim Gerrie para MC1
 https://www.facebook.com/groups/731424100317748/posts/4095539113906213/?comment_id=4095541893905935
 https://www.youtube.com/watch?v=h99jU_szJu4
 
+
+A versão 5 (2021-10-29) modifica a primeira versão usando 3 tipos de caracteres em vez de dois. O resultado é mais parecido com o original do C64.
