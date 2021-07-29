@@ -1,0 +1,28 @@
+Há um famoso programinha de uma só linha para Commodore 64 que imprime um labirinto na tela de texto usando dois caracteres gráficos:
+
+	10 PRINT CHR$(205.5+RND(1)); : GOTO 10
+
+Estas são algumas adaptações para o MC-1000.
+
+
+A versão 1 (2019-08-09) é uma adaptação desta versão de David Maunder para VZ200 usando o modo Semigraphics 4 do MC6847:
+https://www.facebook.com/groups/4609469943/permalink/10151182539134944/
+
+	10 IFRND(2)=1,PRINTCHR$(138);:GOTO10ELSEPRINTCHR$(140);:GOTO10
+
+Os labirintos criados têm características diferentes das dos labirintos criados no C64.  
+
+
+A versão 2 (2019-08-10) foi feita em modo HGR (Resolution Graphics 6) para imitar a tela do C64.
+
+Curiosidade: Foi durante a criação deste programa que foi descoberto o bug dos comandos PLOT, UNPLOT, DRAW e UNDRAW:
+https://sites.google.com/site/ccemc1000/sistema/bugs
+
+
+A versão 3 (2019-08-12) foi feita novamente em Semigraphics 4, mas tentando reproduzir as características dos labirintos do C64.
+
+
+A versão 4 (2021-07-29) é uma adaptação desta versão de Jim Gerrie para MC10 usando o modo Semigráfico 6:
+https://www.facebook.com/groups/731424100317748/posts/4095539113906213/?comment_id=4095541893905935
+https://www.youtube.com/watch?v=h99jU_szJu4
+
