@@ -1,0 +1,3 @@
+Algoritmo de desenho de linhas.
+
+(Pode ser útil para desenhar em modos gráficos além do GR e HGR.)

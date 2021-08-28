@@ -1,0 +1,15 @@
+10  GR 
+20 X0 =  INT ( RND (1) * 128)
+25 Y0 =  INT ( RND (1) * 64)
+30 X1 =  INT ( RND (1) * 128)
+35 Y1 =  INT ( RND (1) * 64)
+40  COLOR  = 1: PLOT X0,Y0 TO X1,Y1
+50  COLOR  = 2: GOSUB 100
+60  GOTO 20
+100 DX = X1 - X0:AX =  INT ( ABS (DX)):SX =  SGN (DX)
+110 DY = Y1 - Y0:AY =  INT ( ABS (DY)):SY =  SGN (DY)
+120  IF AY > AX THEN 150
+130 Y = Y0:S =  INT (AX / 2): FOR X = X0 TO X1 STEP SX: PLOT X,Y:S = S + AY: IF S >= AX THEN S = S - AX:Y = Y + SY
+140  NEXT X: RETURN 
+150 X = X0:S =  INT (AY / 2): FOR Y = Y0 TO Y1 STEP SY: PLOT X,Y:S = S + AX: IF S >= AY THEN S = S - AY:X = X + SX
+160  NEXT Y: RETURN 
