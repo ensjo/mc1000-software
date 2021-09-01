@@ -27,4 +27,12 @@ https://www.facebook.com/groups/731424100317748/posts/4095539113906213/?comment_
 https://www.youtube.com/watch?v=h99jU_szJu4
 
 
-A versão 5 (2021-10-29) modifica a primeira versão usando 3 tipos de caracteres em vez de dois. O resultado é mais parecido com o original do C64.
+A versão 5 (2021-08-29) modifica a primeira versão usando 3 tipos de caracteres em vez de dois. O resultado é mais parecido com o original do C64.
+
+
+A versão 6 (2021-09-01) é uma adaptação de um programa de labirinto para o NEC PC-6001 em modo Resolution Graphics 6 compartilhado por Carlos Camacho:
+https://www.facebook.com/groups/2359462640/posts/10159434682972641/
+
+
+A versão 7 (2021-09-01) é uma readaptação dessa mesma lógica para o modo Semigraphics 4.
+ 
