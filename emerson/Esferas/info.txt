@@ -1,0 +1,60 @@
+Esta é uma adaptação de um programa para VZ200/VZ300 — https://www.facebook.com/groups/4609469943/posts/10151675107894944 — que por sua vez é uma adaptação de um programa para ZX Spectrum que desenha esferas espelhadas sobre um plano axadrezado usando a técnica de rastreamento de raios (ray tracing).
+
+Devido à grande quantidade de cálculos, o programa leva HORAS para ser concluído.
+
+Em uma postagem em um fórum de discussão — https://stardot.org.uk/forums/viewtopic.php?p=217419#p217419 —, foi apresentada uma outra versão deste programa com comentários explicando seu funcionamento, que eu adapto aqui à versão para MC1000:
+
+5: Passa ao modo gráfico 256x192 preto e branco.
+10: 2 esferas com centro C(n)(x,y,z), raio: R(n), quadrado do raio: Q(n).
+20-40: Lê dados das esferas: x,y,z,raio.
+50: Itera pelos pixels y, itera pelos pixels x.
+70-72: Usa a posição da câmera como origem do raio.
+    A câmera sempre visualiza ao longo do eixo +z.
+    Calcula o vetor D através do ponto de tela (j,i) à distância 300.
+    {FOV (campo de visão?)} ~60 graus.
+    Calcula DD = comprimento do vetor D.
+100: Plano infinito fixo em (0,0,0) paralelo aos eixos x,z.
+    {We seem to have -ve y pointing upwards?}
+    Se a câmera estiver abaixo do plano o raio sempre o atingirá.
+    Se o raio apontar para baixo ele sempre vai intersectar em algum lugar.
+    Se houver interseção então registra objeto N = 0 e calcula a distância da interseção
+    S = -Y/DY.
+110: Itera por todas as esferas.
+    Calcula o vetor P da origem do raio até o centro da esfera.
+140: Calcula SC = P produto escalar D = comprimento da projeção de P na direção do raio D.
+150: Se SC <= 0 então o raio se afasta da esfera e não há interseção:
+     desvia para iterar à próxima esfera.
+155: Calcula PP = comprimento de P.
+160: Calcula BB = distância ao longo do raio até onde o centro da esfera é projetado.
+    Calcula AA = raio ao quadrado - distância ao centro da esfera ao quadrado + BB.
+180: Se AA <= 0 então o raio não atingiu a esfera - desvia para iterar à próxima esfera.
+190: Calcula SC = distância ao longo do raio que intersecta esfera.
+    Se SC < atual menor distância S então registra objeto N = esfera K.
+200: Itera à próxima esfera.
+    Se N < 0 o raio não colidiu com chão nem esfera, então atingiu o céu:
+    desvia para iterar ao próximo pixel da tela sem plotar nada (mantém o preto do fundo da tela).
+220: Encurta o vetor da direção do raio D ao comprimento da distância da interseção.
+    Calcula DD = novo comprimento de D.
+    Calcula nova origem do raio como o ponto de interseção =
+    velha origem + direção do raio. 
+240: Se o objeto atingido foi o chão, desvia para calcula a cor.
+250: O objeto era uma esfera.
+    Calcula o vetor N = normal da esfera no ponto de interseção =
+    ponto de interseção - centro da esfera.
+270: Calcula o valor incidente L = 2 * D produto escalar N / comprimento de N^2.
+280: As esferas têm reflexão perfeita.
+    Computa nova direção do raio D = velha direção do raio refletida em torno da normal =
+    D - N * valor incidente.
+    Desvia para rastrear novo raio com origem na esfera.
+    (Isto se repetirá até que se atinja o chão ou o céu!)
+300-320: O raio atingiu o chão. Dentro ou fora da sombra de uma esfera?
+    Para cada esfera, projeta um vetor do ponto de interseção ao centro da esfera
+    sobre o plano 2D x,z.
+    Se o comprimento desse vetor for menor que o raio da esfera então estamos numa sombra.
+    Desvia para iterar ao próximo pixel da tela sem plotar nada (mantém o preto do fundo da tela).
+330: O raio atingiu o chão fora da sombra de uma esfera.
+    Produzir padrão axadrezado com cada quadrado tendo tamanho 1x1:
+    Obtém as partes fracionárias das coordenadas do ponto de interseção: x,z.
+    Se ambas as partes fracionárias forem simultaneamente > 0.5 ou <= 0.5, plota um pixel branco
+    (senão, mantém o preto do fundo da tela).
+350: Itera ao próximo pixel da tela.
