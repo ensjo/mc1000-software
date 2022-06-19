@@ -340,6 +340,7 @@ C1DF  77        LD      (HL),A
 C1E0  C9        RET
 
 ; VOICE:
+; Monta os registros CHANA/CHANB/CHANC e aponta NNA/NNB/NNC para eles.
 C1E1  3E80      LD      A,#80
 C1E3  326E01    LD      (#016E),A ; CHANA+1
 C1E6  327401    LD      (#0174),A ; CHANB+1
@@ -353,7 +354,10 @@ C1F8  213901    LD      HL,#0139 ; AVALUE
 C1FB  B6        OR      (HL)
 C1FC  CA0CC2    JP      Z,#C20C ; BBB
 C1FF  064D      LD      B,#4D
-C201  CDD7C1    CALL    #C1D7 ; INTIA ; (AVALUE) <-- (AVALUE) << 4 OR #4D.
+C201  CDD7C1    CALL    #C1D7 ; INTIA ; (AVALUE) <-- (AVALUE) << 4 OR #4D:
+                              ; * VOICEA=3, controle de amplitude pela envoltória.
+                              ; * INTRPA=(valor anterior de AVALUE)+1.
+                              ; * Produção de tom.
 C204  216D01    LD      HL,#016D ; CHANA
 C207  223701    LD      (#0137),HL ; NAA ; (NAA) <-- CHANA.
 C20A  360F      LD      (HL),#0F ; (CHANA) <-- #0F.
@@ -363,7 +367,10 @@ C20F  AF        XOR     A
 C210  B6        OR      (HL)
 C211  CA21C2    JP      Z,#C221 ; CCC
 C214  0649      LD      B,#49
-C216  CDD7C1    CALL    #C1D7 ; INTIA ; (BVALUE) <-- (BVALUE) << 4 OR #49.
+C216  CDD7C1    CALL    #C1D7 ; INTIA ; (BVALUE) <-- (BVALUE) << 4 OR #49:
+                              ; * VOICEB=2, amplitude fixa decrescida.
+                              ; * INTRPB=(valor anterior de BVALUE)+1.
+                              ; * Produção de tom.
 C219  217301    LD      HL,#0173 ; CHANB
 C21C  224001    LD      (#0140),HL ; NBB ; (NBB) <-- CHANB.
 C21F  360D      LD      (HL),#0D ; (CHANB) <-- #0D.
@@ -373,7 +380,10 @@ C224  AF        XOR     A
 C225  B6        OR      (HL)
 C226  CA36C2    JP      Z,#C236 ; DZD
 C229  0649      LD      B,#49
-C22B  CDD7C1    CALL    #C1D7 ; INTIA ; (CVALUE) <-- (CVALUE) << 4 OR #49.
+C22B  CDD7C1    CALL    #C1D7 ; INTIA ; (CVALUE) <-- (CVALUE) << 4 OR #49:
+                              ; * VOICEC=2, amplitude fixa decrescida.
+                              ; * INTRPC=(valor anterior de CVALUE)+1.
+                              ; * Produção de tom.
 C22E  217901    LD      HL,#0179 ; CHANC
 C231  224901    LD      (#0149),HL ; NCC ; (NCC) <-- CHANC.
 C234  360D      LD      (HL),#0D ; (CHANC) <-- #0D.
@@ -1065,7 +1075,7 @@ C5B8  79        LD      A,C
 C5B9  325401    LD      (#0154),A ; DEFIN
 C5BC  7C        LD      A,H
 C5BD  325101    LD      (#0151),A ; AMPLIT
-; Seleciona AVALUE, BVALUE ou CVALUE em HL.
+; Faz HL apontar para AVALUE, BVALUE ou CVALUE.
 C5C0  213901    LD      HL,#0139 ; AVALUE
 C5C3  58        LD      E,B
 C5C4  1600      LD      D,#00
@@ -1092,16 +1102,17 @@ C5DC  C9        RET
 
 ; AI:
 ; G1:
-; Desvia se o bit 1 de AVALUE/BVALUE/CVALUE também for 1.
+; Desvia se o bit 1 de AVALUE/BVALUE/CVALUE for 1
+; (canal já configurado).
 C5DD  0F        RRCA
 C5DE  DA69C6    JP      C,#C669 ; SONGAS
-; (NSA) = (NAA) + 4, ou
-; (NSB) = (NBB) + 4, ou
-; (NSC) = (NCC) + 4.
-C5E1  E5        PUSH    HL
+; Configurar canal.
+; Faz NSA/NSB/NSC apontar para o início das notas
+; (o endereço apontado por NAA/NBB/NCC acrescido de 4).
+C5E1  E5        PUSH    HL ; Preserva referência a AVALUE/BVALUE/CVALUE.
 C5E2  2B        DEC     HL
 C5E3  56        LD      D,(HL)
-C5E4  2B        DEC     HL
+C5E4  2B        DEC     HL ; HL aponta a NAA/NBB/NCC
 C5E5  5E        LD      E,(HL)
 C5E6  13        INC     DE
 C5E7  13        INC     DE
@@ -1109,13 +1120,13 @@ C5E8  13        INC     DE
 C5E9  13        INC     DE
 C5EA  2B        DEC     HL
 C5EB  72        LD      (HL),D
-C5EC  2B        DEC     HL
-C5ED  73        LD      (HL),E
-; (?)
+C5EC  2B        DEC     HL ; HL aponta a NSA/NSB/NSC.
+C5ED  73        LD      (HL),E ; Carrega o valor de NAA/NBB/NCC + 4.
+; Chama rotina de inicialização usando AVALUE.
 C5EE  CDF7C5    CALL    #C5F7 ; INIABC
 ; Ativa o bit 1 de AVALUE/BVALUE/CVALUE.
 ; (Inicialização do canal concluída.)
-C5F1  E1        POP     HL
+C5F1  E1        POP     HL ; Restaura referência a AVALUE/BVALUE/CVALUE.
 C5F2  7E        LD      A,(HL)
 C5F3  F602      OR      #02
 C5F5  77        LD      (HL),A
@@ -1123,43 +1134,42 @@ C5F6  C9        RET
 
 ; INIABC:
 ; VOICEA/VOICEB/VOICEC = (AVALUE/BVALUE/CVALUE >> 2) & 3
-C5F7  E5        PUSH    HL
-C5F8  47        LD      B,A
-C5F9  E603      AND     #03
+C5F7  E5        PUSH    HL ; Preserva referência a NSA/NSB/NSC.
+C5F8  47        LD      B,A ; Preserva valor de AVALUE/BVALUE/CVALUE (já um pouco modificado).
+C5F9  E603      AND     #03 ; A = valor dos bits 2 e 3 de AVALUE/BVALUE/CVALUE.
 C5FB  110500    LD      DE,#0005
-C5FE  19        ADD     HL,DE
-C5FF  77        LD      (HL),A
+C5FE  19        ADD     HL,DE ; HL aponta para VOICEA/VOICEB/VOICEC.
+C5FF  77        LD      (HL),A ; Armazena aí o valor de A.
 C600  FE03      CP      #03
-C602  E5        PUSH    HL
-C603  CA0CC6    JP      Z,#C60C ; SONG4
-C606  CD11C7    CALL    #C711 ; N7
+C602  E5        PUSH    HL ; Preserva referência a VOICEA/VOICEB/VOICEC.
+C603  CA0CC6    JP      Z,#C60C ; SONG4 ; Desvia se VOICEA/VOICEB/VOICEC = 3.
+C606  CD11C7    CALL    #C711 ; N7 ; Configura amplitude fixa (ver NAA).
 C609  C30FC6    JP      #C60F ; SONG5
-
 ; SONG4:
-C60C  CD4BC7    CALL    #C74B ; COAMP
+C60C  CD4BC7    CALL    #C74B ; COAMP ; Configura amplitude definida pela envoltória (ver NAA).
 ; SONG5:
 ; INTRPA/INTRPB/INTRPC = (AVALUE/BVALUE/CVALUE >> 4) & 3 + 1
-C60F  78        LD      A,B
+C60F  78        LD      A,B ; Restaura valor de AVALUE/BVALUE/CVALUE (já um pouco modificado).
 C610  0F        RRCA
 C611  0F        RRCA
-C612  47        LD      B,A
-C613  E603      AND     #03
-C615  3C        INC     A
-C616  E1        POP     HL
-C617  23        INC     HL
-C618  77        LD      (HL),A
-; INTx = 0
+C612  47        LD      B,A ; Preserva valor de AVALUE/BVALUE/CVALUE (já um pouco modificado).
+C613  E603      AND     #03 ; A = valor dos bits 4 e 5 de AVALUE/BVALUE/CVALUE
+C615  3C        INC     A ; acrescido de 1.
+C616  E1        POP     HL ; Restaura referência a VOICEA/VOICEB/VOICEC.
+C617  23        INC     HL ; HL aponta para INTRPA/INTRPB/INTRPC.
+C618  77        LD      (HL),A ; Armazena aí o valor de A.
+; INTA/INTB/INTC = 0
 C619  23        INC     HL
-C61A  23        INC     HL
-C61B  3600      LD      (HL),#00
+C61A  23        INC     HL ; HL aponta para INTA/INTB/INTC.
+C61B  3600      LD      (HL),#00 ; Zera.
 ; Calcula (AVALUE/BVALUE/CVALUE >> 6) & 3:
 ; Se for 2, executa TONE.
 ; Se for 1, executa NOISE.
 ; 0 ou 3, executa ambos.
-C61D  78        LD      A,B
+C61D  78        LD      A,B ; Restaura valor de AVALUE/BVALUE/CVALUE (já um pouco modificado).
 C61E  0F        RRCA
 C61F  0F        RRCA
-C620  E1        POP     HL
+C620  E1        POP     HL ; Restaura referência a NSA/NSB/NSC.
 C621  5E        LD      E,(HL)
 C622  23        INC     HL     ; HL aponta para NSA/NSB/NSC + 1.
 C623  56        LD      D,(HL) ; DE = endereço apontado por NSA/NSB/NSC.
@@ -1175,7 +1185,7 @@ C634  D1        POP     DE
 C635  E1        POP     HL
 
 ; TONE:
-C636  CDABC7    CALL    #C7AB ; FREQU
+C636  CDABC7    CALL    #C7AB ; FREQU ; Configura PSG para a nota, armazena duração em TEMPA/TEMPB/TEMPC.
 ; Modifica ENABLE para ativar tom do canal.
 C639  215001    LD      HL,#0150 ; ENABLE
 C63C  3A5401    LD      A,(#0154) ; DEFIN
@@ -1183,25 +1193,25 @@ C63F  A6        AND     (HL)
 C640  77        LD      (HL),A
 C641  C9        RET
 
-; NOSE:
+; NOISE:
 C642  1B        DEC     DE
-C643  3E06      LD      A,#06
+C643  3E06      LD      A,#06 ; Registrador de controle do gerador de ruído.
 C645  D320      OUT     (#20),A ; REG
 C647  1A        LD      A,(DE) ; Byte apontado por NSA/NSB/NSC - 1.
 C648  D360      OUT     (#60),A ; WR
-C64A  13        INC     DE
+C64A  13        INC     DE ; Restaura referência a NSA/NSB/NSC.
 C64B  3A5101    LD      A,(#0151) ; AMPLIT
 C64E  D320      OUT     (#20),A ; REG
-C650  1A        LD      A,(DE)
-C651  D360      OUT     (#60),A ; WR ; Byte apontado por NSA/NSB/NSC.
-C653  13        INC     DE
+C650  1A        LD      A,(DE) ; Byte apontado por NSA/NSB/NSC.
+C651  D360      OUT     (#60),A ; WR
+C653  13        INC     DE ; Avança NSA/NSB/NSC.
 C654  72        LD      (HL),D
 C655  2B        DEC     HL
-C656  73        LD      (HL),E ; Incrementa NSA/NSB/NSC.
-C657  1A        LD      A,(DE)
+C656  73        LD      (HL),E
+C657  1A        LD      A,(DE) ; Carrega o novo valor apontado por NSA/NSB/NSC (duração) em TEMPA/TEMPB/TEMPC.
 C658  110700    LD      DE,#0007
 C65B  19        ADD     HL,DE
-C65C  77        LD      (HL),A ; TEMPA/TEMPB/TEMPC = Byte apontado por NSA/NSB/NSC.
+C65C  77        LD      (HL),A
 ; Modifica ENABLE para ativar o ruído do canal.
 C65D  215001    LD      HL,#0150 ; ENABLE
 C660  3A5401    LD      A,(#0154) ; DEFIN
@@ -1213,21 +1223,21 @@ C667  77        LD      (HL),A
 C668  C9        RET
 
 ; SONGAS:
-C669  EB        EX      DE,HL
-C66A  2A5501    LD      HL,(#0155) ; ONAMP
+C669  EB        EX      DE,HL ; Preserva referência a AVALUE/BVALUE/CVALUE em DE.
+C66A  2A5501    LD      HL,(#0155) ; ONAMP ; C = Máscara OR para desativar tom e ruído no canal.
 C66D  4D        LD      C,L
-C66E  EB        EX      DE,HL
-C66F  23        INC     HL
+C66E  EB        EX      DE,HL ; Restaura referência a AVALUE/BVALUE/CVALUE em HL.
+C66F  23        INC     HL ; B = valor de VOICEA/VOICEB/VOICEC.
 C670  46        LD      B,(HL)
-C671  23        INC     HL
+C671  23        INC     HL ; Desvia se bit 7 de INTRPA/INTRPB/INTRPC for 1.
 C672  CB7E      BIT     7,(HL)
 C674  C294C6    JP      NZ,#C694 ; HH1
 ; Incrementa INTA/INTB/INTC.
-C677  E5        PUSH    HL
+C677  E5        PUSH    HL ; Preserva referência a INTRPA/INTRPB/INTRPC.
 C678  23        INC     HL
 C679  23        INC     HL
-C67A  34        INC     (HL)
-C67B  D1        POP     DE
+C67A  34        INC     (HL) ; Incrementa INTA/INTB/INTC.
+C67B  D1        POP     DE ; Restaura referência a INTRPA/INTRPB/INTRPC em DE.
 ; Retorna se INTA/INTB/INTC <> INTRPA/INTRPB/INTRPC.
 C67C  1A        LD      A,(DE)
 C67D  BE        CP      (HL)
@@ -1239,14 +1249,14 @@ C681  2B        DEC     HL
 C682  35        DEC     (HL)
 ; Desvia se não zerou.
 C683  C285C7    JP      NZ,#C785 ; AMP
-; Se zerou...
+; Se zerou (acabou a duração da nota)...
 C686  2B        DEC     HL ; INTRPA/INTRPB/INTRPC.
 ; Desvia se CHECK <> 90.
 C687  3A5E01    LD      A,(#015E) ; CHECK
 C68A  FE5A      CP      #5A
 C68C  C298C6    JP      NZ,#C698 ; HH
-; Seta bit 7 de INTRPA/INTRPB/INTRPC.
-; Retorna se for par (bit 0 = 0).
+; Se o bit 7 de INTRPA/INTRPB/INTRPC for 0,
+; muda para 1 e retorna.
 C68F  7E        LD      A,(HL)
 C690  07        RLCA
 C691  CBFE      SET     7,(HL)
@@ -1259,27 +1269,28 @@ C697  77        LD      (HL),A
 ; HH:
 ; HL = NSA/NSB/NSC + (CHECK = 90 ? -1 : +1)
 C698  11FAFF    LD      DE,#FFFA ; -6
-C69B  19        ADD     HL,DE ; NSA/NSB/NSC.
+C69B  19        ADD     HL,DE ; HL aponta para NSA/NSB/NSC.
 C69C  5E        LD      E,(HL)
-C69D  23        INC     HL
-C69E  56        LD      D,(HL) ; [NSA/NSB/NSC].
+C69D  23        INC     HL ; NSA/NSB/NSC + 1
+C69E  56        LD      D,(HL) ; DE = valor de NSA/NSB/NSC.
 C69F  EB        EX      DE,HL
 C6A0  3A5E01    LD      A,(#015E) ; CHECK
 C6A3  FE5A      CP      #5A
 C6A5  C2ACC6    JP      NZ,#C6AC ; EVER
-C6A8  2B        DEC     HL ; [NSA/NSB/NSC] - 1
+C6A8  2B        DEC     HL ; HL = valor de NSA/NSB/NSC - 1 (aponta para a mesma nota).
 C6A9  C3ADC6    JP      #C6AD ; EVE
 ; EVER:
-C6AC  23        INC     HL ; [NSA/NSB/NSC] + 1
+C6AC  23        INC     HL ; HL = valor de NSA/NSB/NSC + 1 (aponta para a próxima nota).
 ; EVE:
-; Se [[NSA/NSB/NSC] +/- 1] = #EE...
+; Se o byte da nota não for $EE, desvia.
 C6AD  7E        LD      A,(HL)
 C6AE  FEEE      CP      #EE
 C6B0  13        INC     DE
 C6B1  13        INC     DE
-C6B2  13        INC     DE ; NAA/NBB/NCC.
+C6B2  13        INC     DE ; AVALUE/BVALUE/CVALUE.
 C6B3  C2BCC6    JP      NZ,#C6BC ; OVER
-; ...desativa bit 1 de [NAA/NBB/NCC] e retorna.
+; É $EE: desativa bit 1 do valor de AVALUE/BVALUE/CVALUE
+; (sinalizando reinício da música) e retorna.
 C6B6  4F        LD      C,A
 C6B7  1A        LD      A,(DE)
 C6B8  E6FD      AND     #FD
@@ -1287,14 +1298,14 @@ C6BA  12        LD      (DE),A
 C6BB  C9        RET
 
 ; OVER:
-; Se [[NSA/NSB/NSC] +/- 1] <> #FF, desvia.
+; Se o byte da nota for diferente de $FF, desvia.
 C6BC  FEFF      CP      #FF
 C6BE  C2DFC6    JP      NZ,#C6DF ; NEXT
-; Se CHECK <> 90, zera NAA/NBB/NCC.
-; Senão, zera os bits 0 e 1 de NAA/NBB/NCC.
+; É $FF.
 C6C1  3A5E01    LD      A,(#015E) ; CHECK
 C6C4  FE5A      CP      #5A
 C6C6  CAD9C6    JP      Z,#C6D9 ; BAS
+; CHECK <> 90: Zera AVALUE/BVALUE/CVALUE.
 C6C9  AF        XOR     A
 ; OVERP:
 C6CA  12        LD      (DE),A
@@ -1312,19 +1323,25 @@ C6D5  320200    LD      (#0002),A ; SNDSW
 C6D8  C9        RET
 
 ; BAS:
+; CHECK = 90: Zera os bits 0 e 1 de AVALUE/BVALUE/CVALUE (silencia canal)
+; preservando os demais bits (para quê?).
 C6D9  1A        LD      A,(DE)
 C6DA  E6FC      AND     #FC
 C6DC  C3CAC6    JP      #C6CA ; OVERP
 
 ; NEXT:
+; Continua a música.
+; Desvia se AVALUE/BVALUE/CVALUE estiver configurado para produzir apenas tom.
 C6DF  1A        LD      A,(DE)
 C6E0  E6C0      AND     #C0
 C6E2  FE40      CP      #40
-C6E4  EB        EX      DE,HL
+C6E4  EB        EX      DE,HL ; Endereço de AVALUE/BVALUE/CVALUE em HL; DE aponta para próxima nota.
 C6E5  CA03C7    JP      Z,#C703 ; NET
+; Desvia se AVALUE/BVALUE/CVALUE estiver configurado para produzir apenas ruído.
 C6E8  FE80      CP      #80
-C6EA  E5        PUSH    HL
+C6EA  E5        PUSH    HL ; Preserva referência a AVALUE/BVALUE/CVALUE.
 C6EB  CAF3C6    JP      Z,#C6F3 ; NET0
+; AVALUE/BVALUE/CVALUE configurado para produzir tom e ruído.
 C6EE  D5        PUSH    DE
 C6EF  CD03C7    CALL    #C703 ; NET
 C6F2  D1        POP     DE
@@ -1342,61 +1359,69 @@ C700  C398C7    JP      #C798 ; ND
 ; NET:
 C703  2B        DEC     HL
 C704  2B        DEC     HL
-C705  2B        DEC     HL
+C705  2B        DEC     HL ; HL aponta para NSA/NSB/NSC+1.
 C706  CDABC7    CALL    #C7AB ; FREQU
+; Se VOICEA/VOICEB/VOICEC = 3, configura controle de amplitude pela envoltória.
 C709  2B        DEC     HL
-C70A  2B        DEC     HL
+C70A  2B        DEC     HL ; HL aponta para VOICEA/VOICEB/VOICEC.
 C70B  7E        LD      A,(HL)
 C70C  FE03      CP      #03
 C70E  CA4BC7    JP      Z,#C74B ; COAMP
+; Senão...
+
 ; N7:
+; Define valor de amplitude fixa conforme o nibble menos
+; significativo do primeiro byte apontado por NAA/NBB/NCC.
 C711  3A5101    LD      A,(#0151) ; AMPLIT
 C714  D320      OUT     (#20),A ; REG
 C716  2B        DEC     HL
 C717  2B        DEC     HL
 C718  56        LD      D,(HL)
-C719  2B        DEC     HL
-C71A  5E        LD      E,(HL)
-C71B  1A        LD      A,(DE)
-C71C  E60F      AND     #0F
+C719  2B        DEC     HL ; HL aponta para NAA/NBB/NCC.
+C71A  5E        LD      E,(HL) ; Estrutura apontada por NAA/NBB/NCC.
+C71B  1A        LD      A,(DE) ; Primeiro byte.
+C71C  E60F      AND     #0F ; Nibble menos significativo.
 C71E  D360      OUT     (#60),A ; WR
 C720  C9        RET
 
 ; F1:
 ; Entrada:
-; HL aponta para byte aaaabbbb.
-; aaaa = oitava (1~8).
-; bbbb = nota (0~11).
+; HL aponta para byte aaaabbbb, onde:
+; * aaaa = oitava (1~8).
+; * bbbb = nota (0~11).
 ; Saída:
 ; BC contém o período da nota para o PSG.
 C721  119FC4    LD      DE,#C49F ; FREQ ; Tabela de períodos máximos das notas.
 ; BC = #C49F + ((HL) and #0F) x 2
-C724  7E        LD      A,(HL)
-C725  E60F      AND     #0F
-C727  07        RLCA
-C728  83        ADD     A,E
+C724  7E        LD      A,(HL) ; Obtém byte [oitava,nota].
+C725  E60F      AND     #0F ; Isola a nota.
+C727  07        RLCA    ; x2
+C728  83        ADD     A,E ; Soma ao endereço FREQ da tabela de períodos.
 C729  4F        LD      C,A
 C72A  3E00      LD      A,#00
 C72C  8A        ADC     A,D
-C72D  47        LD      B,A
+C72D  47        LD      B,A ; e armazena em BC.
 ; D = ((HL)/16) and #0F
-C72E  7E        LD      A,(HL)
-C72F  0F        RRCA
+C72E  7E        LD      A,(HL) ; Obtém byte [oitava,nota].
+C72F  0F        RRCA    ; Isola a oitava.
 C730  0F        RRCA
 C731  0F        RRCA
 C732  0F        RRCA
 C733  E60F      AND     #0F
-C735  57        LD      D,A
+C735  57        LD      D,A ; Armazena em D.
 ; BC = (BC)
-C736  0A        LD      A,(BC)
+C736  0A        LD      A,(BC) ; Obtém o período da nota em BC.
 C737  5F        LD      E,A
 C738  03        INC     BC
 C739  0A        LD      A,(BC)
 C73A  47        LD      B,A
 C73B  4B        LD      C,E
 ; F1A:
-; BC = BC / (2 ^ D)
-C73C  15        DEC     D
+; Divide o período repetidamente por 2
+; D vezes, até atingir o valor correspondente
+; à oitava desejada.
+; BC = BC / (2 ^ (D - 1))
+C73C  15        DEC     D ; Retorna se já terminou.
 C73D  C8        RET     Z
 ; BC = (RR BC) and #0FFF.
 C73E  78        LD      A,B
@@ -1416,9 +1441,9 @@ C748  C33CC7    JP      #C73C ; F1A
 ; envoltória. (Graças ao bit 4 do byte #1F.
 ; Os bits 0~3 são ignorados.)
 ; Entrada:
-; HL aponta para NAA/NBB/NCC + 3.
+; HL aponta para VOICEA/VOICEB/VOICEC.
 C74B  3A5101    LD      A,(#0151) ; AMPLIT
-C74E  D320      OUT     (#20),A ; REG
+C74E  D320      OUT     (#20),A ; REG ; Seleciona registrador de amplitude do canal.
 C750  3E1F      LD      A,#1F
 C752  D360      OUT     (#60),A ; WR
 ; Configura a forma da envoltória
@@ -1431,13 +1456,13 @@ C759  2B        DEC     HL
 C75A  2B        DEC     HL ; HL aponta para NAA/NBB/NCC.
 C75B  5E        LD      E,(HL)
 C75C  23        INC     HL
-C75D  56        LD      D,(HL) ; DE contém NAA/NBB/NCC.
-C75E  1A        LD      A,(DE)
+C75D  56        LD      D,(HL) ; DE aponta para a estrutura apontada por NAA/NBB/NCC.
+C75E  1A        LD      A,(DE) ; Obtém o primeiro byte.
 C75F  0F        RRCA
 C760  0F        RRCA
 C761  0F        RRCA
 C762  0F        RRCA
-C763  E60F      AND     #0F
+C763  E60F      AND     #0F ; Extrai o valor dos 4 bits mais significativos e define a envoltória.
 C765  D360      OUT     (#60),A ; WR
 ; Configura o período da envoltória
 ; com os dois bytes seguintes àquele
@@ -1469,6 +1494,7 @@ C782  D360      OUT     (#60),A ; WR
 C784  C9        RET
 
 ; AMP:
+; Se VOICEA/VOICEB/VOICEC = 2...
 C785  78        LD      A,B
 C786  FE02      CP      #02
 C788  C0        RET     NZ
@@ -1487,34 +1513,43 @@ C795  D360      OUT     (#60),A ; WR
 C797  C9        RET
 
 ; ND:
-; Obtém a duração da nota e armazena em TEMPA/TEMPB/TEMPC.
-C798  D5        PUSH    DE
-C799  13        INC     DE
+; Entrada:
+; DE aponta para o byte contendo [oitava,nota].
+; HL aponta para NSA/NSB/NSC + 1.
+; Avança NSA/NSB/NSC,
+; obtém a duração da nota e armazena em TEMPA/TEMPB/TEMPC.
+C798  D5        PUSH    DE ; Preserva referência ao byte [oitava,nota].
+C799  13        INC     DE ; Obtém duração em A.
 C79A  1A        LD      A,(DE)
-C79B  72        LD      (HL),D
+C79B  72        LD      (HL),D ; Atualiza NSA/NSB/NSC apontando para a duração.
 C79C  2B        DEC     HL
 C79D  73        LD      (HL),E
-C79E  110700    LD      DE,#0007
+C79E  110700    LD      DE,#0007 ; HL aponta para TEMPA/TEMPB/TEMPC.
 C7A1  19        ADD     HL,DE
-C7A2  77        LD      (HL),A
-C7A3  A7        AND     A
+C7A2  77        LD      (HL),A ; Armazena duração em TEMPA/TEMPB/TEMPC.
+C7A3  A7        AND     A ; Se o valor é zero, armazena 2.
 C7A4  C2A9C7    JP      NZ,#C7A9 ; NND
 C7A7  3602      LD      (HL),#02
 ; NND:
-C7A9  D1        POP     DE
+C7A9  D1        POP     DE ; Restaura referência ao byte [oitava,nota].
 C7AA  C9        RET
 
 ; FREQU:
-C7AB  E5        PUSH    HL
+; Entrada:
+; DE aponta para o byte aaaabbbb, onde:
+; * aaaa = oitava (1~8)
+; * bbbb = nota (0~11)
+; HL aponta para NSA/NSB/NSC + 1.
+C7AB  E5        PUSH    HL ; Preserva referência a NSA/NSB/NSC + 1.
 C7AC  EB        EX      DE,HL
-C7AD  CD21C7    CALL    #C721 ; F1 ; Calcula o período da nota.
+C7AD  CD21C7    CALL    #C721 ; F1 ; Calcula a período da nota em BC.
 C7B0  EB        EX      DE,HL
-C7B1  E1        POP     HL
-C7B2  CD98C7    CALL    #C798 ; ND ; Guarda a duração.
-C7B5  E5        PUSH    HL
+C7B1  E1        POP     HL ; Restaura referência a NSA/NSB/NSC + 1.
+C7B2  CD98C7    CALL    #C798 ; ND ; Guarda a duração em TEMPA/TEMPB/TEMPC.
+C7B5  E5        PUSH    HL ; Preserva referência a TEMPA/TEMPB/TEMPC.
 C7B6  2A5201    LD      HL,(#0152) ; REGIST
 C7B9  CD78C7    CALL    #C778 ; TONREG ; Aplica o período ao PSG.
-C7BC  E1        POP     HL
+C7BC  E1        POP     HL ; Restaura referência a TEMPA/TEMPB/TEMPC.
 C7BD  C9        RET
 
 ; DREG1:
@@ -2938,25 +2973,26 @@ CFAF  3814      JR      C,#CFC5 ; Canal 1.
 CFB1  2809      JR      Z,#CFBC ; Canal 2.
 ; Canal 3.
 CFB3  78        LD      A,B
-CFB4  327B01    LD      (#017B),A ; CHANC+2.
+CFB4  327B01    LD      (#017B),A ; CHANC+2. Byte mais significativo do período da envoltória.
 CFB7  79        LD      A,C
 CFB8  324B01    LD      (#014B),A ; CVALUE
 CFBB  C9        RET
 ; Canal 2.
 CFBC  78        LD      A,B
-CFBD  327501    LD      (#0175),A ; CHANB+2.
+CFBD  327501    LD      (#0175),A ; CHANB+2. Byte mais significativo do período da envoltória.
 CFC0  79        LD      A,C
 CFC1  324201    LD      (#0142),A ; BVALUE
 CFC4  C9        RET
 ; Canal 1.
 CFC5  78        LD      A,B
-CFC6  326F01    LD      (#016F),A ; CHANA+2.
+CFC6  326F01    LD      (#016F),A ; CHANA+2. Byte mais significativo do período da envoltória.
 CFC9  79        LD      A,C
 CFCA  323901    LD      (#0139),A ; AVALUE
 CFCD  C9        RET
 
 ; BSOUND
 CFCE  C8        RET Z
+; Se nenhum som estiver sendo tocado, inicializa algumas variáveis referentes aos canais.
 CFCF  E5        PUSH    HL
 CFD0  3A0100    LD      A,(#0001) ; Se (#0001) = 0...
 CFD3  B7        OR      A
@@ -2965,12 +3001,13 @@ CFD6  3C        INC     A ; (#0001) <-- 1
 CFD7  320100    LD      (#0001),A
 CFDA  CDE1C1    CALL    #C1E1 ; VOICE
 CFDD  E1        POP     HL
+;
 CFDE  CD76CF    CALL    #CF76 ; Lê os três parâmetros de TEMPO/SOUND: B, C, A.
 CFE1  3820      JR      C,#D003 ; Canal 1.
 CFE3  280F      JR      Z,#CFF4 ; Canal 2.
 
 ; Canal 3.
-; Espera acabar a nota anterior.
+; Espera acabar a nota anterior, se houver.
 CFE5  3A7E01    LD      A,(#017E) ; TONEC
 CFE8  B7        OR      A
 CFE9  20FA      JR      NZ,#CFE5 ; (-6)
@@ -2982,7 +3019,7 @@ CFF0  327E01    LD      (#017E),A ; TONEC
 CFF3  C9        RET
 
 ; Canal 2.
-; Espera acabar a nota anterior.
+; Espera acabar a nota anterior, se houver.
 CFF4  3A7801    LD      A,(#0178) ; TONEB
 CFF7  B7        OR      A
 CFF8  20FA      JR      NZ,#CFF4 ; (-6)
@@ -2994,7 +3031,7 @@ CFFF  327801    LD      (#0178),A ; TONEB
 D002  C9 RET
 
 ; Canal 1.
-; Espera acabar a nota anterior.
+; Espera acabar a nota anterior, se houver.
 D003  3A7201    LD      A,(#0172) ; TONEA
 D006  B7        OR      A
 D007  20FA      JR      NZ,#D003        ; (-6)
