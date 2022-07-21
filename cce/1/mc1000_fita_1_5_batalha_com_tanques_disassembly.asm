@@ -1,4 +1,4 @@
-; Disassembly of the file "D:\Emerson\mc-1000\aplicativos cassete\BATATANQ.BIN"
+﻿; Disassembly of the file "D:\Emerson\mc-1000\aplicativos cassete\BATATANQ.BIN"
 ;
 ; Created with dZ80 v1.31
 ;
@@ -6,27 +6,27 @@
 ;
 0100  ffffff    db      #ff, #ff, #ff
 0103  ff        db      #ff ; PGM/PGN/MUSIC.
-0104  01        db      #01 ; PLAY: T�pico (modo) de jogo atual.
-0105  11        db      #11 ; PLAYMX: Quantidade de t�picos.
-0106  00        db      #00 ; HEAD: MC-1000 em modo de jogo (n�o BASIC).
+0104  01        db      #01 ; PLAY: Tópico (modo) de jogo atual.
+0105  11        db      #11 ; PLAYMX: Quantidade de tópicos.
+0106  00        db      #00 ; HEAD: MC-1000 em modo de jogo (não BASIC).
 0107  ba36      db      #ba, #36 ; RANDOM.
-0109  45        db      #45 ; RCRDPT: Byte menos significativo do endere�o do �ltimo slot de placar preenchido.
+0109  45        db      #45 ; RCRDPT: Byte menos significativo do endereço do último slot de placar preenchido.
 010a  50        db      #50
 010b  4d36340d  db      #4d, #36, #34, #0d ; RECORD: 16 bytes, 8 pares de placares (jogadores 1 e 2).
 010f  0a0dffff  db      #0a, #0d, #ff, #ff
 0113  ffffffff  db      #ff, #ff, #ff, #ff
 0117  ffffffff  db      #ff, #ff, #ff, #ff
-011b  ffffffff  db      #ff, #ff, #ff, #ff ; KEY0: At� quatro teclas pressionadas.
+011b  ffffffff  db      #ff, #ff, #ff, #ff ; KEY0: Até quatro teclas pressionadas.
 011f  ff        db      #ff
-0120  c9        ret     ; JOB: 1� hook de leitura do teclado.
+0120  c9        ret     ; JOB: 1º hook de leitura do teclado.
 0121  430b      db      #43, #0b
 0123  00        db      #00 ; SCOREA.
 0124  00        db      #00 ; SCOREB.
-0125  ff        db      #ff ; SHAPE0: Indica se SHAPOF detectou colis�o.
+0125  ff        db      #ff ; SHAPE0: Indica se SHAPOF detectou colisão.
 0126  ffffffff  db      #ff, #ff, #ff, #ff
 012a  ffffffff  db      #ff, #ff, #ff, #ff
 012e  ffff      db      #ff, #ff
-0130  c9        ret     ; JOBM: 2� hook de leitura do teclado.
+0130  c9        ret     ; JOBM: 2º hook de leitura do teclado.
 0131  ffffffff  db      #ff, #ff, #ff, #ff
 0135  ffff      db      #ff, #ff ; TABLE/NSA.
 0137  ffff      db      #ff, #ff ; NAA.
@@ -100,8 +100,8 @@
 01f8  ffffffff  db      #ff, #ff, #ff, #ff
 01fc  ffffffff  db      #ff, #ff, #ff, #ff
  
-; Tabela de saltos para os "t�picos" de jogo
-; (selecion�veis com CTRL+H).
+; Tabela de saltos para os "tópicos" de jogo
+; (selecionáveis com CTRL+H).
 0200  c37904    jp      #0479
 0203  c37904    jp      #0479
 0206  c37904    jp      #0479
@@ -120,7 +120,7 @@
 022d  c37904    jp      #0479
 0230  c34bc0    jp      #c04b ; SCORE
  
-; Posi��es para desenhar uma parede
+; Posições para desenhar uma parede
 ; de 2 bytes x 2 linhas.
 0233  8381      dw      #8183
 0235  8881      dw      #8188
@@ -140,7 +140,7 @@
 0251  1b87      dw      #871b
 0253  ffff      dw      #ffff
  
-; Posi��es para desenhar uma parede
+; Posições para desenhar uma parede
 ; de 1 byte x 4 linhas.
 0255  8782      dw      #8287
 0257  9882      dw      #8298
@@ -150,7 +150,7 @@
 025f  d885      dw      #85d8
 0261  ffff      dw      #ffff
  
-; Posi��es para desenhar uma parede
+; Posições para desenhar uma parede
 ; de 3 bytes x 2 linhas.
 0263  4484      dw      #8444
 0265  4884      dw      #8448
@@ -172,7 +172,7 @@
 0281  1087      dw      #8710
 0283  ffff      dw      #ffff
  
-; Posi��es para desenhar uma parede
+; Posições para desenhar uma parede
 ; de 1 byte x 6 linhas.
 0285  c381      dw      #81c3
 0287  dc81      dw      #81dc
@@ -688,14 +688,14 @@
 0449  dd        db      #dd ; 11.01.11.01 (vermelho e amarelo alternados).
 044a  03        db      #03 ; 3 bytes.
  
-044b  3c        inc     a
+044b  3c        db      #3c ; 00.11.11.00 (ponto vermelho sobre fundo verde).
 044c  14        inc     d
 044d  1a        ld      a,(de)
 044e  58        ld      e,b
 044f  40        ld      b,b
 0450  ff        rst     #38
  
-; Inicializa m�sica.
+; Inicializa música.
 0451  212b0f    ld      hl,#0f2b ; Notas para o canal A.
 0454  223701    ld      (#0137),hl ; NAA.
 0457  216010    ld      hl,#1060 ; Notas para o canal B.
@@ -709,7 +709,7 @@
 046b  c9        ret
  
 ; Faz uma linha de pontos vermelhos e amarelos atravessando
-; a tela em y=5 para separar o placar da �rea de jogo.
+; a tela em y=5 para separar o placar da área de jogo.
 046c  21a080    ld      hl,#80a0
 046f  36dd      ld      (hl),#dd
 0471  23        inc     hl
@@ -718,22 +718,22 @@
 0475  c26f04    jp      nz,#046f
 0478  c9        ret
  
-; PONTO INICIAL DE TODOS OS T�PICOS DO JOGO.
+; PONTO INICIAL DE TODOS OS TÓPICOS DO JOGO.
 0479  310002    ld      sp,#0200
-; Redireciona interrup��es do Z80 para INTRUP
-; (para a m�sica funcionar).
-047c  3a890e    ld      a,(#0e89) ; J� redirecionou?
+; Redireciona interrupções do Z80 para INTRUP
+; (para a música funcionar).
+047c  3a890e    ld      a,(#0e89) ; Já redirecionou?
 047f  a7        and     a
 0480  c29404    jp      nz,#0494
-0483  3ec3      ld      a,#c3 ; N�o: Redireciona.
+0483  3ec3      ld      a,#c3 ; Não: Redireciona.
 0485  323800    ld      (#0038),a
 0488  2124c0    ld      hl,#c024 ; INTRUP.
 048b  223900    ld      (#0039),hl
 048e  fb        ei
-048f  3e02      ld      a,#02 ; Anota que j� redirecionou.
+048f  3e02      ld      a,#02 ; Anota que já redirecionou.
 0491  32890e    ld      (#0e89),a
 ;
-0494  cd5104    call    #0451 ; Inicializa m�sica.
+0494  cd5104    call    #0451 ; Inicializa música.
 0497  210000    ld      hl,#0000
 049a  225f0e    ld      (#0e5f),hl
 049d  227e0e    ld      (#0e7e),hl
@@ -767,7 +767,7 @@
 04de  c31a05    jp      #051a
 ; PLAY=1,5,9,13.
 04e1  118602    ld      de,#0286
-04e4  01dd01    ld      bc,#01dd ; 1 byte de largura, padr�o 11.01.11.01.
+04e4  01dd01    ld      bc,#01dd ; 1 byte de largura, padrão 11.01.11.01.
 04e7  3e06      ld      a,#06 ; 6 linhas de altura.
 04e9  cd110f    call    #0f11
 04ec  0603      ld      b,#03 ; 3 bytes de largura.
@@ -799,19 +799,22 @@
 0525  05        dec     b ; 1 byte de largura.
 0526  115602    ld      de,#0256
 0529  cd110f    call    #0f11
-; Desenha o valor de PLAY.
+
+; Desenha painel do placar acima da área de jogo.
+; Desenha o valor de PLAY (tópico de jogo atual).
 052c  110180    ld      de,#8001
 052f  3a0401    ld      a,(#0104) ; PLAY.
 0532  0e00      ld      c,#00
 0534  cd3fc0    call    #c03f ; DISPY2.
-;
+; Desenha tanques na área do placar.
 0537  214880    ld      hl,#8048
-053a  110f04    ld      de,#040f
+053a  110f04    ld      de,#040f ; Sprite: tanque azul para a esquerda.
 053d  cdf30d    call    #0df3 ; SHAPON'.
 0540  215580    ld      hl,#8055
-0543  11f403    ld      de,#03f4
+0543  11f403    ld      de,#03f4 ; Sprite: tanque amarelo para a direita.
 0546  cdf30d    call    #0df3 ; SHAPON'.
-0549  3a4b04    ld      a,(#044b)
+; Desenha dois-pontos após cada tanque.
+0549  3a4b04    ld      a,(#044b) ; Padrão: ponto vermelho.
 054c  322a80    ld      (#802a),a
 054f  326a80    ld      (#806a),a
 0552  323780    ld      (#8037),a
@@ -819,10 +822,10 @@
 0558  c39a05    jp      #059a
  
 ;
-055b  214184    ld      hl,#8441
-055e  115d03    ld      de,#035d ; Sprite: Tanque azul para cima.
+055b  214184    ld      hl,#8441 ; Posição inicial do tanque azul à esquerda da tela.
+055e  115d03    ld      de,#035d ; Sprite: tanque azul para cima.
 0561  cdf30d    call    #0df3 ; SHAPON'.
-0564  22540e    ld      (#0e54),hl
+0564  22540e    ld      (#0e54),hl ; Guarda posição do tanque azul.
 0567  21bf02    ld      hl,#02bf
 056a  22570e    ld      (#0e57),hl
 056d  225a0e    ld      (#0e5a),hl
@@ -830,10 +833,10 @@
 0572  32560e    ld      (#0e56),a
 0575  c9        ret
  
-0576  215e84    ld      hl,#845e
-0579  117c03    ld      de,#037c
+0576  215e84    ld      hl,#845e ; Posição inicial do tanque amarelo à direita da tela.
+0579  117c03    ld      de,#037c ; Sprite: tanque amarelo para cima.
 057c  cdf30d    call    #0df3 ; SHAPON'.
-057f  22730e    ld      (#0e73),hl
+057f  22730e    ld      (#0e73),hl ; Guarda posição do tanque amarelo.
 0582  21c302    ld      hl,#02c3
 0585  22760e    ld      (#0e76),hl
 0588  22790e    ld      (#0e79),hl
@@ -918,7 +921,7 @@
 0652  cdce0d    call    #0dce
 0655  cab706    jp      z,#06b7
 0658  cdc106    call    #06c1
-065b  2a730e    ld      hl,(#0e73)
+065b  2a730e    ld      hl,(#0e73) ; Posição do tanque amarelo.
 065e  7c        ld      a,h
 065f  fe83      cp      #83
 0661  da7106    jp      c,#0671
@@ -950,7 +953,7 @@
 069d  c35808    jp      #0858
 06a0  f1        pop     af
 06a1  c38e06    jp      #068e
-06a4  2a730e    ld      hl,(#0e73)
+06a4  2a730e    ld      hl,(#0e73) ; Posição do tanque amarelo.
 06a7  eb        ex      de,hl
 06a8  cd3f0e    call    #0e3f
 06ab  3a750e    ld      a,(#0e75)
@@ -978,9 +981,9 @@
 06cc  77        ld      (hl),a
 06cd  c9        ret
  
-06ce  2a540e    ld      hl,(#0e54)
+06ce  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 06d1  eb        ex      de,hl
-06d2  2a730e    ld      hl,(#0e73)
+06d2  2a730e    ld      hl,(#0e73) ; Posição do tanque amarelo.
 06d5  7a        ld      a,d
 06d6  bc        cp      h
 06d7  cafd06    jp      z,#06fd
@@ -1031,7 +1034,7 @@
 0730  7b        ld      a,e
 0731  e61f      and     #1f
 0733  4f        ld      c,a
-0734  3a540e    ld      a,(#0e54)
+0734  3a540e    ld      a,(#0e54) ; LSB da posição do tanque azul.
 0737  e61f      and     #1f
 0739  b9        cp      c
 073a  da4b07    jp      c,#074b
@@ -1077,7 +1080,7 @@
 07aa  7b        ld      a,e
 07ab  e61f      and     #1f
 07ad  4f        ld      c,a
-07ae  3a540e    ld      a,(#0e54)
+07ae  3a540e    ld      a,(#0e54) ; Posição do tanque azul.
 07b1  e61f      and     #1f
 07b3  b9        cp      c
 07b4  dac007    jp      c,#07c0
@@ -1184,7 +1187,7 @@
 08a4  0e39      ld      c,#39
 08a6  cdce0d    call    #0dce
 08a9  c2c008    jp      nz,#08c0
-08ac  2a540e    ld      hl,(#0e54)
+08ac  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 08af  eb        ex      de,hl
 08b0  cd3f0e    call    #0e3f
 08b3  3a560e    ld      a,(#0e56)
@@ -1416,9 +1419,9 @@
 0a82  23        inc     hl
 0a83  70        ld      (hl),b
 0a84  e5        push    hl
-0a85  214911    ld      hl,#1149
+0a85  214911    ld      hl,#1149 ; Som do tiro.
 0a88  224901    ld      (#0149),hl ; NCC.
-0a8b  3e79      ld      a,#79
+0a8b  3e79      ld      a,#79 ; VOICEC=2, INTRPC=4, produção de tom.
 0a8d  324b01    ld      (#014b),a ; CVALUE.
 0a90  e1        pop     hl
 0a91  c9        ret
@@ -1441,7 +1444,7 @@
 0ab7  3a6e0e    ld      a,(#0e6e)
 0aba  4f        ld      c,a
 0abb  cdce0d    call    #0dce
-0abe  2a540e    ld      hl,(#0e54)
+0abe  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0ac1  eb        ex      de,hl
 0ac2  c2e70a    jp      nz,#0ae7
 0ac5  7b        ld      a,e
@@ -1579,7 +1582,7 @@
 0bf8  7e        ld      a,(hl)
 0bf9  a7        and     a
 0bfa  c2db0c    jp      nz,#0cdb
-0bfd  2a540e    ld      hl,(#0e54)
+0bfd  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0c00  eb        ex      de,hl
 0c01  3a560e    ld      a,(#0e56)
 0c04  fe01      cp      #01
@@ -1656,7 +1659,7 @@
 0caa  22570e    ld      (#0e57),hl
 0cad  210100    ld      hl,#0001
 0cb0  19        add     hl,de
-0cb1  22540e    ld      (#0e54),hl
+0cb1  22540e    ld      (#0e54),hl ; Guarda posição do tanque azul.
 0cb4  c3db0c    jp      #0cdb
 0cb7  2a620e    ld      hl,(#0e62)
 0cba  22570e    ld      (#0e57),hl
@@ -1682,12 +1685,12 @@
 0cef  56        ld      d,(hl)
 0cf0  23        inc     hl
 0cf1  22570e    ld      (#0e57),hl
-0cf4  2a540e    ld      hl,(#0e54)
+0cf4  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0cf7  cdf30d    call    #0df3 ; SHAPON'.
 0cfa  c9        ret
  
-0cfb  21540e    ld      hl,#0e54
-0cfe  11730e    ld      de,#0e73
+0cfb  21540e    ld      hl,#0e54 ; Endereço da posição do tanque azul.
+0cfe  11730e    ld      de,#0e73 ; Endereço da posição do tanque amarelo.
 0d01  060d      ld      b,#0d
 0d03  4e        ld      c,(hl)
 0d04  eb        ex      de,hl
@@ -1701,6 +1704,7 @@
 0d0b  23        inc     hl
 0d0c  13        inc     de
 0d0d  c3030d    jp      #0d03
+
 0d10  214200    ld      hl,#0042
 0d13  d5        push    de
 0d14  c5        push    bc
@@ -1741,9 +1745,9 @@
 0d54  fe05      cp      #05
 0d56  c8        ret     z
  
-0d57  217a11    ld      hl,#117a
+0d57  217a11    ld      hl,#117a ; Som da explosão.
 0d5a  224901    ld      (#0149),hl ; NCC.
-0d5d  3eb5      ld      a,#b5
+0d5d  3eb5      ld      a,#b5 ; VOICEC=1, INTRPC=4, geração de ruído.
 0d5f  324b01    ld      (#014b),a ; CVALUE.
 0d62  cdb50d    call    #0db5
 0d65  3e05      ld      a,#05
@@ -1818,7 +1822,7 @@
 0dcd  c9        ret
  
 ; Verifica se a tecla em C foi pressionada
-; (i.e., se est� em KEY0~KEY0+3).
+; (i.e., se está em KEY0~KEY0+3).
 0dce  3a1b01    ld      a,(#011b) ; KEY0.
 0dd1  b9        cp      c
 0dd2  c8        ret     z
@@ -1837,13 +1841,13 @@
 0de5  5e        ld      e,(hl)
 0de6  23        inc     hl
 0de7  56        ld      d,(hl)
-0de8  2a540e    ld      hl,(#0e54)
+0de8  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0deb  cd110e    call    #0e11 ; SHAPOF'.
 0dee  3a880e    ld      a,(#0e88) ; SHAPE0'.
 0df1  a7        and     a
 0df2  c9        ret
  
-; "SHAPON'", r�plica da rotina SHAPON (!!!!).
+; "SHAPON'", réplica da rotina SHAPON (!!!!).
 0df3  e5        push    hl
 0df4  d5        push    de
 0df5  c5        push    bc
@@ -1866,12 +1870,12 @@
 0e0f  e1        pop     hl
 0e10  c9        ret
  
-; "SHAPOF'", r�plica da rotina SHAPOF (!!!!).
-; Diferen�as:
-; 1. O byte usado no apagamento � sempre #00,
-;    e n�o o registrador C.
-; 2. O endere�o indicador de colis�o (SHAPE0')
-;    � #0e88.
+; "SHAPOF'", réplica da rotina SHAPOF (!!!!).
+; Diferenças:
+; 1. O byte usado no apagamento é sempre #00,
+;    e não o registrador C.
+; 2. O endereço indicador de colisão (SHAPE0')
+;    é #0e88.
 0e11  e5        push    hl
 0e12  d5        push    de
 0e13  c5        push    bc
@@ -1917,7 +1921,7 @@
 0e52  a7        and     a
 0e53  c9        ret
  
-0e54  ffff      dw      #ffff ; Endere�o da figura na VRAM.
+0e54  ffff      dw      #ffff ; Posição do tanque azul na VRAM.
 0e56  ff        rst     #38
 0e57  ffff      dw      #ffff ; Ponteiro p/ figura (a desenhar?).
 0e59  ff        rst     #38
@@ -1941,8 +1945,8 @@
 0e6e  59        ld      e,c
 0e6f  314951    ld      sp,#5149
 0e72  39        add     hl,sp
-0e73  ff        rst     #38
-0e74  ff        rst     #38
+;
+0e73  ffff      dw      #ffff ; Posição do tanque amarelo na VRAM.
 0e75  ff        rst     #38
 0e76  ff        rst     #38
 0e77  ff        rst     #38
@@ -1960,7 +1964,7 @@
 0e86  ff        rst     #38
 0e87  ff        rst     #38
  
-0e88  00        db      #00 ; SHAPE0', indicador de colis�o
+0e88  00        db      #00 ; SHAPE0', indicador de colisão
                             ; para a rotina SHAPOF'.
 0e89  00        nop
 0e8a  ff        rst     #38
@@ -2059,7 +2063,7 @@
 0efa  0c        inc     c
 0efb  ee        db      #ee
  
-; Preenche uma �rea retangular de B bytes x A linhas
+; Preenche uma área retangular de B bytes x A linhas
 ; com o valor de C a partir de HL.
 0efc  f5        push    af
 ;
@@ -2080,9 +2084,9 @@
 0f0f  f1        pop     af
 0f10  c9        ret
  
-; Preenche n �reas retangulares de B bytes x A linhas
-; com o valor em C; DE aponta para (o 2� byte de)
-; uma lista dos endere�os iniciais das �reas.
+; Preenche n áreas retangulares de B bytes x A linhas
+; com o valor em C; DE aponta para (o 2º byte de)
+; uma lista dos endereços iniciais das áreas.
 ; Um byte #FF indica o fim da lista.
 0f11  f5        push    af
 0f12  eb        ex      de,hl
@@ -2105,353 +2109,356 @@
 0f2a  c9        ret
 
 ; BGM: MARCHA TURCA (MOZART). (Canal A.)
-0f2b  0f        db      #0f ; Forma da envolt�ria = 0 (\___).
-0f2c  8020      dw      #2080 ; Per�odo da envolt�ria = 8320.
-0f2d  00        db      #00 ; ?
+0f2b  0f        db      #0f ; Forma da envoltória = 0 (\___).
+0f2c  8020      dw      #2080 ; Período da envoltória = 8320.
+0f2d  00        db      #00 ; Valor para registrador de controle do gerador de ruído = 0.
 ;
-0f2f  5b08      db      #5b, #08 ; 5� oitava, nota B, dura��o 8.
-0f31  5908      db      #59, #08 ; 5� oitava, nota A, dura��o 8.
-0f33  5808      db      #58, #08 ; 5� oitava, nota G#, dura��o 8.
-0f35  5908      db      #59, #08 ; 5� oitava, nota A, dura��o 8.
-0f37  6010      db      #60, #10 ; 6� oitava, nota C, dura��o 16.
-0f39  0010      db      #00, #10 ; Pausa, dura��o 16.
-0f3b  6208      db      #62, #08 ; 6� oitava, nota D, dura��o 8.
-0f3d  6008      db      #60, #08 ; 6� oitava, nota C, dura��o 8.
-0f3f  5b08      db      #5b, #08 ; 5� oitava, nota B, dura��o 8.
-0f41  6008      db      #60, #08 ; 6� oitava, nota C, dura��o 8.
-0f43  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-0f45  0010      db      #00, #10 ; Pausa, dura��o 16.
-0f47  6508      db      #65, #08 ; 6� oitava, nota F, dura��o 8.
-0f49  6408      db      #64, #08 ; 6� oitava, nota E, dura��o 8.
-0f4b  6308      db      #63, #08 ; 6� oitava, nota D#, dura��o 8.
-0f4d  6408      db      #64, #08 ; 6� oitava, nota E, dura��o 8.
-0f4f  6b08      db      #6b, #08 ; 6� oitava, nota B, dura��o 8.
-0f51  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-0f53  6808      db      #68, #08 ; 6� oitava, nota G#, dura��o 8.
-0f55  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-0f57  6b08      db      #6b, #08 ; 6� oitava, nota B, dura��o 8.
-0f59  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-0f5b  6808      db      #68, #08 ; 6� oitava, nota G#, dura��o 8.
-0f5d  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-0f5f  7020      db      #70, #20 ; 7� oitava, nota C, dura��o 32.
-0f61  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-0f63  7010      db      #70, #10 ; 7� oitava, nota C, dura��o 16.
-0f65  6704      db      #67, #04 ; 6� oitava, nota G, dura��o 4.
-0f67  6904      db      #69, #04 ; 6� oitava, nota A, dura��o 4.
-0f69  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-0f6b  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-0f6d  6710      db      #67, #10 ; 6� oitava, nota G, dura��o 16.
-0f6f  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-0f71  6704      db      #67, #04 ; 6� oitava, nota G, dura��o 4.
-0f73  6904      db      #69, #04 ; 6� oitava, nota A, dura��o 4.
-0f75  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-0f77  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-0f79  6710      db      #67, #10 ; 6� oitava, nota G, dura��o 16.
-0f7b  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-0f7d  6704      db      #67, #04 ; 6� oitava, nota G, dura��o 4.
-0f7f  6904      db      #69, #04 ; 6� oitava, nota A, dura��o 4.
-0f81  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-0f83  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-0f85  6710      db      #67, #10 ; 6� oitava, nota G, dura��o 16.
-0f87  6510      db      #65, #10 ; 6� oitava, nota F, dura��o 16.
-0f89  6420      db      #64, #20 ; 6� oitava, nota E, dura��o 32.
-0f8b  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-0f8d  6510      db      #65, #10 ; 6� oitava, nota F, dura��o 16.
-0f8f  6710      db      #67, #10 ; 6� oitava, nota G, dura��o 16.
-0f91  6710      db      #67, #10 ; 6� oitava, nota G, dura��o 16.
-0f93  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-0f95  6708      db      #67, #08 ; 6� oitava, nota G, dura��o 8.
-0f97  6508      db      #65, #08 ; 6� oitava, nota F, dura��o 8.
-0f99  6408      db      #64, #08 ; 6� oitava, nota E, dura��o 8.
-0f9b  6210      db      #62, #10 ; 6� oitava, nota D, dura��o 16.
-0f9d  5710      db      #57, #10 ; 5� oitava, nota G, dura��o 16.
-0f9f  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-0fa1  6510      db      #65, #10 ; 6� oitava, nota F, dura��o 16.
-0fa3  6710      db      #67, #10 ; 6� oitava, nota G, dura��o 16.
-0fa5  6710      db      #67, #10 ; 6� oitava, nota G, dura��o 16.
-0fa7  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-0fa9  6708      db      #67, #08 ; 6� oitava, nota G, dura��o 8.
-0fab  6508      db      #65, #08 ; 6� oitava, nota F, dura��o 8.
-0fad  6408      db      #64, #08 ; 6� oitava, nota E, dura��o 8.
-0faf  6220      db      #62, #20 ; 6� oitava, nota D, dura��o 32.
-0fb1  6010      db      #60, #10 ; 6� oitava, nota C, dura��o 16.
-0fb3  6210      db      #62, #10 ; 6� oitava, nota D, dura��o 16.
-0fb5  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-0fb7  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-0fb9  6508      db      #65, #08 ; 6� oitava, nota F, dura��o 8.
-0fbb  6408      db      #64, #08 ; 6� oitava, nota E, dura��o 8.
-0fbd  6208      db      #62, #08 ; 6� oitava, nota D, dura��o 8.
-0fbf  6008      db      #60, #08 ; 6� oitava, nota C, dura��o 8.
-0fc1  5b10      db      #5b, #10 ; 5� oitava, nota B, dura��o 16.
-0fc3  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-0fc5  6010      db      #60, #10 ; 6� oitava, nota C, dura��o 16.
-0fc7  6210      db      #62, #10 ; 6� oitava, nota D, dura��o 16.
-0fc9  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-0fcb  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-0fcd  6508      db      #65, #08 ; 6� oitava, nota F, dura��o 8.
-0fcf  6408      db      #64, #08 ; 6� oitava, nota E, dura��o 8.
-0fd1  6208      db      #62, #08 ; 6� oitava, nota D, dura��o 8.
-0fd3  6008      db      #60, #08 ; 6� oitava, nota C, dura��o 8.
-0fd5  5b20      db      #5b, #20 ; 5� oitava, nota B, dura��o 32.
+0f2f  5b08      db      #5b, #08 ; 5ª oitava, nota B, duração 8.
+0f31  5908      db      #59, #08 ; 5ª oitava, nota A, duração 8.
+0f33  5808      db      #58, #08 ; 5ª oitava, nota G#, duração 8.
+0f35  5908      db      #59, #08 ; 5ª oitava, nota A, duração 8.
+0f37  6010      db      #60, #10 ; 6ª oitava, nota C, duração 16.
+0f39  0010      db      #00, #10 ; Pausa, duração 16.
+0f3b  6208      db      #62, #08 ; 6ª oitava, nota D, duração 8.
+0f3d  6008      db      #60, #08 ; 6ª oitava, nota C, duração 8.
+0f3f  5b08      db      #5b, #08 ; 5ª oitava, nota B, duração 8.
+0f41  6008      db      #60, #08 ; 6ª oitava, nota C, duração 8.
+0f43  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+0f45  0010      db      #00, #10 ; Pausa, duração 16.
+0f47  6508      db      #65, #08 ; 6ª oitava, nota F, duração 8.
+0f49  6408      db      #64, #08 ; 6ª oitava, nota E, duração 8.
+0f4b  6308      db      #63, #08 ; 6ª oitava, nota D#, duração 8.
+0f4d  6408      db      #64, #08 ; 6ª oitava, nota E, duração 8.
+0f4f  6b08      db      #6b, #08 ; 6ª oitava, nota B, duração 8.
+0f51  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+0f53  6808      db      #68, #08 ; 6ª oitava, nota G#, duração 8.
+0f55  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+0f57  6b08      db      #6b, #08 ; 6ª oitava, nota B, duração 8.
+0f59  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+0f5b  6808      db      #68, #08 ; 6ª oitava, nota G#, duração 8.
+0f5d  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+0f5f  7020      db      #70, #20 ; 7ª oitava, nota C, duração 32.
+0f61  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+0f63  7010      db      #70, #10 ; 7ª oitava, nota C, duração 16.
+0f65  6704      db      #67, #04 ; 6ª oitava, nota G, duração 4.
+0f67  6904      db      #69, #04 ; 6ª oitava, nota A, duração 4.
+0f69  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+0f6b  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+0f6d  6710      db      #67, #10 ; 6ª oitava, nota G, duração 16.
+0f6f  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+0f71  6704      db      #67, #04 ; 6ª oitava, nota G, duração 4.
+0f73  6904      db      #69, #04 ; 6ª oitava, nota A, duração 4.
+0f75  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+0f77  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+0f79  6710      db      #67, #10 ; 6ª oitava, nota G, duração 16.
+0f7b  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+0f7d  6704      db      #67, #04 ; 6ª oitava, nota G, duração 4.
+0f7f  6904      db      #69, #04 ; 6ª oitava, nota A, duração 4.
+0f81  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+0f83  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+0f85  6710      db      #67, #10 ; 6ª oitava, nota G, duração 16.
+0f87  6510      db      #65, #10 ; 6ª oitava, nota F, duração 16.
+0f89  6420      db      #64, #20 ; 6ª oitava, nota E, duração 32.
+0f8b  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+0f8d  6510      db      #65, #10 ; 6ª oitava, nota F, duração 16.
+0f8f  6710      db      #67, #10 ; 6ª oitava, nota G, duração 16.
+0f91  6710      db      #67, #10 ; 6ª oitava, nota G, duração 16.
+0f93  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+0f95  6708      db      #67, #08 ; 6ª oitava, nota G, duração 8.
+0f97  6508      db      #65, #08 ; 6ª oitava, nota F, duração 8.
+0f99  6408      db      #64, #08 ; 6ª oitava, nota E, duração 8.
+0f9b  6210      db      #62, #10 ; 6ª oitava, nota D, duração 16.
+0f9d  5710      db      #57, #10 ; 5ª oitava, nota G, duração 16.
+0f9f  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+0fa1  6510      db      #65, #10 ; 6ª oitava, nota F, duração 16.
+0fa3  6710      db      #67, #10 ; 6ª oitava, nota G, duração 16.
+0fa5  6710      db      #67, #10 ; 6ª oitava, nota G, duração 16.
+0fa7  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+0fa9  6708      db      #67, #08 ; 6ª oitava, nota G, duração 8.
+0fab  6508      db      #65, #08 ; 6ª oitava, nota F, duração 8.
+0fad  6408      db      #64, #08 ; 6ª oitava, nota E, duração 8.
+0faf  6220      db      #62, #20 ; 6ª oitava, nota D, duração 32.
+0fb1  6010      db      #60, #10 ; 6ª oitava, nota C, duração 16.
+0fb3  6210      db      #62, #10 ; 6ª oitava, nota D, duração 16.
+0fb5  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+0fb7  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+0fb9  6508      db      #65, #08 ; 6ª oitava, nota F, duração 8.
+0fbb  6408      db      #64, #08 ; 6ª oitava, nota E, duração 8.
+0fbd  6208      db      #62, #08 ; 6ª oitava, nota D, duração 8.
+0fbf  6008      db      #60, #08 ; 6ª oitava, nota C, duração 8.
+0fc1  5b10      db      #5b, #10 ; 5ª oitava, nota B, duração 16.
+0fc3  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+0fc5  6010      db      #60, #10 ; 6ª oitava, nota C, duração 16.
+0fc7  6210      db      #62, #10 ; 6ª oitava, nota D, duração 16.
+0fc9  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+0fcb  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+0fcd  6508      db      #65, #08 ; 6ª oitava, nota F, duração 8.
+0fcf  6408      db      #64, #08 ; 6ª oitava, nota E, duração 8.
+0fd1  6208      db      #62, #08 ; 6ª oitava, nota D, duração 8.
+0fd3  6008      db      #60, #08 ; 6ª oitava, nota C, duração 8.
+0fd5  5b20      db      #5b, #20 ; 5ª oitava, nota B, duração 32.
 ;
-0fd7  5b08      db      #5b, #08 ; 5� oitava, nota B, dura��o 8.
-0fd9  5908      db      #59, #08 ; 5� oitava, nota A, dura��o 8.
-0fdb  5708      db      #57, #08 ; 5� oitava, nota G, dura��o 8.
-0fdd  5908      db      #59, #08 ; 5� oitava, nota A, dura��o 8.
-0fdf  6010      db      #60, #10 ; 6� oitava, nota C, dura��o 16.
-0fe1  0010      db      #00, #10 ; Pausa, dura��o 16.
-0fe3  6208      db      #62, #08 ; 6� oitava, nota D, dura��o 8.
-0fe5  6008      db      #60, #08 ; 6� oitava, nota C, dura��o 8.
-0fe7  5b08      db      #5b, #08 ; 5� oitava, nota B, dura��o 8.
-0fe9  6008      db      #60, #08 ; 6� oitava, nota C, dura��o 8.
-0feb  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-0fed  0010      db      #00, #10 ; Pausa, dura��o 16.
-0fef  6508      db      #65, #08 ; 6� oitava, nota F, dura��o 8.
-0ff1  6408      db      #64, #08 ; 6� oitava, nota E, dura��o 8.
-0ff3  6308      db      #63, #08 ; 6� oitava, nota D#, dura��o 8.
-0ff5  6408      db      #64, #08 ; 6� oitava, nota E, dura��o 8.
-0ff7  6b08      db      #6b, #08 ; 6� oitava, nota B, dura��o 8.
-0ff9  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-0ffb  6808      db      #68, #08 ; 6� oitava, nota G#, dura��o 8.
-0ffd  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-0fff  6b08      db      #6b, #08 ; 6� oitava, nota B, dura��o 8.
-1001  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-1003  6808      db      #68, #08 ; 6� oitava, nota G#, dura��o 8.
-1005  6908      db      #69, #08 ; 6� oitava, nota A, dura��o 8.
-1007  7020      db      #70, #20 ; 7� oitava, nota C, dura��o 32.
-1009  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-100b  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-100d  7010      db      #70, #10 ; 7� oitava, nota C, dura��o 16.
-100f  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-1011  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-1013  6810      db      #68, #10 ; 6� oitava, nota G#, dura��o 16.
-1015  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-1017  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-1019  6510      db      #65, #10 ; 6� oitava, nota F, dura��o 16.
-101b  6210      db      #62, #10 ; 6� oitava, nota D, dura��o 16.
-101d  6020      db      #60, #20 ; 6� oitava, nota C, dura��o 32.
-101f  5b18      db      #5b, #18 ; 5� oitava, nota B, dura��o 24.
-1021  5908      db      #59, #08 ; 5� oitava, nota A, dura��o 8.
-1023  5920      db      #59, #20 ; 5� oitava, nota A, dura��o 32.
-1025  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-1027  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-1029  7120      db      #71, #20 ; 7� oitava, nota C#, dura��o 32.
-102b  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-102d  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-102f  7110      db      #71, #10 ; 7� oitava, nota C#, dura��o 16.
-1031  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-1033  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-1035  6810      db      #68, #10 ; 6� oitava, nota G#, dura��o 16.
-1037  6610      db      #66, #10 ; 6� oitava, nota F#, dura��o 16.
-1039  6810      db      #68, #10 ; 6� oitava, nota G#, dura��o 16.
-103b  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-103d  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-103f  6810      db      #68, #10 ; 6� oitava, nota G#, dura��o 16.
-1041  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-1043  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-1045  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-1047  7120      db      #71, #20 ; 7� oitava, nota C#, dura��o 32.
-1049  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-104b  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-104d  7110      db      #71, #10 ; 7� oitava, nota C#, dura��o 16.
-104f  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-1051  6910      db      #69, #10 ; 6� oitava, nota A, dura��o 16.
-1053  6810      db      #68, #10 ; 6� oitava, nota G#, dura��o 16.
-1055  6610      db      #66, #10 ; 6� oitava, nota F#, dura��o 16.
-1057  6b10      db      #6b, #10 ; 6� oitava, nota B, dura��o 16.
-1059  6810      db      #68, #10 ; 6� oitava, nota G#, dura��o 16.
-105b  6410      db      #64, #10 ; 6� oitava, nota E, dura��o 16.
-105d  6920      db      #69, #20 ; 6� oitava, nota A, dura��o 32.
+0fd7  5b08      db      #5b, #08 ; 5ª oitava, nota B, duração 8.
+0fd9  5908      db      #59, #08 ; 5ª oitava, nota A, duração 8.
+0fdb  5708      db      #57, #08 ; 5ª oitava, nota G, duração 8.
+0fdd  5908      db      #59, #08 ; 5ª oitava, nota A, duração 8.
+0fdf  6010      db      #60, #10 ; 6ª oitava, nota C, duração 16.
+0fe1  0010      db      #00, #10 ; Pausa, duração 16.
+0fe3  6208      db      #62, #08 ; 6ª oitava, nota D, duração 8.
+0fe5  6008      db      #60, #08 ; 6ª oitava, nota C, duração 8.
+0fe7  5b08      db      #5b, #08 ; 5ª oitava, nota B, duração 8.
+0fe9  6008      db      #60, #08 ; 6ª oitava, nota C, duração 8.
+0feb  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+0fed  0010      db      #00, #10 ; Pausa, duração 16.
+0fef  6508      db      #65, #08 ; 6ª oitava, nota F, duração 8.
+0ff1  6408      db      #64, #08 ; 6ª oitava, nota E, duração 8.
+0ff3  6308      db      #63, #08 ; 6ª oitava, nota D#, duração 8.
+0ff5  6408      db      #64, #08 ; 6ª oitava, nota E, duração 8.
+0ff7  6b08      db      #6b, #08 ; 6ª oitava, nota B, duração 8.
+0ff9  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+0ffb  6808      db      #68, #08 ; 6ª oitava, nota G#, duração 8.
+0ffd  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+0fff  6b08      db      #6b, #08 ; 6ª oitava, nota B, duração 8.
+1001  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+1003  6808      db      #68, #08 ; 6ª oitava, nota G#, duração 8.
+1005  6908      db      #69, #08 ; 6ª oitava, nota A, duração 8.
+1007  7020      db      #70, #20 ; 7ª oitava, nota C, duração 32.
+1009  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+100b  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+100d  7010      db      #70, #10 ; 7ª oitava, nota C, duração 16.
+100f  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+1011  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+1013  6810      db      #68, #10 ; 6ª oitava, nota G#, duração 16.
+1015  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+1017  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+1019  6510      db      #65, #10 ; 6ª oitava, nota F, duração 16.
+101b  6210      db      #62, #10 ; 6ª oitava, nota D, duração 16.
+101d  6020      db      #60, #20 ; 6ª oitava, nota C, duração 32.
+101f  5b18      db      #5b, #18 ; 5ª oitava, nota B, duração 24.
+1021  5908      db      #59, #08 ; 5ª oitava, nota A, duração 8.
+1023  5920      db      #59, #20 ; 5ª oitava, nota A, duração 32.
+1025  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+1027  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+1029  7120      db      #71, #20 ; 7ª oitava, nota C#, duração 32.
+102b  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+102d  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+102f  7110      db      #71, #10 ; 7ª oitava, nota C#, duração 16.
+1031  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+1033  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+1035  6810      db      #68, #10 ; 6ª oitava, nota G#, duração 16.
+1037  6610      db      #66, #10 ; 6ª oitava, nota F#, duração 16.
+1039  6810      db      #68, #10 ; 6ª oitava, nota G#, duração 16.
+103b  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+103d  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+103f  6810      db      #68, #10 ; 6ª oitava, nota G#, duração 16.
+1041  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+1043  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+1045  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+1047  7120      db      #71, #20 ; 7ª oitava, nota C#, duração 32.
+1049  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+104b  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+104d  7110      db      #71, #10 ; 7ª oitava, nota C#, duração 16.
+104f  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+1051  6910      db      #69, #10 ; 6ª oitava, nota A, duração 16.
+1053  6810      db      #68, #10 ; 6ª oitava, nota G#, duração 16.
+1055  6610      db      #66, #10 ; 6ª oitava, nota F#, duração 16.
+1057  6b10      db      #6b, #10 ; 6ª oitava, nota B, duração 16.
+1059  6810      db      #68, #10 ; 6ª oitava, nota G#, duração 16.
+105b  6410      db      #64, #10 ; 6ª oitava, nota E, duração 16.
+105d  6920      db      #69, #20 ; 6ª oitava, nota A, duração 32.
 ;
 105f  ee        db      #ee ; Repetir.
  
 ; BGM: MARCHA TURCA (MOZART). (Canal B.)
-1060  0c        db      #0c ; Forma da envolt�ria = 0 (\___).
-1061  8020      dw      #2080 ; Per�odo da envolt�ria = 8320.
-1063  00        db      #00 ; ?
+1060  0c        db      #0c ; Forma da envoltória = 0 (\___).
+1061  8020      dw      #2080 ; Período da envoltória = 8320.
+1063  00        db      #00 ; Valor para registrador de controle do gerador de ruído = 0.
 ;
-1064  0020      db      #00, #20 ; Pausa, dura��o 32.
-1066  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1068  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-106a  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-106c  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-106e  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1070  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-1072  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-1074  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-1076  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1078  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-107a  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-107c  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-107e  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1080  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-1082  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-1084  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-1086  4418      db      #44, #18 ; 4� oitava, nota E, dura��o 24.
-1088  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-108a  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-108c  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-108e  4418      db      #44, #18 ; 4� oitava, nota E, dura��o 24.
-1090  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-1092  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-1094  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-1096  4418      db      #44, #18 ; 4� oitava, nota E, dura��o 24.
-1098  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-109a  3b10      db      #3b, #10 ; 3� oitava, nota B, dura��o 16.
-109c  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-109e  4420      db      #44, #20 ; 4� oitava, nota E, dura��o 32.
-10a0  0020      db      #00, #20 ; Pausa, dura��o 32.
-10a2  4010      db      #40, #10 ; 4� oitava, nota C, dura��o 16.
-10a4  5010      db      #50, #10 ; 5� oitava, nota C, dura��o 16.
-10a6  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-10a8  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10aa  4720      db      #47, #20 ; 4� oitava, nota G, dura��o 32.
-10ac  0020      db      #00, #20 ; Pausa, dura��o 32.
-10ae  4010      db      #40, #10 ; 4� oitava, nota C, dura��o 16.
-10b0  5010      db      #50, #10 ; 5� oitava, nota C, dura��o 16.
-10b2  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-10b4  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10b6  4720      db      #47, #20 ; 4� oitava, nota G, dura��o 32.
-10b8  0020      db      #00, #20 ; Pausa, dura��o 32.
-10ba  3910      db      #39, #10 ; 3� oitava, nota A, dura��o 16.
-10bc  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-10be  4010      db      #40, #10 ; 4� oitava, nota C, dura��o 16.
-10c0  5010      db      #50, #10 ; 5� oitava, nota C, dura��o 16.
-10c2  4420      db      #44, #20 ; 4� oitava, nota E, dura��o 32.
-10c4  0020      db      #00, #20 ; Pausa, dura��o 32.
-10c6  3910      db      #39, #10 ; 3� oitava, nota A, dura��o 16.
-10c8  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-10ca  4010      db      #40, #10 ; 4� oitava, nota C, dura��o 16.
-10cc  5010      db      #50, #10 ; 5� oitava, nota C, dura��o 16.
-10ce  4420      db      #44, #20 ; 4� oitava, nota E, dura��o 32.
+1064  0020      db      #00, #20 ; Pausa, duração 32.
+1066  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1068  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+106a  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+106c  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+106e  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1070  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+1072  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+1074  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+1076  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1078  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+107a  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+107c  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+107e  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1080  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+1082  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+1084  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+1086  4418      db      #44, #18 ; 4ª oitava, nota E, duração 24.
+1088  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+108a  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+108c  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+108e  4418      db      #44, #18 ; 4ª oitava, nota E, duração 24.
+1090  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+1092  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+1094  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+1096  4418      db      #44, #18 ; 4ª oitava, nota E, duração 24.
+1098  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+109a  3b10      db      #3b, #10 ; 3ª oitava, nota B, duração 16.
+109c  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+109e  4420      db      #44, #20 ; 4ª oitava, nota E, duração 32.
+10a0  0020      db      #00, #20 ; Pausa, duração 32.
+10a2  4010      db      #40, #10 ; 4ª oitava, nota C, duração 16.
+10a4  5010      db      #50, #10 ; 5ª oitava, nota C, duração 16.
+10a6  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+10a8  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10aa  4720      db      #47, #20 ; 4ª oitava, nota G, duração 32.
+10ac  0020      db      #00, #20 ; Pausa, duração 32.
+10ae  4010      db      #40, #10 ; 4ª oitava, nota C, duração 16.
+10b0  5010      db      #50, #10 ; 5ª oitava, nota C, duração 16.
+10b2  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+10b4  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10b6  4720      db      #47, #20 ; 4ª oitava, nota G, duração 32.
+10b8  0020      db      #00, #20 ; Pausa, duração 32.
+10ba  3910      db      #39, #10 ; 3ª oitava, nota A, duração 16.
+10bc  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+10be  4010      db      #40, #10 ; 4ª oitava, nota C, duração 16.
+10c0  5010      db      #50, #10 ; 5ª oitava, nota C, duração 16.
+10c2  4420      db      #44, #20 ; 4ª oitava, nota E, duração 32.
+10c4  0020      db      #00, #20 ; Pausa, duração 32.
+10c6  3910      db      #39, #10 ; 3ª oitava, nota A, duração 16.
+10c8  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+10ca  4010      db      #40, #10 ; 4ª oitava, nota C, duração 16.
+10cc  5010      db      #50, #10 ; 5ª oitava, nota C, duração 16.
+10ce  4420      db      #44, #20 ; 4ª oitava, nota E, duração 32.
 ;
-10d0  0020      db      #00, #20 ; Pausa, dura��o 32.
-10d2  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-10d4  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10d6  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10d8  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10da  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-10dc  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10de  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10e0  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10e2  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-10e4  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10e6  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-10e8  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10ea  4510      db      #45, #10 ; 4� oitava, nota F, dura��o 16.
-10ec  5310      db      #53, #10 ; 5� oitava, nota D#, dura��o 16.
-10ee  5310      db      #53, #10 ; 5� oitava, nota D#, dura��o 16.
-10f0  5310      db      #53, #10 ; 5� oitava, nota D#, dura��o 16.
-10f2  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-10f4  5410      db      #54, #10 ; 5� oitava, nota E, dura��o 16.
-10f6  4210      db      #42, #10 ; 4� oitava, nota D, dura��o 16.
-10f8  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-10fa  4010      db      #40, #10 ; 4� oitava, nota C, dura��o 16.
-10fc  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-10fe  4210      db      #42, #10 ; 4� oitava, nota D, dura��o 16.
-1100  4b10      db      #4b, #10 ; 4� oitava, nota B, dura��o 16.
-1102  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-1104  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-1106  4810      db      #48, #10 ; 4� oitava, nota G#, dura��o 16.
-1108  4810      db      #48, #10 ; 4� oitava, nota G#, dura��o 16.
-110a  4920      db      #49, #20 ; 4� oitava, nota A, dura��o 32.
-110c  0020      db      #00, #20 ; Pausa, dura��o 32.
-110e  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1110  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1112  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1114  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1116  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1118  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-111a  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-111c  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-111e  4210      db      #42, #10 ; 4� oitava, nota D, dura��o 16.
-1120  4210      db      #42, #10 ; 4� oitava, nota D, dura��o 16.
-1122  4310      db      #43, #10 ; 4� oitava, nota D#, dura��o 16.
-1124  5310      db      #53, #10 ; 5� oitava, nota D#, dura��o 16.
-1126  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-1128  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-112a  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-112c  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-112e  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1130  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1132  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1134  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1136  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-1138  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-113a  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-113c  4910      db      #49, #10 ; 4� oitava, nota A, dura��o 16.
-113e  4210      db      #42, #10 ; 4� oitava, nota D, dura��o 16.
-1140  4210      db      #42, #10 ; 4� oitava, nota D, dura��o 16.
-1142  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-1144  4410      db      #44, #10 ; 4� oitava, nota E, dura��o 16.
-1146  3920      db      #39, #20 ; 3� oitava, nota A, dura��o 32.
+10d0  0020      db      #00, #20 ; Pausa, duração 32.
+10d2  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+10d4  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10d6  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10d8  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10da  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+10dc  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10de  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10e0  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10e2  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+10e4  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10e6  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+10e8  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10ea  4510      db      #45, #10 ; 4ª oitava, nota F, duração 16.
+10ec  5310      db      #53, #10 ; 5ª oitava, nota D#, duração 16.
+10ee  5310      db      #53, #10 ; 5ª oitava, nota D#, duração 16.
+10f0  5310      db      #53, #10 ; 5ª oitava, nota D#, duração 16.
+10f2  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+10f4  5410      db      #54, #10 ; 5ª oitava, nota E, duração 16.
+10f6  4210      db      #42, #10 ; 4ª oitava, nota D, duração 16.
+10f8  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+10fa  4010      db      #40, #10 ; 4ª oitava, nota C, duração 16.
+10fc  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+10fe  4210      db      #42, #10 ; 4ª oitava, nota D, duração 16.
+1100  4b10      db      #4b, #10 ; 4ª oitava, nota B, duração 16.
+1102  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+1104  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+1106  4810      db      #48, #10 ; 4ª oitava, nota G#, duração 16.
+1108  4810      db      #48, #10 ; 4ª oitava, nota G#, duração 16.
+110a  4920      db      #49, #20 ; 4ª oitava, nota A, duração 32.
+110c  0020      db      #00, #20 ; Pausa, duração 32.
+110e  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1110  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1112  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1114  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1116  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1118  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+111a  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+111c  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+111e  4210      db      #42, #10 ; 4ª oitava, nota D, duração 16.
+1120  4210      db      #42, #10 ; 4ª oitava, nota D, duração 16.
+1122  4310      db      #43, #10 ; 4ª oitava, nota D#, duração 16.
+1124  5310      db      #53, #10 ; 5ª oitava, nota D#, duração 16.
+1126  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+1128  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+112a  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+112c  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+112e  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1130  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1132  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1134  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1136  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+1138  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+113a  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+113c  4910      db      #49, #10 ; 4ª oitava, nota A, duração 16.
+113e  4210      db      #42, #10 ; 4ª oitava, nota D, duração 16.
+1140  4210      db      #42, #10 ; 4ª oitava, nota D, duração 16.
+1142  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+1144  4410      db      #44, #10 ; 4ª oitava, nota E, duração 16.
+1146  3920      db      #39, #20 ; 3ª oitava, nota A, duração 32.
 ;
 1148  ee        db      #ee ; Repetir.
 
 ; SFX: Tiro. (Canal C.)
-1149  0f        db      #0f ; Forma da envolt�ria = 0 (\___).
-114a  8020      dw      #2080 ; Per�odo da envolt�ria = 8320.
-114c  00        db      #00 ; ?
+1149  0f        db      #0f ; Amplitude fixa = 15.
+114a  8020      dw      #2080 ; Período da envoltória = 8320.
+114c  00        db      #00 ; Valor para registrador de controle do gerador de ruído = 0.
 ;
-114d  7b01      db      #7b, #01 ; 7� oitava, nota B, dura��o 1.
-114f  7a01      db      #7a, #01 ; 7� oitava, nota A#, dura��o 1.
-1151  7901      db      #79, #01 ; 7� oitava, nota A, dura��o 1.
-1153  7801      db      #78, #01 ; 7� oitava, nota G#, dura��o 1.
-1155  7701      db      #77, #01 ; 7� oitava, nota G, dura��o 1.
-1157  7601      db      #76, #01 ; 7� oitava, nota F#, dura��o 1.
-1159  7501      db      #75, #01 ; 7� oitava, nota F, dura��o 1.
-115b  7401      db      #74, #01 ; 7� oitava, nota E, dura��o 1.
-115d  7301      db      #73, #01 ; 7� oitava, nota D#, dura��o 1.
-115f  7201      db      #72, #01 ; 7� oitava, nota D, dura��o 1.
-1161  7101      db      #71, #01 ; 7� oitava, nota C#, dura��o 1.
-1163  7001      db      #70, #01 ; 7� oitava, nota C, dura��o 1.
-1165  6b01      db      #6b, #01 ; 6� oitava, nota B, dura��o 1.
-1167  6a01      db      #6a, #01 ; 6� oitava, nota A#, dura��o 1.
-1169  6901      db      #69, #01 ; 6� oitava, nota A, dura��o 1.
-116b  6801      db      #68, #01 ; 6� oitava, nota G#, dura��o 1.
-116d  6701      db      #67, #01 ; 6� oitava, nota G, dura��o 1.
-116f  6601      db      #66, #01 ; 6� oitava, nota F#, dura��o 1.
-1171  6501      db      #65, #01 ; 6� oitava, nota F, dura��o 1.
-1173  6401      db      #64, #01 ; 6� oitava, nota E, dura��o 1.
-1175  6301      db      #63, #01 ; 6� oitava, nota D#, dura��o 1.
-1177  6201      db      #62, #01 ; 6� oitava, nota D, dura��o 1.
+114d  7b01      db      #7b, #01 ; 7ª oitava, nota B, duração 1.
+114f  7a01      db      #7a, #01 ; 7ª oitava, nota A#, duração 1.
+1151  7901      db      #79, #01 ; 7ª oitava, nota A, duração 1.
+1153  7801      db      #78, #01 ; 7ª oitava, nota G#, duração 1.
+1155  7701      db      #77, #01 ; 7ª oitava, nota G, duração 1.
+1157  7601      db      #76, #01 ; 7ª oitava, nota F#, duração 1.
+1159  7501      db      #75, #01 ; 7ª oitava, nota F, duração 1.
+115b  7401      db      #74, #01 ; 7ª oitava, nota E, duração 1.
+115d  7301      db      #73, #01 ; 7ª oitava, nota D#, duração 1.
+115f  7201      db      #72, #01 ; 7ª oitava, nota D, duração 1.
+1161  7101      db      #71, #01 ; 7ª oitava, nota C#, duração 1.
+1163  7001      db      #70, #01 ; 7ª oitava, nota C, duração 1.
+1165  6b01      db      #6b, #01 ; 6ª oitava, nota B, duração 1.
+1167  6a01      db      #6a, #01 ; 6ª oitava, nota A#, duração 1.
+1169  6901      db      #69, #01 ; 6ª oitava, nota A, duração 1.
+116b  6801      db      #68, #01 ; 6ª oitava, nota G#, duração 1.
+116d  6701      db      #67, #01 ; 6ª oitava, nota G, duração 1.
+116f  6601      db      #66, #01 ; 6ª oitava, nota F#, duração 1.
+1171  6501      db      #65, #01 ; 6ª oitava, nota F, duração 1.
+1173  6401      db      #64, #01 ; 6ª oitava, nota E, duração 1.
+1175  6301      db      #63, #01 ; 6ª oitava, nota D#, duração 1.
+1177  6201      db      #62, #01 ; 6ª oitava, nota D, duração 1.
 ;
 1179  ff        db      #ff ; Fim.
 
-; SFX: Explos�o. (Canal C.)
-117a  0f        rrca
-117b  00        nop
-117c  00        nop
-117d  1f        rra
-117e  010102    ld      bc,#0201
-1181  010301    ld      bc,#0103
-1184  04        inc     b
-1185  010501    ld      bc,#0105
-1188  0601      ld      b,#01
-118a  07        rlca
-118b  010801    ld      bc,#0108
-118e  09        add     hl,bc
-118f  010a01    ld      bc,#010a
-1192  0b        dec     bc
-1193  010c01    ld      bc,#010c
-1196  0d        dec     c
-1197  010e02    ld      bc,#020e
-119a  0f        rrca
-119b  100e      djnz    #11ab           ; (14)
-119d  100d      djnz    #11ac           ; (13)
-119f  100c      djnz    #11ad           ; (12)
-11a1  100b      djnz    #11ae           ; (11)
-11a3  100a      djnz    #11af           ; (10)
-11a5  1009      djnz    #11b0           ; (9)
-11a7  1008      djnz    #11b1           ; (8)
-11a9  1007      djnz    #11b2           ; (7)
-11ab  1006      djnz    #11b3           ; (6)
-11ad  1005      djnz    #11b4           ; (5)
-11af  1004      djnz    #11b5           ; (4)
-11b1  1003      djnz    #11b6           ; (3)
-11b3  1802      jr      #11b7           ; (2)
-11b5  2001      jr      nz,#11b8        ; (1)
-11b7  20ff      jr      nz,#11b8        ; (-1)
+; SFX: Explosão. (Canal C.)
+117a  0f        db      #0f ; Amplitude fixa = 15.
+117b  0000      dw      #0000 ; Período da envoltória = 0.
+117d  1f        db      #1f ; Valor para registrador de controle do gerador de ruído = 31.
+;
+117e  0101      db      #01, #01 ; Amplitude 1, duração 1.
+1180  0201      db      #02, #01 ; Amplitude 2, duração 1.
+1182  0301      db      #03, #01 ; Amplitude 3, duração 1.
+1184  0401      db      #04, #01 ; Amplitude 4, duração 1.
+1186  0501      db      #05, #01 ; Amplitude 5, duração 1.
+1188  0601      db      #06, #01 ; Amplitude 6, duração 1.
+118a  0701      db      #07, #01 ; Amplitude 7, duração 1.
+118c  0801      db      #08, #01 ; Amplitude 8, duração 1.
+118e  0901      db      #09, #01 ; Amplitude 9, duração 1.
+1190  0a01      db      #0a, #01 ; Amplitude 10, duração 1.
+1192  0b01      db      #0b, #01 ; Amplitude 11, duração 1.
+1194  0c01      db      #0c, #01 ; Amplitude 12, duração 1.
+1196  0d01      db      #0d, #01 ; Amplitude 13, duração 1.
+1198  0e02      db      #0e, #02 ; Amplitude 14, duração 2.
+119a  0f10      db      #0f, #10 ; Amplitude 15, duração 16.
+119c  0e10      db      #0e, #10 ; Amplitude 14, duração 16.
+119e  0d10      db      #0d, #10 ; Amplitude 13, duração 16.
+11a0  0c10      db      #0c, #10 ; Amplitude 12, duração 16.
+11a2  0b10      db      #0b, #10 ; Amplitude 11, duração 16.
+11a4  0a10      db      #0a, #10 ; Amplitude 10, duração 16.
+11a6  0910      db      #09, #10 ; Amplitude 9, duração 16.
+11a8  0810      db      #08, #10 ; Amplitude 8, duração 16.
+11aa  0710      db      #07, #10 ; Amplitude 7, duração 16.
+11ac  0610      db      #06, #10 ; Amplitude 6, duração 16.
+11ae  0510      db      #05, #10 ; Amplitude 5, duração 16.
+11b0  0410      db      #04, #10 ; Amplitude 4, duração 16.
+11b2  0318      db      #03, #18 ; Amplitude 3, duração 24.
+11b4  0220      db      #02, #20 ; Amplitude 2, duração 32.
+11b6  0120      db      #01, #20 ; Amplitude 1, duração 32.
+;
+11b8  ff        db      #ff ; Fim.
+
 11b9  ff        rst     #38
 11ba  ff        rst     #38
 11bb  ff        rst     #38
