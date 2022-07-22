@@ -828,7 +828,7 @@
 0564  22540e    ld      (#0e54),hl ; Guarda posição do tanque azul.
 0567  21bf02    ld      hl,#02bf
 056a  22570e    ld      (#0e57),hl
-056d  225a0e    ld      (#0e5a),hl
+056d  225a0e    ld      (#0e5a),hl ; Ponteiro p/ figura a apagar.
 0570  3e02      ld      a,#02
 0572  32560e    ld      (#0e56),a
 0575  c9        ret
@@ -855,8 +855,8 @@
 05a6  32780e    ld      (#0e78),a
 05a9  af        xor     a
 05aa  32850e    ld      (#0e85),a
-05ad  325c0e    ld      (#0e5c),a
-05b0  327b0e    ld      (#0e7b),a
+05ad  325c0e    ld      (#0e5c),a ; Placar atual jogador 1.
+05b0  327b0e    ld      (#0e7b),a ; Placar atual jogador 2.
 05b3  3a4d04    ld      a,(#044d)
 05b6  47        ld      b,a
 05b7  218a0e    ld      hl,#0e8a
@@ -874,12 +874,12 @@
 05d1  af        xor     a
 05d2  32870e    ld      (#0e87),a
 05d5  32610e    ld      (#0e61),a
-05d8  3a5c0e    ld      a,(#0e5c)
-05db  110d80    ld      de,#800d
-05de  cd900d    call    #0d90
-05e1  3a7b0e    ld      a,(#0e7b)
-05e4  111a80    ld      de,#801a
-05e7  cd900d    call    #0d90
+05d8  3a5c0e    ld      a,(#0e5c) ; Placar atual jogador 1.
+05db  110d80    ld      de,#800d ; Posição na VRAM.
+05de  cd900d    call    #0d90 ; Exibe.
+05e1  3a7b0e    ld      a,(#0e7b) ; Placar atual jogador 2.
+05e4  111a80    ld      de,#801a ; Posição na VRAM.
+05e7  cd900d    call    #0d90 ; Exibe.
 05ea  3a560e    ld      a,(#0e56)
 05ed  fe05      cp      #05
 05ef  cafa05    jp      z,#05fa
@@ -917,9 +917,9 @@
 0648  3a0401    ld      a,(#0104) ; PLAY.
 064b  fe09      cp      #09
 064d  da5808    jp      c,#0858
-0650  0e39      ld      c,#39
-0652  cdce0d    call    #0dce
-0655  cab706    jp      z,#06b7
+0650  0e39      ld      c,#39 ; '9' (tiro).
+0652  cdce0d    call    #0dce ; Tecla foi pressionada?
+0655  cab706    jp      z,#06b7 ; Sim, desvia.
 0658  cdc106    call    #06c1
 065b  2a730e    ld      hl,(#0e73) ; Posição do tanque amarelo.
 065e  7c        ld      a,h
@@ -996,9 +996,9 @@
 06e2  c21a07    jp      nz,#071a
 06e5  7a        ld      a,d
 06e6  bc        cp      h
-06e7  3e48      ld      a,#48
+06e7  3e48      ld      a,#48 ; 'H' (cima).
 06e9  daee06    jp      c,#06ee
-06ec  3e50      ld      a,#50
+06ec  3e50      ld      a,#50 ; 'P' (baixo).
 06ee  321c01    ld      (#011c),a ; KEY0+1.
 06f1  3e01      ld      a,#01
 06f3  32850e    ld      (#0e85),a
@@ -1109,33 +1109,33 @@
 07e6  3a750e    ld      a,(#0e75)
 07e9  da0508    jp      c,#0805
 07ec  a7        and     a
-07ed  0650      ld      b,#50
+07ed  0650      ld      b,#50 ; 'P' (para baixo).
 07ef  cafe07    jp      z,#07fe
 07f2  fe02      cp      #02
-07f4  0648      ld      b,#48
+07f4  0648      ld      b,#48 ; 'H' (para cima).
 07f6  dafe07    jp      c,#07fe
 07f9  ca1508    jp      z,#0815
-07fc  0658      ld      b,#58
+07fc  0658      ld      b,#58 ; 'X' (para a esquerda).
 07fe  78        ld      a,b
 07ff  321c01    ld      (#011c),a ; KEY0+1.
 0802  c34708    jp      #0847
 0805  a7        and     a
-0806  0648      ld      b,#48
+0806  0648      ld      b,#48 ; 'H' (para cima).
 0808  cafe07    jp      z,#07fe
 080b  fe02      cp      #02
-080d  0650      ld      b,#50
+080d  0650      ld      b,#50 ; 'P' (para baixo).
 080f  dafe07    jp      c,#07fe
 0812  cafc07    jp      z,#07fc
-0815  0630      ld      b,#30
+0815  0630      ld      b,#30 ; '0' (para a direita).
 0817  c3fe07    jp      #07fe
 081a  3a750e    ld      a,(#0e75)
 081d  a7        and     a
 081e  cafc07    jp      z,#07fc
 0821  fe02      cp      #02
 0823  da1508    jp      c,#0815
-0826  0650      ld      b,#50
+0826  0650      ld      b,#50 ; 'P' (para baixo).
 0828  cafe07    jp      z,#07fe
-082b  0648      ld      b,#48
+082b  0648      ld      b,#48 ; 'H' (para cima).
 082d  c3fe07    jp      #07fe
 0830  3a0701    ld      a,(#0107) ; RANDOM.
 0833  0f        rrca
@@ -1154,7 +1154,7 @@
 084c  e60f      and     #0f
 084e  fe07      cp      #07
 0850  c25808    jp      nz,#0858
-0853  3e40      ld      a,#40
+0853  3e40      ld      a,#40 ; '@' (tiro).
 0855  321d01    ld      (#011d),a ; KEY0+2.
 0858  21b902    ld      hl,#02b9
 085b  22640e    ld      (#0e64),hl
@@ -1184,9 +1184,9 @@
 089c  328a0e    ld      (#0e8a),a
 089f  fe0a      cp      #0a
 08a1  dac008    jp      c,#08c0
-08a4  0e39      ld      c,#39
-08a6  cdce0d    call    #0dce
-08a9  c2c008    jp      nz,#08c0
+08a4  0e39      ld      c,#39 ; '9' (tiro).
+08a6  cdce0d    call    #0dce ; Tecla foi pressionada?
+08a9  c2c008    jp      nz,#08c0 ; Não: desvia.
 08ac  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 08af  eb        ex      de,hl
 08b0  cd3f0e    call    #0e3f
@@ -1200,9 +1200,9 @@
 08c4  328b0e    ld      (#0e8b),a
 08c7  fe0a      cp      #0a
 08c9  dad708    jp      c,#08d7
-08cc  0e40      ld      c,#40
-08ce  cdce0d    call    #0dce
-08d1  c2d708    jp      nz,#08d7
+08cc  0e40      ld      c,#40 ; '@' (tiro).
+08ce  cdce0d    call    #0dce ; Tecla foi pressionada?
+08d1  c2d708    jp      nz,#08d7 ; Não: desvia.
 08d4  cda406    call    #06a4
 08d7  218d0e    ld      hl,#0e8d
 08da  7e        ld      a,(hl)
@@ -1443,10 +1443,10 @@
 0ab6  47        ld      b,a
 0ab7  3a6e0e    ld      a,(#0e6e)
 0aba  4f        ld      c,a
-0abb  cdce0d    call    #0dce
+0abb  cdce0d    call    #0dce ; Tecla foi pressionada?
 0abe  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0ac1  eb        ex      de,hl
-0ac2  c2e70a    jp      nz,#0ae7
+0ac2  c2e70a    jp      nz,#0ae7 ; Tecla não pressionada: desvia.
 0ac5  7b        ld      a,e
 0ac6  e61f      and     #1f
 0ac8  fe01      cp      #01
@@ -1463,8 +1463,8 @@
 0ae4  c3c80b    jp      #0bc8
 0ae7  3a6f0e    ld      a,(#0e6f)
 0aea  4f        ld      c,a
-0aeb  cdce0d    call    #0dce
-0aee  c20b0b    jp      nz,#0b0b
+0aeb  cdce0d    call    #0dce ; Tecla foi pressionada?
+0aee  c20b0b    jp      nz,#0b0b ; Não: desvia.
 0af1  7b        ld      a,e
 0af2  e61f      and     #1f
 0af4  fe1e      cp      #1e
@@ -1479,8 +1479,8 @@
 0b08  c3de0a    jp      #0ade
 0b0b  3a700e    ld      a,(#0e70)
 0b0e  4f        ld      c,a
-0b0f  cdce0d    call    #0dce
-0b12  c2350b    jp      nz,#0b35
+0b0f  cdce0d    call    #0dce ; Tecla foi pressionada?
+0b12  c2350b    jp      nz,#0b35 ; Não: desvia.
 0b15  7a        ld      a,d
 0b16  fe81      cp      #81
 0b18  c2210b    jp      nz,#0b21
@@ -1497,8 +1497,8 @@
 0b32  c3de0a    jp      #0ade
 0b35  3a710e    ld      a,(#0e71)
 0b38  4f        ld      c,a
-0b39  cdce0d    call    #0dce
-0b3c  c25f0b    jp      nz,#0b5f
+0b39  cdce0d    call    #0dce ; Tecla foi pressionada?
+0b3c  c25f0b    jp      nz,#0b5f ; Não: desvia.
 0b3f  7a        ld      a,d
 0b40  fe87      cp      #87
 0b42  c24b0b    jp      nz,#0b4b
@@ -1527,8 +1527,8 @@
 0b76  d27f0b    jp      nc,#0b7f
 0b79  cd4b0d    call    #0d4b
 0b7c  c2c80b    jp      nz,#0bc8
-0b7f  cde20d    call    #0de2
-0b82  ca930b    jp      z,#0b93
+0b7f  cde20d    call    #0de2 ; Apaga tanque azul.
+0b82  ca930b    jp      z,#0b93 ; Desvia se não houve colisão.
 0b85  3a5e0e    ld      a,(#0e5e)
 0b88  fe0a      cp      #0a
 0b8a  da930b    jp      c,#0b93
@@ -1570,8 +1570,8 @@
 0bda  3c        inc     a
 0bdb  325f0e    ld      (#0e5f),a
 0bde  3600      ld      (hl),#00
-0be0  cde20d    call    #0de2
-0be3  caf40b    jp      z,#0bf4
+0be0  cde20d    call    #0de2 ; Apaga tanque azul.
+0be3  caf40b    jp      z,#0bf4 ; Desvia se não houve colisão.
 0be6  3a5e0e    ld      a,(#0e5e)
 0be9  fe0a      cp      #0a
 0beb  daf40b    jp      c,#0bf4
@@ -1598,9 +1598,9 @@
 0c1e  3d        dec     a
 0c1f  ca520c    jp      z,#0c52
 0c22  32590e    ld      (#0e59),a
-0c25  3a7b0e    ld      a,(#0e7b)
-0c28  c605      add     a,#05
-0c2a  327b0e    ld      (#0e7b),a
+0c25  3a7b0e    ld      a,(#0e7b) ; Placar atual jogador 2.
+0c28  c605      add     a,#05 ; +5 pontos.
+0c2a  327b0e    ld      (#0e7b),a ; Placar atual jogador 2.
 0c2d  01e803    ld      bc,#03e8 ; 1000ms
 0c30  cd48c0    call    #c048 ; DELAYB
 0c33  c1        pop     bc
@@ -1634,7 +1634,7 @@
 0c75  17        rla
 0c76  17        rla
 0c77  80        add     a,b
-0c78  215c0e    ld      hl,#0e5c
+0c78  215c0e    ld      hl,#0e5c ; Placar atual jogador 1.
 0c7b  86        add     a,(hl)
 0c7c  322301    ld      (#0123),a ; SCOREA.
 0c7f  110d80    ld      de,#800d
@@ -1645,12 +1645,12 @@
 0c8a  17        rla
 0c8b  17        rla
 0c8c  80        add     a,b
-0c8d  217b0e    ld      hl,#0e7b
+0c8d  217b0e    ld      hl,#0e7b ; Placar atual jogador 2.
 0c90  86        add     a,(hl)
 0c91  322401    ld      (#0124),a ; SCOREB.
 0c94  111a80    ld      de,#801a
 0c97  cd900d    call    #0d90
-0c9a  cd4ec0    call    #c04e ; LSCORE.
+0c9a  cd4ec0    call    #c04e ; LSCORE. (Transfere placares atuais para tabela.)
 0c9d  c1        pop     bc
 0c9e  018813    ld      bc,#1388 ; 5000ms.
 0ca1  cd48c0    call    #c048 ; DELAYB.
@@ -1679,7 +1679,7 @@
 0ce3  3e8a      ld      a,#8a
 0ce5  d380      out     (#80),a
 0ce7  2a570e    ld      hl,(#0e57)
-0cea  225a0e    ld      (#0e5a),hl
+0cea  225a0e    ld      (#0e5a),hl ; Ponteiro p/ figura a apagar.
 0ced  5e        ld      e,(hl)
 0cee  23        inc     hl
 0cef  56        ld      d,(hl)
@@ -1800,11 +1800,11 @@
 0db0  cd3fc0    call    #c03f ; DISPY2
 0db3  d1        pop     de
 0db4  c9        ret
- 
+
 0db5  011e00    ld      bc,#001e ; 30ms
 0db8  cd48c0    call    #c048 ; DELAYB
 0dbb  c9        ret
- 
+
 ; Limpa KEY0~KEY0+3 e chama SKEY?.
 0dbc  af        xor     a
 0dbd  211b01    ld      hl,#011b ; KEY0.
@@ -1823,6 +1823,7 @@
  
 ; Verifica se a tecla em C foi pressionada
 ; (i.e., se está em KEY0~KEY0+3).
+; Flag Z ativado se foi.
 0dce  3a1b01    ld      a,(#011b) ; KEY0.
 0dd1  b9        cp      c
 0dd2  c8        ret     z
@@ -1835,9 +1836,9 @@
 0ddd  3a1e01    ld      a,(#011e) ; KEY0+3.
 0de0  b9        cp      c
 0de1  c9        ret
- 
-;
-0de2  2a5a0e    ld      hl,(#0e5a)
+
+; Apaga tanque azul.
+0de2  2a5a0e    ld      hl,(#0e5a) ; Ponteiro p/ figura a apagar.
 0de5  5e        ld      e,(hl)
 0de6  23        inc     hl
 0de7  56        ld      d,(hl)
@@ -1846,8 +1847,8 @@
 0dee  3a880e    ld      a,(#0e88) ; SHAPE0'.
 0df1  a7        and     a
 0df2  c9        ret
- 
-; "SHAPON'", réplica da rotina SHAPON (!!!!).
+
+; "SHAPON'", réplica da rotina SHAPON  da ROM (!!!!).
 0df3  e5        push    hl
 0df4  d5        push    de
 0df5  c5        push    bc
@@ -1870,7 +1871,7 @@
 0e0f  e1        pop     hl
 0e10  c9        ret
  
-; "SHAPOF'", réplica da rotina SHAPOF (!!!!).
+; "SHAPOF'", réplica da rotina SHAPOF da ROM (!!!!).
 ; Diferenças:
 ; 1. O byte usado no apagamento é sempre #00,
 ;    e não o registrador C.
@@ -1922,53 +1923,55 @@
 0e53  c9        ret
  
 0e54  ffff      dw      #ffff ; Posição do tanque azul na VRAM.
-0e56  ff        rst     #38
+0e56  ff        db      #ff
 0e57  ffff      dw      #ffff ; Ponteiro p/ figura (a desenhar?).
-0e59  ff        rst     #38
- 
+0e59  ff        db      #ff
 0e5a  ffff      dw      #ffff ; Ponteiro p/ figura a apagar.
-0e5c  ff        rst     #38
-0e5d  00        nop
-0e5e  00        nop
-0e5f  ff        rst     #38
-0e60  ff        rst     #38
-0e61  ff        rst     #38
-0e62  c7        rst     #0
-0e63  02        ld      (bc),a
-0e64  b3        or      e
-0e65  02        ld      (bc),a
-0e66  bf        cp      a
-0e67  02        ld      (bc),a
-0e68  ed02      db      #ed, #02        ; Undocumented 8 T-State NOP
-0e6a  59        ld      e,c
-0e6b  314951    ld      sp,#5149
-0e6e  59        ld      e,c
-0e6f  314951    ld      sp,#5149
-0e72  39        add     hl,sp
+0e5c  ff        db      #ff ; Placar atual jogador 1.
+0e5d  00        db      #00
+0e5e  00        db      #00
+0e5f  ff        db      #ff
+0e60  ff        db      #ff
+0e61  ff        db      #ff
+0e62  c702      dw      #02c7
+0e64  b302      dw      #02b3
+0e66  bf02      dw      #02bf
+0e68  ed02      dw      #02ed
+0e6a  59        db      #59 ; 'Y' (esquerda).
+0e6b  31        db      #31 ; '1' (direita).
+0e6c  49        db      #49 ; 'I' (cima).
+0e6d  51        db      #51 ; 'Q' (baixo).
+0e6e  59        db      #59 ; 'Y' (esquerda).
+0e6f  31        db      #31 ; '1' (direita).
+0e70  49        db      #49 ; 'I' (cima).
+0e71  51        db      #51 ; 'Q' (baixo).
+0e72  39        db      #39 ; '9' (tiro).
 ;
 0e73  ffff      dw      #ffff ; Posição do tanque amarelo na VRAM.
-0e75  ff        rst     #38
-0e76  ff        rst     #38
-0e77  ff        rst     #38
-0e78  ff        rst     #38
-0e79  ff        rst     #38
-0e7a  ff        rst     #38
-0e7b  ff        rst     #38
-0e7c  0100ff    ld      bc,#ff00
-0e7f  ff        rst     #38
-0e80  58        ld      e,b
-0e81  3048      jr      nc,#0ecb        ; (72)
-0e83  50        ld      d,b
-0e84  40        ld      b,b
-0e85  ff        rst     #38
-0e86  ff        rst     #38
-0e87  ff        rst     #38
+0e75  ff        db      #ff
+0e76  ffff      dw      #ffff
+0e78  ff        db      #ff
+0e79  ffff      dw      #ffff
+0e7b  ff        db      #ff ; Placar atual jogador 2.
+0e7c  01        db      #01
+0e7d  00        db      #00
+0e7e  ff        db      #ff
+0e7f  ff        db      #ff
+0e80  58        db      #58 ; 'X' (esquerda).
+0e81  30        db      #30 ; '0' (direita).
+0e82  48        db      #48 ; 'H' (cima).
+0e83  50        db      #50 ; 'P' (baixo).
+0e84  40        db      #40 ; '@' (tiro)
+0e85  ff        db      #ff
+0e86  ff        db      #ff
+0e87  ff        db      #ff
  
 0e88  00        db      #00 ; SHAPE0', indicador de colisão
                             ; para a rotina SHAPOF'.
 0e89  00        nop
 0e8a  ff        rst     #38
 0e8b  ff        rst     #38
+
 0e8c  ff        rst     #38
 0e8d  ff        rst     #38
 0e8e  ff        rst     #38
