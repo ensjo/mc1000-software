@@ -119,87 +119,117 @@
 022a  c37904    jp      #0479
 022d  c37904    jp      #0479
 0230  c34bc0    jp      #c04b ; SCORE
- 
+
+;
+;
+;
+;    MMEEEMM   KKKKKK   NNFFFNN
+;    a                        b
+;    a                        b
+;    a                        b
+;    i   U   jOOGGGGOOk   V   l
+;    i   U   j        k   V   l
+;    i   c   j        k   d   l
+;        c                d
+;        c       PP       d
+;        q       PP       r
+;    m   q   n        o   r   p
+;  = mAAAqBBBn        oCCCrDDDp =
+;    m   W   n        o   X   p
+;        W       QQ       X
+;        e       QQ       f
+;        e                f
+;    s   e   t        u   f   v
+;    s   Y   t        u   Z   v
+;    s   Y   tRRHHHHRRu   Z   v
+;    g                        h
+;    g                        h
+;    g                        h
+;    SSIIISS   LLLLLL   TTJJJTT
+;
+;
+;
+
 ; Posições para desenhar uma parede
 ; de 2 bytes x 2 linhas.
-0233  8381      dw      #8183
-0235  8881      dw      #8188
-0237  9681      dw      #8196
-0239  9b81      dw      #819b
-023b  8c82      dw      #828c
-023d  9282      dw      #8292
-023f  8f83      dw      #838f
-0241  cf83      dw      #83cf
-0243  cf84      dw      #84cf
-0245  0f85      dw      #850f
-0247  0c86      dw      #860c
-0249  1286      dw      #8612
-024b  0387      dw      #8703
-024d  0887      dw      #8708
-024f  1687      dw      #8716
-0251  1b87      dw      #871b
+0233  8381      dw      #8183 ; M
+0235  8881      dw      #8188 ; M
+0237  9681      dw      #8196 ; N
+0239  9b81      dw      #819b ; N
+023b  8c82      dw      #828c ; O
+023d  9282      dw      #8292 ; O
+023f  8f83      dw      #838f ; P
+0241  cf83      dw      #83cf ; P
+0243  cf84      dw      #84cf ; Q
+0245  0f85      dw      #850f ; Q
+0247  0c86      dw      #860c ; R
+0249  1286      dw      #8612 ; R
+024b  0387      dw      #8703 ; S
+024d  0887      dw      #8708 ; S
+024f  1687      dw      #8716 ; T
+0251  1b87      dw      #871b ; T
 0253  ffff      dw      #ffff
  
 ; Posições para desenhar uma parede
 ; de 1 byte x 4 linhas.
-0255  8782      dw      #8287
-0257  9882      dw      #8298
-0259  8784      dw      #8487
-025b  9884      dw      #8498
-025d  c785      dw      #85c7
-025f  d885      dw      #85d8
+0255  8782      dw      #8287 ; U
+0257  9882      dw      #8298 ; V
+0259  8784      dw      #8487 ; W
+025b  9884      dw      #8498 ; X
+025d  c785      dw      #85c7 ; Y
+025f  d885      dw      #85d8 ; Z
 0261  ffff      dw      #ffff
  
 ; Posições para desenhar uma parede
 ; de 3 bytes x 2 linhas.
-0263  4484      dw      #8444
-0265  4884      dw      #8448
-0267  5584      dw      #8455
-0269  5984      dw      #8459
+0263  4484      dw      #8444 ; A
+0265  4884      dw      #8448 ; B
+0267  5584      dw      #8455 ; C
+0269  5984      dw      #8459 ; D
 ;
-026b  8581      dw      #8185
-026d  9881      dw      #8198
-026f  8e82      dw      #828e
-0271  8f82      dw      #828f
-0273  0e86      dw      #860e
-0275  0f86      dw      #860f
-0277  0587      dw      #8705
-0279  1887      dw      #8718
+026b  8581      dw      #8185 ; E
+026d  9881      dw      #8198 ; F
+026f  8e82      dw      #828e ; G
+0271  8f82      dw      #828f ; G
+0273  0e86      dw      #860e ; H
+0275  0f86      dw      #860f ; H
+0277  0587      dw      #8705 ; I
+0279  1887      dw      #8718 ; J
 ;
-027b  8d81      dw      #818d
-027d  9081      dw      #8190
-027f  0d87      dw      #870d
-0281  1087      dw      #8710
+027b  8d81      dw      #818d ; K
+027d  9081      dw      #8190 ; K
+027f  0d87      dw      #870d ; L
+0281  1087      dw      #8710 ; L
 0283  ffff      dw      #ffff
  
 ; Posições para desenhar uma parede
 ; de 1 byte x 6 linhas.
-0285  c381      dw      #81c3
-0287  dc81      dw      #81dc
-0289  0783      dw      #8307
-028b  1883      dw      #8318
-028d  0785      dw      #8507
-028f  1885      dw      #8518
-0291  4386      dw      #8643
-0293  5c86      dw      #865c
+0285  c381      dw      #81c3 ; a
+0287  dc81      dw      #81dc ; b
+0289  0783      dw      #8307 ; c
+028b  1883      dw      #8318 ; d
+028d  0785      dw      #8507 ; e
+028f  1885      dw      #8518 ; f
+0291  4386      dw      #8643 ; g
+0293  5c86      dw      #865c ; h
 ;
-0295  8382      dw      #8283
-0297  8b82      dw      #828b
-0299  9482      dw      #8294
-029b  9c82      dw      #829c
-029d  0384      dw      #8403
-029f  0b84      dw      #840b
-02a1  1484      dw      #8414
-02a3  1c84      dw      #841c
-02a5  c783      dw      #83c7
-02a7  d883      dw      #83d8
-02a9  8385      dw      #8583
-02ab  8b85      dw      #858b
-02ad  9485      dw      #8594
-02af  9c85      dw      #859c
+0295  8382      dw      #8283 ; i
+0297  8b82      dw      #828b ; j
+0299  9482      dw      #8294 ; k
+029b  9c82      dw      #829c ; l
+029d  0384      dw      #8403 ; m
+029f  0b84      dw      #840b ; n
+02a1  1484      dw      #8414 ; o
+02a3  1c84      dw      #841c ; p
+02a5  c783      dw      #83c7 ; q
+02a7  d883      dw      #83d8 ; r
+02a9  8385      dw      #8583 ; s
+02ab  8b85      dw      #858b ; t
+02ad  9485      dw      #8594 ; u
+02af  9c85      dw      #859c ; v
 02b1  ffff      dw      #ffff
  
-;
+; #0e64 em algum momento aponta para cá.
 02b3  d9        exx
 02b4  03        inc     bc
 02b5  f5        push    af
@@ -211,7 +241,7 @@
 02bd  00        nop
 02be  00        nop
  
-;
+; #0e66 em algum momento aponta para cá.
 02bf  5d        ld      e,l
 02c0  03        inc     bc
 02c1  00        nop
@@ -220,6 +250,8 @@
 02c4  03        inc     bc
 02c5  00        nop
 02c6  00        nop
+
+; #0e62 em algum momento aponta para cá.
 02c7  27        daa
 02c8  03        inc     bc
 02c9  0f        rrca
@@ -245,6 +277,8 @@
 02e9  2804      jr      z,#02ef         ; (4)
 02eb  00        nop
 02ec  00        nop
+
+; #0e68 em algum momento aponta para cá.
 02ed  9b        sbc     a,e
 02ee  03        inc     bc
 02ef  00        nop
@@ -687,13 +721,15 @@
 ;
 0449  dd        db      #dd ; 11.01.11.01 (vermelho e amarelo alternados).
 044a  03        db      #03 ; 3 bytes.
- 
+
+; Padrão para os caracteres dois-pontos no alto da tela.
 044b  3c        db      #3c ; 00.11.11.00 (ponto vermelho sobre fundo verde).
-044c  14        inc     d
-044d  1a        ld      a,(de)
-044e  58        ld      e,b
-044f  40        ld      b,b
-0450  ff        rst     #38
+
+044c  14        db      #14 ; 20
+044d  1a        db      #1a ; 26 (qtd de bytes a zerar desde $0e8a)
+044e  58        db      #58
+044f  40        db      #40
+0450  ff        db      #ff
  
 ; Inicializa música.
 0451  212b0f    ld      hl,#0f2b ; Notas para o canal A.
@@ -738,7 +774,7 @@
 049a  225f0e    ld      (#0e5f),hl
 049d  227e0e    ld      (#0e7e),hl
 04a0  222301    ld      (#0123),hl ; SCOREA & SCOREB
-04a3  3e88      ld      a,#88 ; Tela em modo GR.
+04a3  3e88      ld      a,#88 ; Tela em modo GR (128x64, verde/amarelo/azul/vermelho).
 04a5  d380      out     (#80),a ; COL32.
 04a7  0600      ld      b,#00 ; Limpa tela com fundo verde.
 04a9  cd30c0    call    #c030 ; XCLEAR.
@@ -749,14 +785,45 @@
 04b4  cae104    jp      z,#04e1
 04b7  fe03      cp      #03
 04b9  2a4904    ld      hl,(#0449)
-04bc  4d        ld      c,l
-04bd  44        ld      b,h
+04bc  4d        ld      c,l ; Padrão vermelho e amarelo alternados.
+04bd  44        ld      b,h ; 3 bytes.
 04be  dacc04    jp      c,#04cc
 04c1  caf304    jp      z,#04f3
 04c4  d604      sub     #04
 04c6  ca0805    jp      z,#0508
 04c9  c2b204    jp      nz,#04b2
+
 ; PLAY=2,6,10,14.
+;
+;
+;
+;    #######   ######   #######
+;
+;
+;
+;    #   #   ##########   #   #
+;    #   #   #        #   #   #
+;    #       #        #       #
+;
+;                ##
+;        #       ##       #
+;    #   #   #        #   #   #
+;  = #########        ######### =
+;    #   #   #        #   #   #
+;        #       ##       #
+;                ##
+;
+;    #       #        #       #
+;    #   #   #        #   #   #
+;    #   #   ##########   #   #
+;
+;
+;
+;    #######   ######   #######
+;
+;
+;
+
 04cc  3e02      ld      a,#02 ; 2 linhas de altura.
 04ce  116402    ld      de,#0264
 04d1  cd110f    call    #0f11
@@ -765,7 +832,37 @@
 04d8  119602    ld      de,#0296
 04db  cd110f    call    #0f11
 04de  c31a05    jp      #051a
+
 ; PLAY=1,5,9,13.
+;
+;
+;
+;    #######   ######   #######
+;    #                        #
+;    #                        #
+;    #                        #
+;    #   #   ##########   #   #
+;    #   #   #        #   #   #
+;    #   #   #        #   #   #
+;        #                #
+;        #       ##       #
+;        #       ##       #
+;    #   #   #        #   #   #
+;  = #########        ######### =
+;    #   #   #        #   #   #
+;        #       ##       #
+;        #       ##       #
+;        #                #
+;    #   #   #        #   #   #
+;    #   #   #        #   #   #
+;    #   #   ##########   #   #
+;    #                        #
+;    #                        #
+;    #                        #
+;    #######   ######   #######
+;
+;
+;
 04e1  118602    ld      de,#0286
 04e4  01dd01    ld      bc,#01dd ; 1 byte de largura, padrão 11.01.11.01.
 04e7  3e06      ld      a,#06 ; 6 linhas de altura.
@@ -773,7 +870,37 @@
 04ec  0603      ld      b,#03 ; 3 bytes de largura.
 04ee  3e02      ld      a,#02 ; 2 linhas de altura.
 04f0  c3cc04    jp      #04cc
+
 ; PLAY=3,7,11,15.
+;
+;
+;
+;    #######   ######   #######
+;    #                        #
+;    #                        #
+;    #                        #
+;    #   #   ##########   #   #
+;    #   #   #        #   #   #
+;    #   #   #        #   #   #
+;        #                #
+;        #       ##       #
+;        #       ##       #
+;    #   #   #        #   #   #
+;  = #   #   #        #   #   # =
+;    #   #   #        #   #   #
+;        #       ##       #
+;        #       ##       #
+;        #                #
+;    #   #   #        #   #   #
+;    #   #   #        #   #   #
+;    #   #   ##########   #   #
+;    #                        #
+;    #                        #
+;    #                        #
+;    #######   ######   #######
+;
+;
+;
 04f3  3e02      ld      a,#02 ; 2 linhas de altura.
 04f5  116c02    ld      de,#026c
 04f8  cd110f    call    #0f11
@@ -782,7 +909,37 @@
 04ff  118602    ld      de,#0286
 0502  cd110f    call    #0f11
 0505  c31a05    jp      #051a
+
 ; PLAY=4,8,12,16.
+;
+;
+;
+;    ##   ##   ######   ##   ##
+;
+;
+;
+;    #   #   ###    ###   #   #
+;    #   #   #        #   #   #
+;    #       #        #       #
+;
+;                ##
+;        #       ##       #
+;    #   #   #        #   #   #
+;  = #   #   #        #   #   # =
+;    #   #   #        #   #   #
+;        #       ##       #
+;                ##
+;
+;    #       #        #       #
+;    #   #   #        #   #   #
+;    #   #   ###    ###   #   #
+;
+;
+;
+;    ##   ##   ######   ##   ##
+;
+;
+;
 0508  3e02      ld      a,#02 ; 2 linhas de altura.
 050a  117c02    ld      de,#027c
 050d  cd110f    call    #0f11
@@ -857,9 +1014,9 @@
 05aa  32850e    ld      (#0e85),a
 05ad  325c0e    ld      (#0e5c),a ; Placar atual jogador 1.
 05b0  327b0e    ld      (#0e7b),a ; Placar atual jogador 2.
-05b3  3a4d04    ld      a,(#044d)
+05b3  3a4d04    ld      a,(#044d) ; 26.
 05b6  47        ld      b,a
-05b7  218a0e    ld      hl,#0e8a
+05b7  218a0e    ld      hl,#0e8a ; Contador de ciclos de espera para jogador 1.
 05ba  3600      ld      (hl),#00
 05bc  23        inc     hl
 05bd  05        dec     b
@@ -919,8 +1076,8 @@
 064d  da5808    jp      c,#0858
 0650  0e39      ld      c,#39 ; '9' (tiro).
 0652  cdce0d    call    #0dce ; Tecla foi pressionada?
-0655  cab706    jp      z,#06b7 ; Sim, desvia.
-0658  cdc106    call    #06c1
+0655  cab706    jp      z,#06b7 ; Sim: desvia. Apaga KEY0~KEY0+3 e coloca C em KEY0.
+0658  cdc106    call    #06c1 ; Apaga KEY0~KEY0+3.
 065b  2a730e    ld      hl,(#0e73) ; Posição do tanque amarelo.
 065e  7c        ld      a,h
 065f  fe83      cp      #83
@@ -961,10 +1118,11 @@
  
 06af  cd630a    call    #0a63
 06b2  af        xor     a
-06b3  328b0e    ld      (#0e8b),a
+06b3  328b0e    ld      (#0e8b),a ; Contador de ciclos de espera para jogador 2.
 06b6  c9        ret
- 
-06b7  cdc106    call    #06c1
+
+; Apaga KEY0~KEY0+3 e coloca C em KEY0.
+06b7  cdc106    call    #06c1 ; Apaga KEY0~KEY0+3.
 06ba  79        ld      a,c
 06bb  321b01    ld      (#011b),a ; KEY0.
 06be  c35b06    jp      #065b
@@ -1179,10 +1337,10 @@
 0891  3a870e    ld      a,(#0e87)
 0894  a7        and     a
 0895  c2ed09    jp      nz,#09ed
-0898  3a8a0e    ld      a,(#0e8a)
-089b  3c        inc     a
-089c  328a0e    ld      (#0e8a),a
-089f  fe0a      cp      #0a
+0898  3a8a0e    ld      a,(#0e8a) ; Contador de ciclos de espera para jogador 1.
+089b  3c        inc     a ; Incrementa.
+089c  328a0e    ld      (#0e8a),a ; Contador de ciclos de espera para jogador 1.
+089f  fe0a      cp      #0a ; Aceita comando quando conta até 10.
 08a1  dac008    jp      c,#08c0
 08a4  0e39      ld      c,#39 ; '9' (tiro).
 08a6  cdce0d    call    #0dce ; Tecla foi pressionada?
@@ -1194,11 +1352,11 @@
 08b6  c2d708    jp      nz,#08d7
 08b9  cd630a    call    #0a63
 08bc  af        xor     a
-08bd  328a0e    ld      (#0e8a),a
-08c0  3a8b0e    ld      a,(#0e8b)
-08c3  3c        inc     a
-08c4  328b0e    ld      (#0e8b),a
-08c7  fe0a      cp      #0a
+08bd  328a0e    ld      (#0e8a),a ; Contador de ciclos de espera para jogador 1.
+08c0  3a8b0e    ld      a,(#0e8b) ; Contador de ciclos de espera para jogador 2.
+08c3  3c        inc     a ; Incrementa.
+08c4  328b0e    ld      (#0e8b),a ; Contador de ciclos de espera para jogador 2.
+08c7  fe0a      cp      #0a ; Aceita comando quando conta até 10.
 08c9  dad708    jp      c,#08d7
 08cc  0e40      ld      c,#40 ; '@' (tiro).
 08ce  cdce0d    call    #0dce ; Tecla foi pressionada?
@@ -1968,36 +2126,38 @@
  
 0e88  00        db      #00 ; SHAPE0', indicador de colisão
                             ; para a rotina SHAPOF'.
-0e89  00        nop
-0e8a  ff        rst     #38
-0e8b  ff        rst     #38
+0e89  00        db      #00
 
-0e8c  ff        rst     #38
-0e8d  ff        rst     #38
-0e8e  ff        rst     #38
-0e8f  ff        rst     #38
-0e90  ff        rst     #38
-0e91  ff        rst     #38
-0e92  ff        rst     #38
-0e93  ff        rst     #38
-0e94  ff        rst     #38
-0e95  ff        rst     #38
-0e96  ff        rst     #38
-0e97  ff        rst     #38
-0e98  ff        rst     #38
-0e99  ff        rst     #38
-0e9a  ff        rst     #38
-0e9b  ff        rst     #38
-0e9c  ff        rst     #38
-0e9d  ff        rst     #38
-0e9e  ff        rst     #38
-0e9f  ff        rst     #38
-0ea0  ff        rst     #38
-0ea1  ff        rst     #38
-0ea2  ff        rst     #38
-0ea3  ff        rst     #38
-0ea4  ff        rst     #38
-0ea5  ff        rst     #38
+0e8a  ff        db      #ff ; Contador de ciclos de espera para jogador 1.
+0e8b  ff        db      #ff ; Contador de ciclos de espera para jogador 2.
+
+0e8c  ff        db      #ff
+0e8d  ff        db      #ff
+0e8e  ff        db      #ff
+0e8f  ff        db      #ff
+0e90  ff        db      #ff
+0e91  ff        db      #ff
+0e92  ff        db      #ff
+0e93  ff        db      #ff
+0e94  ff        db      #ff
+0e95  ff        db      #ff
+0e96  ff        db      #ff
+0e97  ff        db      #ff
+0e98  ff        db      #ff
+0e99  ff        db      #ff
+0e9a  ff        db      #ff
+0e9b  ff        db      #ff
+0e9c  ff        db      #ff
+0e9d  ff        db      #ff
+0e9e  ff        db      #ff
+0e9f  ff        db      #ff
+0ea0  ff        db      #ff
+0ea1  ff        db      #ff
+0ea2  ff        db      #ff
+0ea3  ff        db      #ff
+0ea4  ff        db      #ff
+0ea5  ff        db      #ff
+
 0ea6  3f        ccf
 0ea7  09        add     hl,bc
 0ea8  e0        ret     po
