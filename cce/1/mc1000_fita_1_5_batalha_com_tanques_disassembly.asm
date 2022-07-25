@@ -229,64 +229,56 @@
 02af  9c85      dw      #859c ; v
 02b1  ffff      dw      #ffff
  
-; #0e64 em algum momento aponta para cá.
-02b3  d9        exx
-02b4  03        inc     bc
-02b5  f5        push    af
-02b6  02        ld      (bc),a
-02b7  00        nop
-02b8  00        nop
-02b9  f4030e    call    p,#0e03
-02bc  03        inc     bc
-02bd  00        nop
-02be  00        nop
+; Animação: Tanque azul para a direita.
+02b3  d903      dw      #03d9 ; Sprite: Tanque azul para a direita (2/2).
+02b5  f502      dw      #02f5 ; Sprite: Tanque azul para a direita (1/2).
+02b7  0000      dw      #0000
+
+; Animação: Tanque amarelo para a direita.
+02b9  f403      dw      #03f4 ; Sprite: Tanque amarelo para a direita (2/2).
+02bb  0e03      dw      #030e ; Sprite: Tanque amarelo para a direita (1/2).
+02bd  0000      dw      #0000
  
-; #0e66 em algum momento aponta para cá.
-02bf  5d        ld      e,l
-02c0  03        inc     bc
-02c1  00        nop
-02c2  00        nop
-02c3  7c        ld      a,h
-02c4  03        inc     bc
-02c5  00        nop
-02c6  00        nop
+; Animação: Tanque azul para cima.
+02bf  5d03      dw      #035d ; Sprite: Tanque azul para cima.
+02c1  0000      dw      #0000
 
-; #0e62 em algum momento aponta para cá.
-02c7  27        daa
-02c8  03        inc     bc
-02c9  0f        rrca
-02ca  04        inc     b
-02cb  00        nop
-02cc  00        nop
-02cd  a6        and     (hl)
-02ce  0eb5      ld      c,#b5
-02d0  0ec6      ld      c,#c6
-02d2  0ed5      ld      c,#d5
-02d4  0ea6      ld      c,#a6
-02d6  0eb5      ld      c,#b5
-02d8  0ec6      ld      c,#c6
-02da  0ed5      ld      c,#d5
-02dc  0ea6      ld      c,#a6
-02de  0eb5      ld      c,#b5
-02e0  0ec6      ld      c,#c6
-02e2  0ed5      ld      c,#d5
-02e4  0e00      ld      c,#00
-02e6  00        nop
-02e7  42        ld      b,d
-02e8  03        inc     bc
-02e9  2804      jr      z,#02ef         ; (4)
-02eb  00        nop
-02ec  00        nop
+; Animação: Tanque amarelo para cima.
+02c3  7c03      dw      #037c ; Sprite: Tanque amarelo para cima.
+02c5  0000      dw      #0000
 
-; #0e68 em algum momento aponta para cá.
-02ed  9b        sbc     a,e
-02ee  03        inc     bc
-02ef  00        nop
-02f0  00        nop
-02f1  ba        cp      d
-02f2  03        inc     bc
-02f3  00        nop
-02f4  00        nop
+; Animação: Tanque azul para a esquerda.
+02c7  2703      dw      #0327 ; Sprite: Tanque azul para a esquerda (1/2).
+02c9  0f04      dw      #040f ; Sprite: Tanque azul para a esquerda (2/2).
+02cb  0000      dw      #0000
+
+; Animação: Explosão.
+02cd  a60e      dw      #0ea6 ; Sprite: Explosão (1/4).
+02cf  b50e      dw      #0eb5 ; Sprite: Explosão (2/4).
+02d1  c60e      dw      #0ec6 ; Sprite: Explosão (3/4).
+02d3  d50e      dw      #0ed5 ; Sprite: Explosão (4/4).
+03d5  a60e      dw      #0ea6 ; Sprite: Explosão (1/4).
+02d7  b50e      dw      #0eb5 ; Sprite: Explosão (2/4).
+02d9  c60e      dw      #0ec6 ; Sprite: Explosão (3/4).
+02db  d50e      dw      #0ed5 ; Sprite: Explosão (4/4).
+02dd  a60e      dw      #0ea6 ; Sprite: Explosão (1/4).
+02df  b50e      dw      #0eb5 ; Sprite: Explosão (2/4).
+02e1  c60e      dw      #0ec6 ; Sprite: Explosão (3/4).
+02e3  d50e      dw      #0ed5 ; Sprite: Explosão (4/4).
+02e4  0000      dw      #0000
+
+; Animação: Tanque amarelo para a esquerda.
+02e7  4203      dw      #0342 ; Sprite: Tanque amarelo para a esquerda (1/2).
+02e9  2804      dw      #0428 ; Sprite: Tanque amarelo para a esquerda (2/2).
+02eb  0000      dw      #0000
+
+; Animação: Tanque azul para baixo.
+02ed  9b03      dw      #039b ; Sprite: Tanque azul para baixo.
+02ef  0000      dw      #0000
+
+; Animação: Tanque amarelo para baixo.
+02f1  ba03      dw      #03ba ; Sprite: Tanque amarelo para baixo.
+02f3  0000      dw      #0000
  
 ; Sprite: Tanque azul para a direita (1/2).
 ; |--BB|BB--|BBB-|
@@ -983,18 +975,18 @@
 055e  115d03    ld      de,#035d ; Sprite: tanque azul para cima.
 0561  cdf30d    call    #0df3 ; SHAPON'.
 0564  22540e    ld      (#0e54),hl ; Guarda posição do tanque azul.
-0567  21bf02    ld      hl,#02bf
-056a  22570e    ld      (#0e57),hl
-056d  225a0e    ld      (#0e5a),hl ; Ponteiro p/ figura a apagar.
-0570  3e02      ld      a,#02
-0572  32560e    ld      (#0e56),a
+0567  21bf02    ld      hl,#02bf ; Animação: Tanque azul para cima.
+056a  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
+056d  225a0e    ld      (#0e5a),hl ; Ponteiro p/ sprite do tanque azul a apagar.
+0570  3e02      ld      a,#02 ; Para cima.
+0572  32560e    ld      (#0e56),a ; Direção do tanque azul.
 0575  c9        ret
  
 0576  215e84    ld      hl,#845e ; Posição inicial do tanque amarelo à direita da tela.
 0579  117c03    ld      de,#037c ; Sprite: tanque amarelo para cima.
 057c  cdf30d    call    #0df3 ; SHAPON'.
 057f  22730e    ld      (#0e73),hl ; Guarda posição do tanque amarelo.
-0582  21c302    ld      hl,#02c3
+0582  21c302    ld      hl,#02c3 ; Animação: Tanque amarelo para cima.
 0585  22760e    ld      (#0e76),hl
 0588  22790e    ld      (#0e79),hl
 058b  3a0701    ld      a,(#0107) ; RANDOM.
@@ -1037,7 +1029,7 @@
 05e1  3a7b0e    ld      a,(#0e7b) ; Placar atual jogador 2.
 05e4  111a80    ld      de,#801a ; Posição na VRAM.
 05e7  cd900d    call    #0d90 ; Exibe.
-05ea  3a560e    ld      a,(#0e56)
+05ea  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 05ed  fe05      cp      #05
 05ef  cafa05    jp      z,#05fa
 05f2  3a750e    ld      a,(#0e75)
@@ -1047,13 +1039,13 @@
 05fd  21610e    ld      hl,#0e61
 0600  be        cp      (hl)
 0601  da2e06    jp      c,#062e
-0604  21b302    ld      hl,#02b3
+0604  21b302    ld      hl,#02b3 ; Animação: Tanque azul para a direita.
 0607  22640e    ld      (#0e64),hl
-060a  21c702    ld      hl,#02c7
+060a  21c702    ld      hl,#02c7 ; Animação: Tanque azul para a esquerda.
 060d  22620e    ld      (#0e62),hl
-0610  21bf02    ld      hl,#02bf
+0610  21bf02    ld      hl,#02bf ; Animação: Tanque azul para cima.
 0613  22660e    ld      (#0e66),hl
-0616  21ed02    ld      hl,#02ed
+0616  21ed02    ld      hl,#02ed ; Animação: Tanque azul para baixo.
 0619  22680e    ld      (#0e68),hl
 061c  2a6a0e    ld      hl,(#0e6a)
 061f  226e0e    ld      (#0e6e),hl
@@ -1068,7 +1060,7 @@
 0638  3a750e    ld      a,(#0e75)
 063b  fe05      cp      #05
 063d  ca5808    jp      z,#0858
-0640  3a560e    ld      a,(#0e56)
+0640  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 0643  fe05      cp      #05
 0645  cad105    jp      z,#05d1
 0648  3a0401    ld      a,(#0104) ; PLAY.
@@ -1314,13 +1306,13 @@
 0850  c25808    jp      nz,#0858
 0853  3e40      ld      a,#40 ; '@' (tiro).
 0855  321d01    ld      (#011d),a ; KEY0+2.
-0858  21b902    ld      hl,#02b9
+0858  21b902    ld      hl,#02b9 ; Animação: Tanque amarelo para a direita.
 085b  22640e    ld      (#0e64),hl
-085e  21e702    ld      hl,#02e7
+085e  21e702    ld      hl,#02e7 ; Animação: Tanque amarelo para a esquerda.
 0861  22620e    ld      (#0e62),hl
-0864  21c302    ld      hl,#02c3
+0864  21c302    ld      hl,#02c3 ; Animação: Tanque amarelo para cima.
 0867  22660e    ld      (#0e66),hl
-086a  21f102    ld      hl,#02f1
+086a  21f102    ld      hl,#02f1 ; Animação: Tanque amarelo para baixo.
 086d  22680e    ld      (#0e68),hl
 0870  2a800e    ld      hl,(#0e80)
 0873  226e0e    ld      (#0e6e),hl
@@ -1348,7 +1340,7 @@
 08ac  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 08af  eb        ex      de,hl
 08b0  cd3f0e    call    #0e3f
-08b3  3a560e    ld      a,(#0e56)
+08b3  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 08b6  c2d708    jp      nz,#08d7
 08b9  cd630a    call    #0a63
 08bc  af        xor     a
@@ -1595,7 +1587,7 @@
 0aa9  be        cp      (hl)
 0aaa  caae0a    jp      z,#0aae
 0aad  34        inc     (hl)
-0aae  3a560e    ld      a,(#0e56)
+0aae  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 0ab1  fe05      cp      #05
 0ab3  cac20b    jp      z,#0bc2
 0ab6  47        ld      b,a
@@ -1616,8 +1608,8 @@
 0ad6  cac80b    jp      z,#0bc8
 0ad9  3e01      ld      a,#01
 0adb  2a620e    ld      hl,(#0e62)
-0ade  32560e    ld      (#0e56),a
-0ae1  22570e    ld      (#0e57),hl
+0ade  32560e    ld      (#0e56),a ; Direção do tanque azul.
+0ae1  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0ae4  c3c80b    jp      #0bc8
 0ae7  3a6f0e    ld      a,(#0e6f)
 0aea  4f        ld      c,a
@@ -1735,14 +1727,14 @@
 0beb  daf40b    jp      c,#0bf4
 0bee  cd510d    call    #0d51
 0bf1  c3db0c    jp      #0cdb
-0bf4  2a570e    ld      hl,(#0e57)
+0bf4  2a570e    ld      hl,(#0e57) ; Ponteiro p/ sprite do tanque azul a desenhar.
 0bf7  23        inc     hl
 0bf8  7e        ld      a,(hl)
 0bf9  a7        and     a
 0bfa  c2db0c    jp      nz,#0cdb
 0bfd  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0c00  eb        ex      de,hl
-0c01  3a560e    ld      a,(#0e56)
+0c01  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 0c04  fe01      cp      #01
 0c06  cab70c    jp      z,#0cb7
 0c09  daa70c    jp      c,#0ca7
@@ -1814,35 +1806,35 @@
 0ca1  cd48c0    call    #c048 ; DELAYB.
 0ca4  c37904    jp      #0479
 0ca7  2a640e    ld      hl,(#0e64)
-0caa  22570e    ld      (#0e57),hl
+0caa  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cad  210100    ld      hl,#0001
 0cb0  19        add     hl,de
 0cb1  22540e    ld      (#0e54),hl ; Guarda posição do tanque azul.
 0cb4  c3db0c    jp      #0cdb
 0cb7  2a620e    ld      hl,(#0e62)
-0cba  22570e    ld      (#0e57),hl
+0cba  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cbd  21ffff    ld      hl,#ffff
 0cc0  c3b00c    jp      #0cb0
 0cc3  2a660e    ld      hl,(#0e66)
-0cc6  22570e    ld      (#0e57),hl
+0cc6  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cc9  21e0ff    ld      hl,#ffe0
 0ccc  c3b00c    jp      #0cb0
 0ccf  2a680e    ld      hl,(#0e68)
-0cd2  22570e    ld      (#0e57),hl
+0cd2  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cd5  212000    ld      hl,#0020
 0cd8  c3b00c    jp      #0cb0
-0cdb  3a560e    ld      a,(#0e56)
+0cdb  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 0cde  fe05      cp      #05
 0ce0  c2e70c    jp      nz,#0ce7
 0ce3  3e8a      ld      a,#8a
 0ce5  d380      out     (#80),a
-0ce7  2a570e    ld      hl,(#0e57)
-0cea  225a0e    ld      (#0e5a),hl ; Ponteiro p/ figura a apagar.
+0ce7  2a570e    ld      hl,(#0e57) ; Ponteiro p/ sprite do tanque azul a desenhar.
+0cea  225a0e    ld      (#0e5a),hl ; Ponteiro p/ sprite do tanque azul a apagar.
 0ced  5e        ld      e,(hl)
 0cee  23        inc     hl
 0cef  56        ld      d,(hl)
 0cf0  23        inc     hl
-0cf1  22570e    ld      (#0e57),hl
+0cf1  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cf4  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0cf7  cdf30d    call    #0df3 ; SHAPON'.
 0cfa  c9        ret
@@ -1899,7 +1891,8 @@
  
 0d4b  215f00    ld      hl,#005f
 0d4e  c3320d    jp      #0d32
-0d51  3a560e    ld      a,(#0e56)
+
+0d51  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 0d54  fe05      cp      #05
 0d56  c8        ret     z
  
@@ -1909,9 +1902,9 @@
 0d5f  324b01    ld      (#014b),a ; CVALUE.
 0d62  cdb50d    call    #0db5
 0d65  3e05      ld      a,#05
-0d67  32560e    ld      (#0e56),a
-0d6a  21cd02    ld      hl,#02cd
-0d6d  22570e    ld      (#0e57),hl
+0d67  32560e    ld      (#0e56),a ; Direção do tanque azul.
+0d6a  21cd02    ld      hl,#02cd ; Animação: Explosão.
+0d6d  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0d70  cd740d    call    #0d74
 0d73  c9        ret
  
@@ -1996,7 +1989,7 @@
 0de1  c9        ret
 
 ; Apaga tanque azul.
-0de2  2a5a0e    ld      hl,(#0e5a) ; Ponteiro p/ figura a apagar.
+0de2  2a5a0e    ld      hl,(#0e5a) ; Ponteiro p/ sprite do tanque azul a apagar.
 0de5  5e        ld      e,(hl)
 0de6  23        inc     hl
 0de7  56        ld      d,(hl)
@@ -2081,20 +2074,20 @@
 0e53  c9        ret
  
 0e54  ffff      dw      #ffff ; Posição do tanque azul na VRAM.
-0e56  ff        db      #ff
-0e57  ffff      dw      #ffff ; Ponteiro p/ figura (a desenhar?).
+0e56  ff        db      #ff ; Direção do tanque azul.
+0e57  ffff      dw      #ffff ; Ponteiro p/ sprite do tanque azul a desenhar.
 0e59  ff        db      #ff
-0e5a  ffff      dw      #ffff ; Ponteiro p/ figura a apagar.
+0e5a  ffff      dw      #ffff ; Ponteiro p/ sprite do tanque azul a apagar.
 0e5c  ff        db      #ff ; Placar atual jogador 1.
 0e5d  00        db      #00
 0e5e  00        db      #00
 0e5f  ff        db      #ff
 0e60  ff        db      #ff
 0e61  ff        db      #ff
-0e62  c702      dw      #02c7
-0e64  b302      dw      #02b3
-0e66  bf02      dw      #02bf
-0e68  ed02      dw      #02ed
+0e62  c702      dw      #02c7 ; Animação: Tanque azul para a esquerda.
+0e64  b302      dw      #02b3 ; Animação: Tanque azul para a direita.
+0e66  bf02      dw      #02bf ; Animação: Tanque azul para cima.
+0e68  ed02      dw      #02ed ; Animação: Tanque azul para baixo.
 0e6a  59        db      #59 ; 'Y' (esquerda).
 0e6b  31        db      #31 ; '1' (direita).
 0e6c  49        db      #49 ; 'I' (cima).
@@ -2158,52 +2151,97 @@
 0ea4  ff        db      #ff
 0ea5  ff        db      #ff
 
-0ea6  3f        ccf
-0ea7  09        add     hl,bc
-0ea8  e0        ret     po
- 
-0ea9  02        ld      (bc),a
-0eaa  0164e0    ld      bc,#e064
-0ead  bb        cp      e
-0eae  e0        ret     po
- 
-0eaf  2e01      ld      l,#01
-0eb1  c0        ret     nz
- 
-0eb2  e0        ret     po
- 
-0eb3  b0        or      b
-0eb4  ff        rst     #38
-0eb5  40        ld      b,b
-0eb6  02        ld      (bc),a
-0eb7  01c0df    ld      bc,#dfc0
-0eba  3b        dec     sp
-0ebb  0180df    ld      bc,#df80
-0ebe  eedf      xor     #df
-0ec0  010198    ld      bc,#9801
-0ec3  df        rst     #18
-0ec4  06ff      ld      b,#ff
-0ec6  3f        ccf
-0ec7  0ee0      ld      c,#e0
-0ec9  02        ld      (bc),a
-0eca  01ece0    ld      bc,#e0ec
-0ecd  bb        cp      e
-0ece  e0        ret     po
- 
-0ecf  2601      ld      h,#01
-0ed1  04        inc     b
-0ed2  e0        ret     po
- 
-0ed3  90        sub     b
-0ed4  ff        rst     #38
-0ed5  41        ld      b,c
-0ed6  06df      ld      b,#df
-0ed8  49        ld      c,c
-0ed9  0180df    ld      bc,#df80
-0edc  eedf      xor     #df
-0ede  03        inc     bc
-0edf  01b9df    ld      bc,#dfb9
-0ee2  0eff      ld      c,#ff
+; Sprite: Explosão (1/4).
+; |    |    |BR--|
+; |    |-BRB|R---|
+; |    >BRBR|
+; |---B|YBY-|
+; |--BY|
+0ea6  3f        db      #3f ; +2 linhas, -1 coluna.
+0ea7  09        db      #09 ; 00.00.10.01
+0ea8  e0        db      #e0 ; -1 linha.
+0ea9  02        db      #02 ; 00.00.00.10
+0eaa  01        db      #01 ; +1 coluna.
+0eab  64        db      #64 ; 01.10.01.00
+0eac  e0        db      #e0 ; -1 linha.
+0ead  bb        db      #bb ; 10.11.10.11
+0eae  e0        db      #e0 ; -1 linha.
+0eaf  2e        db      #2e ; 00.10.11.10
+0eb0  01        db      #01 ; +1 coluna.
+0eb1  c0        db      #c0 ; 11.00.00.00
+0eb2  e0        db      #e0 ; -1 linha.
+0eb3  b0        db      #b0 ; 10.11.00.00
+0eb4  ff        db      #ff
+
+; Sprite: Explosão (2/4).
+; |--YB|
+; |---Y|BYB-|
+; |    >RBRB|
+; |    |-RBR|B---|
+; |    |---B|R---|
+0eb5  40        db      #40 ; +2 linhas.
+0eb6  02        db      #02 ; 00.00.00.10
+0eb7  01        db      #01 ; +1 coluna.
+0eb8  c0        db      #c0 ; 11.00.00.00
+0eb9  df        db      #df ; -1 linha, -1 coluna.
+0eba  3b        db      #3b ; 00.11.10.11
+0ebb  01        db      #01 ; +1 coluna.
+0ebc  80        db      #80 ; 10.00.00.00
+0ebd  df        db      #df ; -1 linha, -1 coluna.
+0ebe  ee        db      #ee ; 11.10.11.10
+0ebf  df        db      #df ; -1 linha, -1 coluna.
+0ec0  01        db      #01 ; 00.00.00.01
+0ec1  01        db      #01 ; +1 coluna.
+0ec2  98        db      #98 ; 10.01.10.00
+0ec3  df        db      #df ; -1 linha, -1 coluna.
+0ec4  06        db      #06 ; 00.00.01.10
+0ec5  ff        db      #ff
+
+; Sprite: Explosão (3/4).
+; |    |    |BY--|
+; |    |-BYB|--Y-|
+; |    >BRBR|
+; |---B|RBR-|
+; |--RB|
+0ec6  3f        db      #3f ; +2 linhas, -1 coluna.
+0ec7  0e        db      #0e ; 00.00.11.10
+0ec8  e0        db      #e0 ; -1 linha.
+0ec9  02        db      #02 ; 00.00.00.10
+0eca  01        db      #01 ; +1 coluna.
+0ecb  ec        db      #ec ; 11.10.11.00
+0ecc  e0        db      #e0 ; -1 linha.
+0ecd  bb        db      #bb ; 10.11.10.11
+0ece  e0        db      #e0 ; -1 linha.
+0ecf  26        db      #26 ; 00.10.01.10
+0ed0  01        db      #01 ; +1 coluna.
+0ed1  04        db      #04 ; 00.00.01.00
+0ed2  e0        db      #e0 ; -1 linha.
+0ed3  90        db      #90 ; 10.01.00.00
+0ed4  ff        db      #ff
+
+; Sprite: Explosão (4/4).
+; |--RB|
+; |---R|BRBY|
+; |    >RBRB|
+; |    |Y-BY|Y---|
+; |    |    |--YB|
+0ed5  41        db      #41 ; +2 linhas, +1 coluna.
+0ed6  06        db      #06 ; 00.00.01.10
+0ed7  df        db      #df ; -1 linha, -1 coluna.
+0ed8  49        db      #49 ; 01.00.10.01
+0ed9  01        db      #01 ; +1 coluna.
+0eda  80        db      #80 ; 10.00.00.00
+0edb  df        db      #df ; -1 linha, -1 coluna.
+0edc  ee        db      #ee ; 11.10.11.10
+0edd  df        db      #df ; -1 linha, -1 coluna.
+0ede  03        db      #03 ; 00.00.00.11
+0edf  01        db      #01 ; +1 coluna.
+0ee0  b9        db      #b9 ; 10.11.10.01
+0ee1  df        db      #df ; -1 linha, -1 coluna.
+0ee2  0e        db      #0e ; 00.00.11.10
+0ee3  ff        db      #ff
+
+;
 0ee4  07        rlca
 0ee5  80        add     a,b
 0ee6  2000      jr      nz,#0ee8        ; (0)
