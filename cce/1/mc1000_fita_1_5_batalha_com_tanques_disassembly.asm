@@ -752,7 +752,7 @@
 ; (para a música funcionar).
 047c  3a890e    ld      a,(#0e89) ; Já redirecionou?
 047f  a7        and     a
-0480  c29404    jp      nz,#0494
+0480  c29404    jp      nz,#0494 ; Sim: Início propriamente dito.
 0483  3ec3      ld      a,#c3 ; Não: Redireciona.
 0485  323800    ld      (#0038),a
 0488  2124c0    ld      hl,#c024 ; INTRUP.
@@ -760,7 +760,7 @@
 048e  fb        ei
 048f  3e02      ld      a,#02 ; Anota que já redirecionou.
 0491  32890e    ld      (#0e89),a
-;
+; Início propriamente dito.
 0494  cd5104    call    #0451 ; Inicializa música.
 0497  210000    ld      hl,#0000
 049a  225f0e    ld      (#0e5f),hl
@@ -970,7 +970,7 @@
 0555  327780    ld      (#8077),a
 0558  c39a05    jp      #059a
  
-;
+; Inicializa posição do tanque azul e o desenha.
 055b  214184    ld      hl,#8441 ; Posição inicial do tanque azul à esquerda da tela.
 055e  115d03    ld      de,#035d ; Sprite: tanque azul para cima.
 0561  cdf30d    call    #0df3 ; SHAPON'.
@@ -981,25 +981,26 @@
 0570  3e02      ld      a,#02 ; Para cima.
 0572  32560e    ld      (#0e56),a ; Direção do tanque azul.
 0575  c9        ret
- 
+
+; Inicializa posição do tanque amarelo e o desenha.
 0576  215e84    ld      hl,#845e ; Posição inicial do tanque amarelo à direita da tela.
 0579  117c03    ld      de,#037c ; Sprite: tanque amarelo para cima.
 057c  cdf30d    call    #0df3 ; SHAPON'.
 057f  22730e    ld      (#0e73),hl ; Guarda posição do tanque amarelo.
 0582  21c302    ld      hl,#02c3 ; Animação: Tanque amarelo para cima.
-0585  22760e    ld      (#0e76),hl
-0588  22790e    ld      (#0e79),hl
+0585  22760e    ld      (#0e76),hl ; Ponteiro p/ sprite do tanque amarelo a desenhar.
+0588  22790e    ld      (#0e79),hl ; Ponteiro p/ sprite do tanque amarelo a apagar.
 058b  3a0701    ld      a,(#0107) ; RANDOM.
 058e  0f        rrca
-058f  3e02      ld      a,#02
+058f  3e02      ld      a,#02 ; Para cima.
 0591  da9605    jp      c,#0596
-0594  3e03      ld      a,#03
-0596  32750e    ld      (#0e75),a
+0594  3e03      ld      a,#03 ; Para baixo.
+0596  32750e    ld      (#0e75),a ; Direção do tanque amarelo.
 0599  c9        ret
  
-059a  cd5b05    call    #055b
-059d  cd7605    call    #0576
-05a0  3a4c04    ld      a,(#044c)
+059a  cd5b05    call    #055b ; Inicializa posição do tanque azul e o desenha.
+059d  cd7605    call    #0576 ; Inicializa posição do tanque amarelo e o desenha.
+05a0  3a4c04    ld      a,(#044c) ; 20
 05a3  32590e    ld      (#0e59),a
 05a6  32780e    ld      (#0e78),a
 05a9  af        xor     a
@@ -1016,10 +1017,11 @@
 05c1  36ff      ld      (hl),#ff
 05c3  23        inc     hl
 05c4  36ff      ld      (hl),#ff
-05c6  cd5104    call    #0451
+05c6  cd5104    call    #0451 ; Inicializa música.
 05c9  3e04      ld      a,#04
 05cb  322b0f    ld      (#0f2b),a
 05ce  326010    ld      (#1060),a
+;
 05d1  af        xor     a
 05d2  32870e    ld      (#0e87),a
 05d5  32610e    ld      (#0e61),a
@@ -1032,9 +1034,10 @@
 05ea  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 05ed  fe05      cp      #05
 05ef  cafa05    jp      z,#05fa
-05f2  3a750e    ld      a,(#0e75)
+05f2  3a750e    ld      a,(#0e75) ; Direção do tanque amarelo.
 05f5  fe05      cp      #05
 05f7  ca2e06    jp      z,#062e
+;
 05fa  3a5f0e    ld      a,(#0e5f)
 05fd  21610e    ld      hl,#0e61
 0600  be        cp      (hl)
@@ -1047,17 +1050,18 @@
 0613  22660e    ld      (#0e66),hl
 0616  21ed02    ld      hl,#02ed ; Animação: Tanque azul para baixo.
 0619  22680e    ld      (#0e68),hl
-061c  2a6a0e    ld      hl,(#0e6a)
-061f  226e0e    ld      (#0e6e),hl
-0622  2a6c0e    ld      hl,(#0e6c)
-0625  22700e    ld      (#0e70),hl
+061c  2a6a0e    ld      hl,(#0e6a) ; Teclas do jogador 1 (esquerda, direita).
+061f  226e0e    ld      (#0e6e),hl ; Teclas atuais (esquerda,direita).
+0622  2a6c0e    ld      hl,(#0e6c) ; Teclas do jogador 1 (cima, baixo).
+0625  22700e    ld      (#0e70),hl ; Teclas atuais (cima, baixo).
 0628  cdbc0d    call    #0dbc
 062b  cda40a    call    #0aa4
+;
 062e  3a7e0e    ld      a,(#0e7e)
 0631  21610e    ld      hl,#0e61
 0634  be        cp      (hl)
 0635  da8508    jp      c,#0885
-0638  3a750e    ld      a,(#0e75)
+0638  3a750e    ld      a,(#0e75) ; Direção do tanque amarelo.
 063b  fe05      cp      #05
 063d  ca5808    jp      z,#0858
 0640  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
@@ -1105,7 +1109,7 @@
 06a4  2a730e    ld      hl,(#0e73) ; Posição do tanque amarelo.
 06a7  eb        ex      de,hl
 06a8  cd3f0e    call    #0e3f
-06ab  3a750e    ld      a,(#0e75)
+06ab  3a750e    ld      a,(#0e75) ; Direção do tanque amarelo.
 06ae  c0        ret     nz
  
 06af  cd630a    call    #0a63
@@ -1173,7 +1177,7 @@
 0715  3e58      ld      a,#58
 0717  c3ee06    jp      #06ee
 071a  eb        ex      de,hl
-071b  3a750e    ld      a,(#0e75)
+071b  3a750e    ld      a,(#0e75) ; Direção do tanque amarelo.
 071e  a7        and     a
 071f  ca5c07    jp      z,#075c
 0722  fe02      cp      #02
@@ -1256,7 +1260,7 @@
 07df  fe84      cp      #84
 07e1  ca1a08    jp      z,#081a
 07e4  fe80      cp      #80
-07e6  3a750e    ld      a,(#0e75)
+07e6  3a750e    ld      a,(#0e75) ; Direção do tanque amarelo.
 07e9  da0508    jp      c,#0805
 07ec  a7        and     a
 07ed  0650      ld      b,#50 ; 'P' (para baixo).
@@ -1278,7 +1282,7 @@
 0812  cafc07    jp      z,#07fc
 0815  0630      ld      b,#30 ; '0' (para a direita).
 0817  c3fe07    jp      #07fe
-081a  3a750e    ld      a,(#0e75)
+081a  3a750e    ld      a,(#0e75) ; Direção do tanque amarelo.
 081d  a7        and     a
 081e  cafc07    jp      z,#07fc
 0821  fe02      cp      #02
@@ -1314,16 +1318,16 @@
 0867  22660e    ld      (#0e66),hl
 086a  21f102    ld      hl,#02f1 ; Animação: Tanque amarelo para baixo.
 086d  22680e    ld      (#0e68),hl
-0870  2a800e    ld      hl,(#0e80)
-0873  226e0e    ld      (#0e6e),hl
-0876  2a820e    ld      hl,(#0e82)
-0879  22700e    ld      (#0e70),hl
+0870  2a800e    ld      hl,(#0e80) ; Teclas do jogador 2 (esquerda, direita).
+0873  226e0e    ld      (#0e6e),hl ; Teclas atuais (esquerda, direita).
+0876  2a820e    ld      hl,(#0e82) ; Teclas do jogador 2 (cima, baixo).
+0879  22700e    ld      (#0e70),hl ; Teclas atuais (cima, baixo).
 087c  cdfb0c    call    #0cfb
 087f  cda40a    call    #0aa4
 0882  cdfb0c    call    #0cfb
 0885  21610e    ld      hl,#0e61
 0888  34        inc     (hl)
-0889  3a750e    ld      a,(#0e75)
+0889  3a750e    ld      a,(#0e75) ; Direção do tanque amarelo.
 088c  fe05      cp      #05
 088e  cad105    jp      z,#05d1
 0891  3a870e    ld      a,(#0e87)
@@ -1512,6 +1516,7 @@
 0a04  e655      and     #55
 0a06  c20b0a    jp      nz,#0a0b
 0a09  3655      ld      (hl),#55
+; Produz breve pausa conforme o nível de jogo.
 0a0b  3a0401    ld      a,(#0104) ; PLAY.
 0a0e  fe05      cp      #05
 0a10  da1d0a    jp      c,#0a1d
@@ -1520,37 +1525,41 @@
 0a18  d608      sub     #08
 0a1a  c30e0a    jp      #0a0e
 0a1d  fe02      cp      #02
-0a1f  011100    ld      bc,#0011 ; 17ms.
+0a1f  011100    ld      bc,#0011 ; PLAY=1,9: 17ms.
 0a22  da360a    jp      c,#0a36
-0a25  010e00    ld      bc,#000e ; 14ms.
+0a25  010e00    ld      bc,#000e ; PLAY=2,10: 14ms.
 0a28  ca360a    jp      z,#0a36
 0a2b  fe04      cp      #04
-0a2d  010b00    ld      bc,#000b ; 11ms.
+0a2d  010b00    ld      bc,#000b ; PLAY=4,12: 11ms.
 0a30  ca360a    jp      z,#0a36
-0a33  010800    ld      bc,#0008 ; 8ms.
+0a33  010800    ld      bc,#0008 ; PLAY=3,11: 8ms.
 0a36  cd48c0    call    #c048 ; DELAYB.
 0a39  c3d105    jp      #05d1
+
 0a3c  fe06      cp      #06
-0a3e  010b00    ld      bc,#000b ; 11ms.
+0a3e  010b00    ld      bc,#000b ; PLAY=5,13: 11ms.
 0a41  da550a    jp      c,#0a55
-0a44  010900    ld      bc,#0009 ; 9ms.
+0a44  010900    ld      bc,#0009 ; PLAY=6,14: 9ms.
 0a47  ca550a    jp      z,#0a55
-0a4a  fe03      cp      #03
-0a4c  010800    ld      bc,#0008 ; 8ms.
+0a4a  fe03      cp      #03 ; (Bug? Deveria ser 8?)
+0a4c  010800    ld      bc,#0008 ; (PLAY=8,16:) 8ms.
 0a4f  ca550a    jp      z,#0a55
-0a52  010600    ld      bc,#0006 ; 6ms.
+0a52  010600    ld      bc,#0006 ; PLAY=8,9,15,16: 6ms.
 0a55  cd48c0    call    #c048 ; DELAYB.
+
 0a58  3a610e    ld      a,(#0e61)
 0a5b  fe03      cp      #03
 0a5d  cad105    jp      z,#05d1
 0a60  c3ea05    jp      #05ea
+
 0a63  e5        push    hl
 0a64  a7        and     a
 0a65  ca920a    jp      z,#0a92
 0a68  fe02      cp      #02
 0a6a  da980a    jp      c,#0a98
 0a6d  ca9e0a    jp      z,#0a9e
-0a70  21a000    ld      hl,#00a0
+0a70  21a000    ld      hl,#00a0 ; +160 (+5 linhas).
+;
 0a73  19        add     hl,de
 0a74  47        ld      b,a
 0a75  7d        ld      a,l
@@ -1576,12 +1585,15 @@
 0a90  e1        pop     hl
 0a91  c9        ret
  
-0a92  210300    ld      hl,#0003
+0a92  210300    ld      hl,#0003 ; +3
 0a95  c3730a    jp      #0a73
-0a98  21fdff    ld      hl,#fffd
+
+0a98  21fdff    ld      hl,#fffd ; -3
 0a9b  c3730a    jp      #0a73
+
 0a9e  2a4f04    ld      hl,(#044f)
 0aa1  c3730a    jp      #0a73
+
 0aa4  215e0e    ld      hl,#0e5e
 0aa7  3e0b      ld      a,#0b
 0aa9  be        cp      (hl)
@@ -1590,8 +1602,9 @@
 0aae  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 0ab1  fe05      cp      #05
 0ab3  cac20b    jp      z,#0bc2
-0ab6  47        ld      b,a
-0ab7  3a6e0e    ld      a,(#0e6e)
+0ab6  47        ld      b,a ; Direção anterior.
+
+0ab7  3a6e0e    ld      a,(#0e6e) ; Tecla para esquerda.
 0aba  4f        ld      c,a
 0abb  cdce0d    call    #0dce ; Tecla foi pressionada?
 0abe  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
@@ -1608,17 +1621,19 @@
 0ad6  cac80b    jp      z,#0bc8
 0ad9  3e01      ld      a,#01
 0adb  2a620e    ld      hl,(#0e62)
+; Define direção.
 0ade  32560e    ld      (#0e56),a ; Direção do tanque azul.
 0ae1  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0ae4  c3c80b    jp      #0bc8
-0ae7  3a6f0e    ld      a,(#0e6f)
+
+0ae7  3a6f0e    ld      a,(#0e6f) ; Tecla para direita.
 0aea  4f        ld      c,a
 0aeb  cdce0d    call    #0dce ; Tecla foi pressionada?
 0aee  c20b0b    jp      nz,#0b0b ; Não: desvia.
-0af1  7b        ld      a,e
+0af1  7b        ld      a,e ; Pode ir mais à direita?
 0af2  e61f      and     #1f
 0af4  fe1e      cp      #1e
-0af6  ca0b0b    jp      z,#0b0b
+0af6  ca0b0b    jp      z,#0b0b ; Não: desvia.
 0af9  cd100d    call    #0d10
 0afc  ca0b0b    jp      z,#0b0b
 0aff  78        ld      a,b
@@ -1626,17 +1641,18 @@
 0b01  cac80b    jp      z,#0bc8
 0b04  af        xor     a
 0b05  2a640e    ld      hl,(#0e64)
-0b08  c3de0a    jp      #0ade
-0b0b  3a700e    ld      a,(#0e70)
+0b08  c3de0a    jp      #0ade ; Define direção.
+
+0b0b  3a700e    ld      a,(#0e70) ; Tecla para cima.
 0b0e  4f        ld      c,a
 0b0f  cdce0d    call    #0dce ; Tecla foi pressionada?
 0b12  c2350b    jp      nz,#0b35 ; Não: desvia.
-0b15  7a        ld      a,d
+0b15  7a        ld      a,d ; Pode ir mais para cima?
 0b16  fe81      cp      #81
 0b18  c2210b    jp      nz,#0b21
 0b1b  7b        ld      a,e
 0b1c  fe40      cp      #40
-0b1e  da350b    jp      c,#0b35
+0b1e  da350b    jp      c,#0b35 ; Não: desvia.
 0b21  cd2f0d    call    #0d2f
 0b24  ca350b    jp      z,#0b35
 0b27  78        ld      a,b
@@ -1644,17 +1660,18 @@
 0b2a  cac80b    jp      z,#0bc8
 0b2d  3e02      ld      a,#02
 0b2f  2a660e    ld      hl,(#0e66)
-0b32  c3de0a    jp      #0ade
-0b35  3a710e    ld      a,(#0e71)
+0b32  c3de0a    jp      #0ade ; Define direção.
+
+0b35  3a710e    ld      a,(#0e71) ; Tecla para baixo.
 0b38  4f        ld      c,a
 0b39  cdce0d    call    #0dce ; Tecla foi pressionada?
 0b3c  c25f0b    jp      nz,#0b5f ; Não: desvia.
-0b3f  7a        ld      a,d
+0b3f  7a        ld      a,d ; Pode ir mais para baixo?
 0b40  fe87      cp      #87
 0b42  c24b0b    jp      nz,#0b4b
 0b45  7b        ld      a,e
 0b46  fea0      cp      #a0
-0b48  d25f0b    jp      nc,#0b5f
+0b48  d25f0b    jp      nc,#0b5f ; Não: desvia.
 0b4b  cd4b0d    call    #0d4b
 0b4e  ca5f0b    jp      z,#0b5f
 0b51  78        ld      a,b
@@ -1662,7 +1679,8 @@
 0b54  cac80b    jp      z,#0bc8
 0b57  3e03      ld      a,#03
 0b59  2a680e    ld      hl,(#0e68)
-0b5c  c3de0a    jp      #0ade
+0b5c  c3de0a    jp      #0ade ; Define direção.
+
 0b5f  78        ld      a,b
 0b60  fe01      cp      #01
 0b62  caae0b    jp      z,#0bae
@@ -1709,6 +1727,7 @@
 0bbf  c37c0b    jp      #0b7c
 0bc2  013200    ld      bc,#0032 ; 50ms
 0bc5  cd48c0    call    #c048 ; DELAYB
+
 0bc8  21600e    ld      hl,#0e60
 0bcb  34        inc     (hl)
 0bcc  3e10      ld      a,#10
@@ -1736,12 +1755,12 @@
 0c00  eb        ex      de,hl
 0c01  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 0c04  fe01      cp      #01
-0c06  cab70c    jp      z,#0cb7
-0c09  daa70c    jp      c,#0ca7
+0c06  cab70c    jp      z,#0cb7 ; =1
+0c09  daa70c    jp      c,#0ca7 ; =0
 0c0c  fe03      cp      #03
-0c0e  cacf0c    jp      z,#0ccf
-0c11  dac30c    jp      c,#0cc3
-0c14  cd5104    call    #0451
+0c0e  cacf0c    jp      z,#0ccf ; =3
+0c11  dac30c    jp      c,#0cc3 ; =2
+0c14  cd5104    call    #0451 ; Inicializa música.
 0c17  3e88      ld      a,#88
 0c19  d380      out     (#80),a
 0c1b  3a590e    ld      a,(#0e59)
@@ -1757,16 +1776,16 @@
 0c34  3a5d0e    ld      a,(#0e5d)
 0c37  a7        and     a
 0c38  c2450c    jp      nz,#0c45
-0c3b  cd5b05    call    #055b
+0c3b  cd5b05    call    #055b ; Inicializa posição do tanque azul e o desenha.
 0c3e  af        xor     a
 0c3f  325e0e    ld      (#0e5e),a
 0c42  c3d105    jp      #05d1
 0c45  cdfb0c    call    #0cfb
-0c48  cd7605    call    #0576
+0c48  cd7605    call    #0576; Inicializa posição do tanque amarelo e o desenha.
 0c4b  af        xor     a
 0c4c  327d0e    ld      (#0e7d),a
 0c4f  c3d105    jp      #05d1
-0c52  cd5104    call    #0451
+0c52  cd5104    call    #0451 ; Inicializa música.
 0c55  3a5d0e    ld      a,(#0e5d)
 0c58  a7        and     a
 0c59  ca850c    jp      z,#0c85
@@ -2088,10 +2107,12 @@
 0e64  b302      dw      #02b3 ; Animação: Tanque azul para a direita.
 0e66  bf02      dw      #02bf ; Animação: Tanque azul para cima.
 0e68  ed02      dw      #02ed ; Animação: Tanque azul para baixo.
+; Teclas do jogador 1.
 0e6a  59        db      #59 ; 'Y' (esquerda).
 0e6b  31        db      #31 ; '1' (direita).
 0e6c  49        db      #49 ; 'I' (cima).
 0e6d  51        db      #51 ; 'Q' (baixo).
+; Teclas atuais.
 0e6e  59        db      #59 ; 'Y' (esquerda).
 0e6f  31        db      #31 ; '1' (direita).
 0e70  49        db      #49 ; 'I' (cima).
@@ -2099,15 +2120,16 @@
 0e72  39        db      #39 ; '9' (tiro).
 ;
 0e73  ffff      dw      #ffff ; Posição do tanque amarelo na VRAM.
-0e75  ff        db      #ff
-0e76  ffff      dw      #ffff
+0e75  ff        db      #ff ; Direção do tanque amarelo.
+0e76  ffff      dw      #ffff ; Ponteiro p/ sprite do tanque amarelo a desenhar.
 0e78  ff        db      #ff
-0e79  ffff      dw      #ffff
+0e79  ffff      dw      #ffff ; Ponteiro p/ sprite do tanque amarelo a apagar.
 0e7b  ff        db      #ff ; Placar atual jogador 2.
 0e7c  01        db      #01
 0e7d  00        db      #00
 0e7e  ff        db      #ff
 0e7f  ff        db      #ff
+; Teclas do jogador 2.
 0e80  58        db      #58 ; 'X' (esquerda).
 0e81  30        db      #30 ; '0' (direita).
 0e82  48        db      #48 ; 'H' (cima).
