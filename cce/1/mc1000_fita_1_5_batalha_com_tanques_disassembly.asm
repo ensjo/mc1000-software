@@ -717,10 +717,10 @@
 ; Padrão para os caracteres dois-pontos no alto da tela.
 044b  3c        db      #3c ; 00.11.11.00 (ponto vermelho sobre fundo verde).
 
-044c  14        db      #14 ; 20
-044d  1a        db      #1a ; 26 (qtd de bytes a zerar desde $0e8a)
-044e  58        db      #58
-044f  40        db      #40
+044c  14        db      #14 ; 20.
+044d  1a        db      #1a ; 26 (qtd de bytes a zerar desde $0e8a).
+044e  58        db      #58 ; 88.
+044f  40        db      #40 ; 64.
 0450  ff        db      #ff
  
 ; Inicializa música.
@@ -728,11 +728,11 @@
 0454  223701    ld      (#0137),hl ; NAA.
 0457  216010    ld      hl,#1060 ; Notas para o canal B.
 045a  224001    ld      (#0140),hl ; NBB.
-045d  3e7d      ld      a,#7d
+045d  3e7d      ld      a,#7d ; %01.11.11.0.1: Produzir tom; INTRPA=4; VOICEA=3 (envoltória); inicializar; tocar.
 045f  323901    ld      (#0139),a ; AVALUE.
-0462  3e79      ld      a,#79
+0462  3e79      ld      a,#79 ; %01.11.10.0.1: Produzir tom; INTRPB=4; VOICEB=2 (decrescente); inicializar; tocar.
 0464  324201    ld      (#0142),a ; BVALUE.
-0467  af        xor     a
+0467  af        xor     a ; %00.00.00.0.0: ...; não tocar.
 0468  324b01    ld      (#014b),a ; CVALUE.
 046b  c9        ret
  
@@ -956,10 +956,10 @@
 0532  0e00      ld      c,#00
 0534  cd3fc0    call    #c03f ; DISPY2.
 ; Desenha tanques na área do placar.
-0537  214880    ld      hl,#8048
+0537  214880    ld      hl,#8048 ; Posição na VRAM.
 053a  110f04    ld      de,#040f ; Sprite: tanque azul para a esquerda.
 053d  cdf30d    call    #0df3 ; SHAPON'.
-0540  215580    ld      hl,#8055
+0540  215580    ld      hl,#8055 ; Posição na VRAM.
 0543  11f403    ld      de,#03f4 ; Sprite: tanque amarelo para a direita.
 0546  cdf30d    call    #0df3 ; SHAPON'.
 ; Desenha dois-pontos após cada tanque.
@@ -969,7 +969,7 @@
 0552  323780    ld      (#8037),a
 0555  327780    ld      (#8077),a
 0558  c39a05    jp      #059a
- 
+
 ; Inicializa posição do tanque azul e o desenha.
 055b  214184    ld      hl,#8441 ; Posição inicial do tanque azul à esquerda da tela.
 055e  115d03    ld      de,#035d ; Sprite: tanque azul para cima.
@@ -1001,12 +1001,13 @@
 059a  cd5b05    call    #055b ; Inicializa posição do tanque azul e o desenha.
 059d  cd7605    call    #0576 ; Inicializa posição do tanque amarelo e o desenha.
 05a0  3a4c04    ld      a,(#044c) ; 20
-05a3  32590e    ld      (#0e59),a
-05a6  32780e    ld      (#0e78),a
+05a3  32590e    ld      (#0e59),a ; Vidas restantes do jogador 1.
+05a6  32780e    ld      (#0e78),a ; Vidas restantes do jogador 2.
 05a9  af        xor     a
 05aa  32850e    ld      (#0e85),a
 05ad  325c0e    ld      (#0e5c),a ; Placar atual jogador 1.
 05b0  327b0e    ld      (#0e7b),a ; Placar atual jogador 2.
+; Zera 26 bytes a partir de $0e8a.
 05b3  3a4d04    ld      a,(#044d) ; 26.
 05b6  47        ld      b,a
 05b7  218a0e    ld      hl,#0e8a ; Contador de ciclos de espera para jogador 1.
@@ -1014,49 +1015,55 @@
 05bc  23        inc     hl
 05bd  05        dec     b
 05be  c2ba05    jp      nz,#05ba
+; Depois 2 bytes com $ff.
 05c1  36ff      ld      (hl),#ff
 05c3  23        inc     hl
 05c4  36ff      ld      (hl),#ff
+;
 05c6  cd5104    call    #0451 ; Inicializa música.
 05c9  3e04      ld      a,#04
-05cb  322b0f    ld      (#0f2b),a
-05ce  326010    ld      (#1060),a
+05cb  322b0f    ld      (#0f2b),a ; Envoltória do canal A. (Com VOICEA=3 se usa o nibble mais significativo, #0.)
+05ce  326010    ld      (#1060),a ; Envoltória do canal B. (Com VOICEB=2 se usa o nibble menos significativo, #4, e decresce.)
 ;
 05d1  af        xor     a
 05d2  32870e    ld      (#0e87),a
 05d5  32610e    ld      (#0e61),a
 05d8  3a5c0e    ld      a,(#0e5c) ; Placar atual jogador 1.
-05db  110d80    ld      de,#800d ; Posição na VRAM.
-05de  cd900d    call    #0d90 ; Exibe.
+05db  110d80    ld      de,#800d ; Posição na VRAM do placar do jogador 1.
+05de  cd900d    call    #0d90 ; Exibe valor de A alinhado à esquerda.
 05e1  3a7b0e    ld      a,(#0e7b) ; Placar atual jogador 2.
-05e4  111a80    ld      de,#801a ; Posição na VRAM.
-05e7  cd900d    call    #0d90 ; Exibe.
+05e4  111a80    ld      de,#801a ; Posição na VRAM do placar do jogador 2.
+05e7  cd900d    call    #0d90 ; Exibe valor de A alinhado à esquerda.
 05ea  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 05ed  fe05      cp      #05
 05ef  cafa05    jp      z,#05fa
 05f2  3a750e    ld      a,(#0e75) ; Direção do tanque amarelo.
 05f5  fe05      cp      #05
 05f7  ca2e06    jp      z,#062e
-;
+; if (m[0x0e5f] >= m[0x0e61]) {
+;   // ...
+; }
 05fa  3a5f0e    ld      a,(#0e5f)
 05fd  21610e    ld      hl,#0e61
 0600  be        cp      (hl)
 0601  da2e06    jp      c,#062e
 0604  21b302    ld      hl,#02b3 ; Animação: Tanque azul para a direita.
-0607  22640e    ld      (#0e64),hl
+0607  22640e    ld      (#0e64),hl ; Animação: Tanque para a direita.
 060a  21c702    ld      hl,#02c7 ; Animação: Tanque azul para a esquerda.
-060d  22620e    ld      (#0e62),hl
+060d  22620e    ld      (#0e62),hl ; Animação: Tanque para a esquerda.
 0610  21bf02    ld      hl,#02bf ; Animação: Tanque azul para cima.
-0613  22660e    ld      (#0e66),hl
+0613  22660e    ld      (#0e66),hl ; Animação: Tanque para cima.
 0616  21ed02    ld      hl,#02ed ; Animação: Tanque azul para baixo.
-0619  22680e    ld      (#0e68),hl
+0619  22680e    ld      (#0e68),hl ; Animação: Tanque para baixo.
 061c  2a6a0e    ld      hl,(#0e6a) ; Teclas do jogador 1 (esquerda, direita).
 061f  226e0e    ld      (#0e6e),hl ; Teclas atuais (esquerda,direita).
 0622  2a6c0e    ld      hl,(#0e6c) ; Teclas do jogador 1 (cima, baixo).
 0625  22700e    ld      (#0e70),hl ; Teclas atuais (cima, baixo).
 0628  cdbc0d    call    #0dbc
 062b  cda40a    call    #0aa4
-;
+; if (m[0x0e7e] >= m[0x0e61]) {
+;   // ...
+; }
 062e  3a7e0e    ld      a,(#0e7e)
 0631  21610e    ld      hl,#0e61
 0634  be        cp      (hl)
@@ -1074,6 +1081,7 @@
 0652  cdce0d    call    #0dce ; Tecla foi pressionada?
 0655  cab706    jp      z,#06b7 ; Sim: desvia. Apaga KEY0~KEY0+3 e coloca C em KEY0.
 0658  cdc106    call    #06c1 ; Apaga KEY0~KEY0+3.
+;
 065b  2a730e    ld      hl,(#0e73) ; Posição do tanque amarelo.
 065e  7c        ld      a,h
 065f  fe83      cp      #83
@@ -1183,8 +1191,9 @@
 0722  fe02      cp      #02
 0724  da8507    jp      c,#0785
 0727  caa407    jp      z,#07a4
-072a  cd4b0d    call    #0d4b
-072d  c2c907    jp      nz,#07c9
+072a  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
+
+072d  c2c907    jp      nz,#07c9 ; Não: desvia.
 0730  7b        ld      a,e
 0731  e61f      and     #1f
 0733  4f        ld      c,a
@@ -1192,45 +1201,45 @@
 0737  e61f      and     #1f
 0739  b9        cp      c
 073a  da4b07    jp      c,#074b
-073d  cd100d    call    #0d10
-0740  c25707    jp      nz,#0757
-0743  3e48      ld      a,#48
+073d  cd100d    call    #0d10 ; Há parede à direita do tanque?
+0740  c25707    jp      nz,#0757 ; Não: desvia.
+0743  3e48      ld      a,#48 ; 'H' (para cima).
 0745  321c01    ld      (#011c),a ; KEY0+1
 0748  c34708    jp      #0847
-074b  cd290d    call    #0d29
-074e  ca3d07    jp      z,#073d
-0751  3a4e04    ld      a,(#044e)
+074b  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
+074e  ca3d07    jp      z,#073d ; Sim: desvia.
+0751  3a4e04    ld      a,(#044e) ; 'X' (para a esquerda).
 0754  c34507    jp      #0745
-0757  3e30      ld      a,#30
+0757  3e30      ld      a,#30 ; '0' (para a direita).
 0759  c34507    jp      #0745
-075c  cd100d    call    #0d10
-075f  c2c907    jp      nz,#07c9
+075c  cd100d    call    #0d10 ; Há parede à direita do tanque?
+075f  c2c907    jp      nz,#07c9 ; Não: desvia.
 0762  3a550e    ld      a,(#0e55)
 0765  ba        cp      d
 0766  da7507    jp      c,#0775
-0769  cd4b0d    call    #0d4b
-076c  c28007    jp      nz,#0780
-076f  3a4e04    ld      a,(#044e)
+0769  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
+076c  c28007    jp      nz,#0780 ; Não: desvia.
+076f  3a4e04    ld      a,(#044e) ; 'X' (para a esquerda).
 0772  c34507    jp      #0745
-0775  cd2f0d    call    #0d2f
-0778  ca6907    jp      z,#0769
-077b  3e48      ld      a,#48
+0775  cd2f0d    call    #0d2f ; Há parede acima do tanque?
+0778  ca6907    jp      z,#0769 ; Sim: desvia.
+077b  3e48      ld      a,#48 ; 'H' (para cima).
 077d  c34507    jp      #0745
-0780  3e50      ld      a,#50
+0780  3e50      ld      a,#50 ; 'P' (para baixo).
 0782  c34507    jp      #0745
-0785  cd290d    call    #0d29
-0788  c2c907    jp      nz,#07c9
+0785  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
+0788  c2c907    jp      nz,#07c9 ; Não: desvia.
 078b  3a550e    ld      a,(#0e55)
 078e  ba        cp      d
 078f  da9b07    jp      c,#079b
-0792  cd4b0d    call    #0d4b
-0795  c28007    jp      nz,#0780
+0792  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
+0795  c28007    jp      nz,#0780 ; Não: desvia.
 0798  c35707    jp      #0757
-079b  cd2f0d    call    #0d2f
-079e  ca9207    jp      z,#0792
+079b  cd2f0d    call    #0d2f ; Há parede acima do tanque?
+079e  ca9207    jp      z,#0792 ; Sim: desvia.
 07a1  c37b07    jp      #077b
-07a4  cd2f0d    call    #0d2f
-07a7  c2c907    jp      nz,#07c9
+07a4  cd2f0d    call    #0d2f ; Há parede acima do tanque?
+07a7  c2c907    jp      nz,#07c9 ; Não: desvia.
 07aa  7b        ld      a,e
 07ab  e61f      and     #1f
 07ad  4f        ld      c,a
@@ -1238,11 +1247,11 @@
 07b1  e61f      and     #1f
 07b3  b9        cp      c
 07b4  dac007    jp      c,#07c0
-07b7  cd100d    call    #0d10
-07ba  c25707    jp      nz,#0757
+07b7  cd100d    call    #0d10 ; Há parede à direita do tanque?
+07ba  c25707    jp      nz,#0757 ; Não: desvia.
 07bd  c38007    jp      #0780
-07c0  cd290d    call    #0d29
-07c3  cab707    jp      z,#07b7
+07c0  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
+07c3  cab707    jp      z,#07b7 ; Sim: desvia.
 07c6  c35107    jp      #0751
 07c9  2a0701    ld      hl,(#0107) ; RANDOM.
 07cc  7c        ld      a,h
@@ -1311,13 +1320,13 @@
 0853  3e40      ld      a,#40 ; '@' (tiro).
 0855  321d01    ld      (#011d),a ; KEY0+2.
 0858  21b902    ld      hl,#02b9 ; Animação: Tanque amarelo para a direita.
-085b  22640e    ld      (#0e64),hl
+085b  22640e    ld      (#0e64),hl ; Animação: Tanque para a direita.
 085e  21e702    ld      hl,#02e7 ; Animação: Tanque amarelo para a esquerda.
-0861  22620e    ld      (#0e62),hl
+0861  22620e    ld      (#0e62),hl ; Animação: Tanque para a esquerda.
 0864  21c302    ld      hl,#02c3 ; Animação: Tanque amarelo para cima.
-0867  22660e    ld      (#0e66),hl
+0867  22660e    ld      (#0e66),hl ; Animação: Tanque para cima.
 086a  21f102    ld      hl,#02f1 ; Animação: Tanque amarelo para baixo.
-086d  22680e    ld      (#0e68),hl
+086d  22680e    ld      (#0e68),hl ; Animação: Tanque para baixo.
 0870  2a800e    ld      hl,(#0e80) ; Teclas do jogador 2 (esquerda, direita).
 0873  226e0e    ld      (#0e6e),hl ; Teclas atuais (esquerda, direita).
 0876  2a820e    ld      hl,(#0e82) ; Teclas do jogador 2 (cima, baixo).
@@ -1554,11 +1563,11 @@
 
 0a63  e5        push    hl
 0a64  a7        and     a
-0a65  ca920a    jp      z,#0a92
+0a65  ca920a    jp      z,#0a92 ; A=0: HL=+3.
 0a68  fe02      cp      #02
-0a6a  da980a    jp      c,#0a98
-0a6d  ca9e0a    jp      z,#0a9e
-0a70  21a000    ld      hl,#00a0 ; +160 (+5 linhas).
+0a6a  da980a    jp      c,#0a98 ; A=1: HL=-3.
+0a6d  ca9e0a    jp      z,#0a9e ; A=2: HL=+64 (+2 linhas).
+0a70  21a000    ld      hl,#00a0 ; A=4: HL=+160 (+5 linhas).
 ;
 0a73  19        add     hl,de
 0a74  47        ld      b,a
@@ -1585,13 +1594,13 @@
 0a90  e1        pop     hl
 0a91  c9        ret
  
-0a92  210300    ld      hl,#0003 ; +3
+0a92  210300    ld      hl,#0003 ; +3.
 0a95  c3730a    jp      #0a73
 
-0a98  21fdff    ld      hl,#fffd ; -3
+0a98  21fdff    ld      hl,#fffd ; -3.
 0a9b  c3730a    jp      #0a73
 
-0a9e  2a4f04    ld      hl,(#044f)
+0a9e  2a4f04    ld      hl,(#044f) ; +64.
 0aa1  c3730a    jp      #0a73
 
 0aa4  215e0e    ld      hl,#0e5e
@@ -1614,13 +1623,13 @@
 0ac6  e61f      and     #1f
 0ac8  fe01      cp      #01
 0aca  cae70a    jp      z,#0ae7
-0acd  cd290d    call    #0d29
-0ad0  cae70a    jp      z,#0ae7
+0acd  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
+0ad0  cae70a    jp      z,#0ae7 ; Sim: desvia.
 0ad3  78        ld      a,b
 0ad4  fe01      cp      #01
 0ad6  cac80b    jp      z,#0bc8
 0ad9  3e01      ld      a,#01
-0adb  2a620e    ld      hl,(#0e62)
+0adb  2a620e    ld      hl,(#0e62) ; Animação: Tanque para a esquerda.
 ; Define direção.
 0ade  32560e    ld      (#0e56),a ; Direção do tanque azul.
 0ae1  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
@@ -1634,13 +1643,13 @@
 0af2  e61f      and     #1f
 0af4  fe1e      cp      #1e
 0af6  ca0b0b    jp      z,#0b0b ; Não: desvia.
-0af9  cd100d    call    #0d10
-0afc  ca0b0b    jp      z,#0b0b
+0af9  cd100d    call    #0d10 ; Há parede à direita do tanque?
+0afc  ca0b0b    jp      z,#0b0b ; Sim: desvia.
 0aff  78        ld      a,b
 0b00  a7        and     a
 0b01  cac80b    jp      z,#0bc8
 0b04  af        xor     a
-0b05  2a640e    ld      hl,(#0e64)
+0b05  2a640e    ld      hl,(#0e64) ; Animação: Tanque para a direita.
 0b08  c3de0a    jp      #0ade ; Define direção.
 
 0b0b  3a700e    ld      a,(#0e70) ; Tecla para cima.
@@ -1653,13 +1662,13 @@
 0b1b  7b        ld      a,e
 0b1c  fe40      cp      #40
 0b1e  da350b    jp      c,#0b35 ; Não: desvia.
-0b21  cd2f0d    call    #0d2f
-0b24  ca350b    jp      z,#0b35
+0b21  cd2f0d    call    #0d2f ; Há parede acima do tanque?
+0b24  ca350b    jp      z,#0b35 ; Sim: desvia.
 0b27  78        ld      a,b
 0b28  fe02      cp      #02
 0b2a  cac80b    jp      z,#0bc8
 0b2d  3e02      ld      a,#02
-0b2f  2a660e    ld      hl,(#0e66)
+0b2f  2a660e    ld      hl,(#0e66) ; Animação: Tanque para cima.
 0b32  c3de0a    jp      #0ade ; Define direção.
 
 0b35  3a710e    ld      a,(#0e71) ; Tecla para baixo.
@@ -1672,13 +1681,13 @@
 0b45  7b        ld      a,e
 0b46  fea0      cp      #a0
 0b48  d25f0b    jp      nc,#0b5f ; Não: desvia.
-0b4b  cd4b0d    call    #0d4b
-0b4e  ca5f0b    jp      z,#0b5f
+0b4b  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
+0b4e  ca5f0b    jp      z,#0b5f ; Sim: desvia.
 0b51  78        ld      a,b
 0b52  fe03      cp      #03
 0b54  cac80b    jp      z,#0bc8
 0b57  3e03      ld      a,#03
-0b59  2a680e    ld      hl,(#0e68)
+0b59  2a680e    ld      hl,(#0e68) ; Animação: Tanque para baixo.
 0b5c  c3de0a    jp      #0ade ; Define direção.
 
 0b5f  78        ld      a,b
@@ -1693,8 +1702,8 @@
 0b73  7b        ld      a,e
 0b74  fea0      cp      #a0
 0b76  d27f0b    jp      nc,#0b7f
-0b79  cd4b0d    call    #0d4b
-0b7c  c2c80b    jp      nz,#0bc8
+0b79  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
+0b7c  c2c80b    jp      nz,#0bc8 ; Não: desvia.
 0b7f  cde20d    call    #0de2 ; Apaga tanque azul.
 0b82  ca930b    jp      z,#0b93 ; Desvia se não houve colisão.
 0b85  3a5e0e    ld      a,(#0e5e)
@@ -1703,30 +1712,39 @@
 0b8d  cd510d    call    #0d51
 0b90  c3c80b    jp      #0bc8
 0b93  cdf30d    call    #0df3 ; SHAPON'.
+; if (m[0x0e5f] != 0) {
+;   --m[0x0e5f];
+; }
 0b96  3a5f0e    ld      a,(#0e5f)
 0b99  a7        and     a
 0b9a  c8        ret     z
- 
 0b9b  3d        dec     a
 0b9c  325f0e    ld      (#0e5f),a
 0b9f  c9        ret
- 
+
 0ba0  7b        ld      a,e
 0ba1  e61f      and     #1f
 0ba3  fe1e      cp      #1e
 0ba5  ca7f0b    jp      z,#0b7f
-0ba8  cd100d    call    #0d10
+0ba8  cd100d    call    #0d10 ; Há parede à direita do tanque?
 0bab  c37c0b    jp      #0b7c
 0bae  7b        ld      a,e
 0baf  e61f      and     #1f
 0bb1  fe01      cp      #01
 0bb3  ca7f0b    jp      z,#0b7f
-0bb6  cd290d    call    #0d29
+0bb6  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
 0bb9  c37c0b    jp      #0b7c
-0bbc  cd2f0d    call    #0d2f
+0bbc  cd2f0d    call    #0d2f ; Há parede acima do tanque?
 0bbf  c37c0b    jp      #0b7c
 0bc2  013200    ld      bc,#0032 ; 50ms
 0bc5  cd48c0    call    #c048 ; DELAYB
+
+; if (++mem[0x0e60] < 10) {
+;   if (mem[0x0e5f] != 3) {
+;     ++mem[0x0e5f];
+;     mem[0x0e60] = 0;
+;   }
+; }
 
 0bc8  21600e    ld      hl,#0e60
 0bcb  34        inc     (hl)
@@ -1763,10 +1781,10 @@
 0c14  cd5104    call    #0451 ; Inicializa música.
 0c17  3e88      ld      a,#88
 0c19  d380      out     (#80),a
-0c1b  3a590e    ld      a,(#0e59)
-0c1e  3d        dec     a
-0c1f  ca520c    jp      z,#0c52
-0c22  32590e    ld      (#0e59),a
+0c1b  3a590e    ld      a,(#0e59) ; Vidas restantes do jogador 1.
+0c1e  3d        dec     a ; Menos uma.
+0c1f  ca520c    jp      z,#0c52 ; Zerou: Desvia.
+0c22  32590e    ld      (#0e59),a ; Vidas restantes do jogador 1.
 0c25  3a7b0e    ld      a,(#0e7b) ; Placar atual jogador 2.
 0c28  c605      add     a,#05 ; +5 pontos.
 0c2a  327b0e    ld      (#0e7b),a ; Placar atual jogador 2.
@@ -1785,6 +1803,7 @@
 0c4b  af        xor     a
 0c4c  327d0e    ld      (#0e7d),a
 0c4f  c3d105    jp      #05d1
+
 0c52  cd5104    call    #0451 ; Inicializa música.
 0c55  3a5d0e    ld      a,(#0e5d)
 0c58  a7        and     a
@@ -1797,48 +1816,53 @@
 0c69  ca700c    jp      z,#0c70
 0c6c  3c        inc     a
 0c6d  320401    ld      (#0104),a ; PLAY.
-0c70  af        xor     a
-0c71  3a590e    ld      a,(#0e59)
-0c74  47        ld      b,a
+; +5 pontos por cada vida restante do jogador 1.
+0c70  af        xor     a ; Zera carry flag.
+0c71  3a590e    ld      a,(#0e59) ; Vidas restantes do jogador 1.
+0c74  47        ld      b,a ; Multiplica por 5.
 0c75  17        rla
 0c76  17        rla
 0c77  80        add     a,b
 0c78  215c0e    ld      hl,#0e5c ; Placar atual jogador 1.
 0c7b  86        add     a,(hl)
 0c7c  322301    ld      (#0123),a ; SCOREA.
-0c7f  110d80    ld      de,#800d
+0c7f  110d80    ld      de,#800d ; Posição na VRAM do placar do jogador 1.
 0c82  c3970c    jp      #0c97
-0c85  af        xor     a
-0c86  3a780e    ld      a,(#0e78)
-0c89  47        ld      b,a
+; +5 pontos para cada vida restante do jogador 2.
+0c85  af        xor     a ; Zera carry flag.
+0c86  3a780e    ld      a,(#0e78) ; Vidas restantes do jogador 2.
+0c89  47        ld      b,a ; Multiplica por 5.
 0c8a  17        rla
 0c8b  17        rla
 0c8c  80        add     a,b
 0c8d  217b0e    ld      hl,#0e7b ; Placar atual jogador 2.
 0c90  86        add     a,(hl)
 0c91  322401    ld      (#0124),a ; SCOREB.
-0c94  111a80    ld      de,#801a
-0c97  cd900d    call    #0d90
+0c94  111a80    ld      de,#801a ; Posição na VRAM do placar do jogador 2.
+
+0c97  cd900d    call    #0d90 ; Exibe valor de A alinhado à esquerda.
 0c9a  cd4ec0    call    #c04e ; LSCORE. (Transfere placares atuais para tabela.)
 0c9d  c1        pop     bc
 0c9e  018813    ld      bc,#1388 ; 5000ms.
 0ca1  cd48c0    call    #c048 ; DELAYB.
 0ca4  c37904    jp      #0479
-0ca7  2a640e    ld      hl,(#0e64)
+;
+0ca7  2a640e    ld      hl,(#0e64) ; Animação: Tanque para a direita.
 0caa  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cad  210100    ld      hl,#0001
 0cb0  19        add     hl,de
 0cb1  22540e    ld      (#0e54),hl ; Guarda posição do tanque azul.
 0cb4  c3db0c    jp      #0cdb
-0cb7  2a620e    ld      hl,(#0e62)
+;
+0cb7  2a620e    ld      hl,(#0e62) ; Animação: Tanque para a esquerda.
 0cba  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cbd  21ffff    ld      hl,#ffff
 0cc0  c3b00c    jp      #0cb0
-0cc3  2a660e    ld      hl,(#0e66)
+0cc3  2a660e    ld      hl,(#0e66) ; Animação: Tanque para cima.
 0cc6  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cc9  21e0ff    ld      hl,#ffe0
 0ccc  c3b00c    jp      #0cb0
-0ccf  2a680e    ld      hl,(#0e68)
+0ccf  2a680e    ld      hl,(#0e68) ; Animação: Tanque para baixo.
 0cd2  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque azul a desenhar.
 0cd5  212000    ld      hl,#0020
 0cd8  c3b00c    jp      #0cb0
@@ -1857,7 +1881,8 @@
 0cf4  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0cf7  cdf30d    call    #0df3 ; SHAPON'.
 0cfa  c9        ret
- 
+
+; Intercambia os 13 bytes a partir de $0e54 com os 13 bytes a partir de $0e73.
 0cfb  21540e    ld      hl,#0e54 ; Endereço da posição do tanque azul.
 0cfe  11730e    ld      de,#0e73 ; Endereço da posição do tanque amarelo.
 0d01  060d      ld      b,#0d
@@ -1874,43 +1899,55 @@
 0d0c  13        inc     de
 0d0d  c3030d    jp      #0d03
 
-0d10  214200    ld      hl,#0042
+; Verifica se há (parte de) parede à direita do tanque.
+; Retorna flag Z ativo se houver.
+0d10  214200    ld      hl,#0042 ; +2 linhas, +2 colunas.
 0d13  d5        push    de
 0d14  c5        push    bc
-0d15  0606      ld      b,#06
+0d15  0606      ld      b,#06 ; Examinar 6 bytes de altura.
 0d17  19        add     hl,de
 0d18  7e        ld      a,(hl)
-0d19  fedd      cp      #dd
-0d1b  ca480d    jp      z,#0d48
+0d19  fedd      cp      #dd ; Há padrão de parede (%11.01.11.01)?
+0d1b  ca480d    jp      z,#0d48 ; Sim: Termina.
 0d1e  05        dec     b
-0d1f  ca450d    jp      z,#0d45
+0d1f  ca450d    jp      z,#0d45 ; Examinou os 6 bytes de altura e não achou parede: Termina.
 0d22  eb        ex      de,hl
-0d23  21e0ff    ld      hl,#ffe0
+0d23  21e0ff    ld      hl,#ffe0 ; -32: -1 linha.
 0d26  c3170d    jp      #0d17
-0d29  213e00    ld      hl,#003e
+
+; Verifica se há (parte de) parede à esquerda do tanque.
+; Retorna flag Z ativo se houver.
+0d29  213e00    ld      hl,#003e ; +2 linhas, -2 colunas.
 0d2c  c3130d    jp      #0d13
-0d2f  217fff    ld      hl,#ff7f
+
+; Verifica se há (parte de) parede acima do tanque.
+; Retorna flag Z ativo se houver.
+0d2f  217fff    ld      hl,#ff7f ; -4 linhas, -1 coluna.
 0d32  d5        push    de
 0d33  c5        push    bc
-0d34  0603      ld      b,#03
+0d34  0603      ld      b,#03 ; Examinar 3 bytes de largura.
 0d36  19        add     hl,de
 0d37  7e        ld      a,(hl)
-0d38  fedd      cp      #dd
-0d3a  ca480d    jp      z,#0d48
+0d38  fedd      cp      #dd ; Há padrão de parede (%11.01.11.01)?
+0d3a  ca480d    jp      z,#0d48 ; Sim: Termina.
 0d3d  05        dec     b
-0d3e  ca450d    jp      z,#0d45
-0d41  23        inc     hl
+0d3e  ca450d    jp      z,#0d45 ; Examinou os 3 bytes de largura e não achou parede: Termina.
+0d41  23        inc     hl ; +1 coluna.
 0d42  c3370d    jp      #0d37
+;
 0d45  af        xor     a
 0d46  3c        inc     a
-0d47  a7        and     a
+0d47  a7        and     a ; Desativa flag Z.
 0d48  c1        pop     bc
 0d49  d1        pop     de
 0d4a  c9        ret
  
-0d4b  215f00    ld      hl,#005f
+; Verifica se há (parte de) parede abaixo do tanque.
+; Retorna flag Z ativo se houver.
+0d4b  215f00    ld      hl,#005f ; +3 linhas, -1 coluna.
 0d4e  c3320d    jp      #0d32
 
+;
 0d51  3a560e    ld      a,(#0e56) ; Direção do tanque azul.
 0d54  fe05      cp      #05
 0d56  c8        ret     z
@@ -1919,7 +1956,7 @@
 0d5a  224901    ld      (#0149),hl ; NCC.
 0d5d  3eb5      ld      a,#b5 ; VOICEC=1, INTRPC=4, geração de ruído.
 0d5f  324b01    ld      (#014b),a ; CVALUE.
-0d62  cdb50d    call    #0db5
+0d62  cdb50d    call    #0db5 ; Pausa de 30ms.
 0d65  3e05      ld      a,#05
 0d67  32560e    ld      (#0e56),a ; Direção do tanque azul.
 0d6a  21cd02    ld      hl,#02cd ; Animação: Explosão.
@@ -1947,30 +1984,35 @@
 0d8b  77        ld      (hl),a
 0d8c  12        ld      (de),a
 0d8d  c3770d    jp      #0d77
+
+; Exibe valor de A alinhado à esquerda.
+; A = valor a exibir. DE = posição na VRAM do 2º dígito.
 0d90  210000    ld      hl,#0000
 0d93  0e00      ld      c,#00
-0d95  fe0a      cp      #0a
-0d97  daad0d    jp      c,#0dad
-0d9a  0e0a      ld      c,#0a
-0d9c  6f        ld      l,a
+0d95  fe0a      cp      #0a ; Valor a exibir < 10?
+0d97  daad0d    jp      c,#0dad ; Sim: desvia e só exibe um dígito.
+0d9a  0e0a      ld      c,#0a ; Divisor = 10.
+0d9c  6f        ld      l,a ; Quociente = valor a exibir.
 0d9d  d5        push    de
-0d9e  cd2dc0    call    #c02d ; DIV
+0d9e  cd2dc0    call    #c02d ; DIV ; Quociente em L, resto em H.
 0da1  d1        pop     de
 0da2  0e00      ld      c,#00
-0da4  7c        ld      a,h
+0da4  7c        ld      a,h ; Resto da divisão por 10.
 0da5  e5        push    hl
 0da6  d5        push    de
 0da7  cd3fc0    call    #c03f ; DISPY2
 0daa  d1        pop     de
 0dab  e1        pop     hl
-0dac  7d        ld      a,l
-0dad  1b        dec     de
+0dac  7d        ld      a,l ; Quociente da divisão por 10.
+;
+0dad  1b        dec     de ; Recua para posição do 1º dígito.
 0dae  1b        dec     de
 0daf  d5        push    de
 0db0  cd3fc0    call    #c03f ; DISPY2
 0db3  d1        pop     de
 0db4  c9        ret
 
+; Pausa de 30ms.
 0db5  011e00    ld      bc,#001e ; 30ms
 0db8  cd48c0    call    #c048 ; DELAYB
 0dbb  c9        ret
@@ -2015,7 +2057,7 @@
 0de8  2a540e    ld      hl,(#0e54) ; Posição do tanque azul.
 0deb  cd110e    call    #0e11 ; SHAPOF'.
 0dee  3a880e    ld      a,(#0e88) ; SHAPE0'.
-0df1  a7        and     a
+0df1  a7        and     a ; Flag Z se não houve colisão.
 0df2  c9        ret
 
 ; "SHAPON'", réplica da rotina SHAPON  da ROM (!!!!).
@@ -2047,6 +2089,8 @@
 ;    e não o registrador C.
 ; 2. O endereço indicador de colisão (SHAPE0')
 ;    é #0e88.
+;    O valor é a quantidade de bytes na VRAM que estavam
+;    diferentes do padrão da figura.
 0e11  e5        push    hl
 0e12  d5        push    de
 0e13  c5        push    bc
@@ -2075,14 +2119,16 @@
 0e3c  d1        pop     de
 0e3d  e1        pop     hl
 0e3e  c9        ret
- 
+
+; A partir de $0e8c, a cada grupo de 3 bytes, procura um grupo cujo 2º byte seja $00 ou $ff.
+; Retorna HL apontando para o 1º byte do grupo.
+; Retorna flag Z conforme o valor encontrado.
 0e3f  218c0e    ld      hl,#0e8c
 0e42  23        inc     hl
 0e43  7e        ld      a,(hl)
 0e44  2b        dec     hl
 0e45  a7        and     a
 0e46  c8        ret     z
- 
 0e47  feff      cp      #ff
 0e49  ca520e    jp      z,#0e52
 0e4c  23        inc     hl
@@ -2091,7 +2137,8 @@
 0e4f  c3420e    jp      #0e42
 0e52  a7        and     a
 0e53  c9        ret
- 
+
+;
 0e54  ffff      dw      #ffff ; Posição do tanque azul na VRAM.
 0e56  ff        db      #ff ; Direção do tanque azul.
 0e57  ffff      dw      #ffff ; Ponteiro p/ sprite do tanque azul a desenhar.
@@ -2102,11 +2149,12 @@
 0e5e  00        db      #00
 0e5f  ff        db      #ff
 0e60  ff        db      #ff
+;
 0e61  ff        db      #ff
-0e62  c702      dw      #02c7 ; Animação: Tanque azul para a esquerda.
-0e64  b302      dw      #02b3 ; Animação: Tanque azul para a direita.
-0e66  bf02      dw      #02bf ; Animação: Tanque azul para cima.
-0e68  ed02      dw      #02ed ; Animação: Tanque azul para baixo.
+0e62  c702      dw      #02c7 ; Animação: Tanque para a esquerda.
+0e64  b302      dw      #02b3 ; Animação: Tanque para a direita.
+0e66  bf02      dw      #02bf ; Animação: Tanque para cima.
+0e68  ed02      dw      #02ed ; Animação: Tanque para baixo.
 ; Teclas do jogador 1.
 0e6a  59        db      #59 ; 'Y' (esquerda).
 0e6b  31        db      #31 ; '1' (direita).
