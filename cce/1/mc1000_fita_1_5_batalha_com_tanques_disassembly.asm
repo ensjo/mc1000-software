@@ -123,35 +123,36 @@
 022d  c37904    jp      #0479
 0230  c34bc0    jp      #c04b ; SCORE
 
+; Partes do labirinto:
+;                                  <-- y=6,7
 ;
 ;
-;
-;    MMEEEMM   KKKKKK   NNFFFNN
+;    MMEEEMM   KKKKKK   NNFFFNN    <-- y=12,13
 ;    a                        b
 ;    a                        b
 ;    a                        b
-;    i   U   jOOGGGGOOk   V   l
+;    i   U   jOOGGGGOOk   V   l    <-- y=20,21
 ;    i   U   j        k   V   l
-;    i   c   j        k   d   l
+;    i   c   j        k   d   l    <-- y=24,25
 ;        c                d
-;        c       PP       d
-;        q       PP       r
-;    m   q   n        o   r   p
-;  = mAAAqBBBn        oCCCrDDDp =
-;    m   W   n        o   X   p
-;        W       QQ       X
-;        e       QQ       f
+;        c       PP       d        <-- y=28,29
+;        q       PP       r        <-- y=30,31
+;    m   q   n        o   r   p    <-- y=32,33
+;  = mAAAqBBBn        oCCCrDDDp =  <-- y=34,35
+;    m   W   n        o   X   p    <-- y=36,37
+;        W       QQ       X        <-- y=38,39
+;        e       QQ       f        <-- y=40,41
 ;        e                f
-;    s   e   t        u   f   v
+;    s   e   t        u   f   v    <-- y=44,45
 ;    s   Y   t        u   Z   v
-;    s   Y   tRRHHHHRRu   Z   v
+;    s   Y   tRRHHHHRRu   Z   v    <-- y=48,49
 ;    g                        h
 ;    g                        h
 ;    g                        h
-;    SSIIISS   LLLLLL   TTJJJTT
+;    SSIIISS   LLLLLL   TTJJJTT    <-- y=56,57
 ;
 ;
-;
+;                                  <-- y=62,63
 
 ; Posições para desenhar uma parede
 ; de 2 bytes x 2 linhas.
@@ -722,8 +723,8 @@
 
 044c  14        db      #14 ; 20.
 044d  1a        db      #1a ; 26 (qtd de bytes a zerar desde $0e8a).
-044e  58        db      #58 ; 'X'.
-044f  40        db      #40 ; 64.
+044e  58        db      #58 ; 'X' (para a esquerda).
+044f  40        db      #40 ; +64: +2 linhas.
 0450  ff        db      #ff
  
 ; Inicializa música.
@@ -1039,6 +1040,7 @@
 05e1  3a7b0e    ld      a,(#0e7b) ; Placar atual do outro jogador.
 05e4  111a80    ld      de,#801a ; Posição na VRAM do placar do jogador 2.
 05e7  cd900d    call    #0d90 ; Exibe valor de A alinhado à esquerda.
+;
 05ea  3a560e    ld      a,(#0e56) ; Direção do tanque atual.
 05ed  fe05      cp      #05 ; Tanque destruído?
 05ef  cafa05    jp      z,#05fa ; Sim: desvia.
@@ -1090,14 +1092,15 @@
 ;
 065b  2a730e    ld      hl,(#0e73) ; Posição do outro tanque.
 065e  7c        ld      a,h
-065f  fe83      cp      #83
-0661  da7106    jp      c,#0671
-0664  fe86      cp      #86
-0666  d27106    jp      nc,#0671
+065f  fe83      cp      #83 ; Acima da linha 24?
+0661  da7106    jp      c,#0671 ; Sim: desvia.
+0664  fe86      cp      #86 ; Acima da linha 48?
+0666  d27106    jp      nc,#0671 ; Não: desvia.
 0669  7d        ld      a,l
 066a  e61f      and     #1f
-066c  fe01      cp      #01
-066e  ca5707    jp      z,#0757
+066c  fe01      cp      #01 ; Está na primeira coluna possível?
+066e  ca5707    jp      z,#0757 ; Sim: desvia. (Dirige-se à direita, evitando bater na base inimiga.)
+;
 0671  3a850e    ld      a,(#0e85)
 0674  a7        and     a
 0675  cace06    jp      z,#06ce
@@ -1106,27 +1109,31 @@
 067c  32860e    ld      (#0e86),a
 067f  f5        push    af
 0680  3a0401    ld      a,(#0104) ; PLAY.
-0683  fe0d      cp      #0d
-0685  d2a006    jp      nc,#06a0
+0683  fe0d      cp      #0d ; Tópico >= 13?
+0685  d2a006    jp      nc,#06a0 ; Sim: desvia.
 0688  f1        pop     af
 0689  fe03      cp      #03
 068b  ca9a06    jp      z,#069a
+;
 068e  fe0a      cp      #0a
 0690  da5808    jp      c,#0858
 0693  af        xor     a
 0694  32850e    ld      (#0e85),a
 0697  32860e    ld      (#0e86),a
-069a  cda406    call    #06a4
+;
+069a  cda406    call    #06a4 ; Posiciona novo tiro do outro tanque.
 069d  c35808    jp      #0858
+;
 06a0  f1        pop     af
 06a1  c38e06    jp      #068e
+
+; Posiciona novo tiro do outro tanque.
 06a4  2a730e    ld      hl,(#0e73) ; Posição do outro tanque.
 06a7  eb        ex      de,hl
 06a8  cd3f0e    call    #0e3f ; Procura slot de tiro disponível.
 06ab  3a750e    ld      a,(#0e75) ; Direção do outro tanque.
 06ae  c0        ret     nz ; Retorna se não há slot disponível.
- 
-06af  cd630a    call    #0a63
+06af  cd630a    call    #0a63 ; Registra novo tiro no slot.
 06b2  af        xor     a
 06b3  328b0e    ld      (#0e8b),a ; Contador de ciclos de espera para jogador 2.
 06b6  c9        ret
@@ -1149,9 +1156,10 @@
 06cc  77        ld      (hl),a
 06cd  c9        ret
  
-06ce  2a540e    ld      hl,(#0e54) ; Posição do tanque atual.
+;
+06ce  2a540e    ld      hl,(#0e54) ; DE=Posição do tanque atual na VRAM.
 06d1  eb        ex      de,hl
-06d2  2a730e    ld      hl,(#0e73) ; Posição do outro tanque.
+06d2  2a730e    ld      hl,(#0e73) ; HL=Posição do outro tanque na VRAM.
 06d5  7a        ld      a,d
 06d6  bc        cp      h ; Os tanques estão na mesma linha (ou quase)?
 06d7  cafd06    jp      z,#06fd ; Sim: desvia.
@@ -1199,53 +1207,68 @@
 0722  fe02      cp      #02
 0724  da8507    jp      c,#0785 ; A=1 (à esquerda)? Desvia.
 0727  caa407    jp      z,#07a4 ; A=2 (para cima)? Desvia.
-; Para baixo.
+; Outro tanque movendo-se para baixo.
 072a  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
 072d  c2c907    jp      nz,#07c9 ; Não: desvia.
-0730  7b        ld      a,e ; LSB da posição do tanque amarelo.
-0731  e61f      and     #1f
+0730  7b        ld      a,e ; LSB da posição do outro tanque na VRAM.
+0731  e61f      and     #1f ; Coluna atual do outro tanque.
 0733  4f        ld      c,a
-0734  3a540e    ld      a,(#0e54) ; LSB da posição do tanque atual.
-0737  e61f      and     #1f
-0739  b9        cp      c ; Tanque azul à esquerda do tanque amarelo?
+0734  3a540e    ld      a,(#0e54) ; LSB da posição do tanque atual na VRAM.
+0737  e61f      and     #1f ; Coluna atual do tanque atual.
+0739  b9        cp      c ; Tanque atual à esquerda do outro tanque?
 073a  da4b07    jp      c,#074b ; Sim: Desvia.
 073d  cd100d    call    #0d10 ; Há parede à direita do tanque?
-0740  c25707    jp      nz,#0757 ; Não: desvia.
+0740  c25707    jp      nz,#0757 ; Não: Define movimento do outro tanque para a direita.
 0743  3e48      ld      a,#48 ; 'H' (para cima).
+
+; Registra tecla de movimento e continua.
 0745  321c01    ld      (#011c),a ; KEY0+1
 0748  c34708    jp      #0847
+
 074b  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
 074e  ca3d07    jp      z,#073d ; Sim: desvia.
+; Define movimento do outro tanque para a esquerda.
 0751  3a4e04    ld      a,(#044e) ; 'X' (para a esquerda).
 0754  c34507    jp      #0745
+; Define movimento do outro tanque para a direita.
 0757  3e30      ld      a,#30 ; '0' (para a direita).
 0759  c34507    jp      #0745
+
+; Outro tanque movendo-se para a direita.
 075c  cd100d    call    #0d10 ; Há parede à direita do tanque?
 075f  c2c907    jp      nz,#07c9 ; Não: desvia.
-0762  3a550e    ld      a,(#0e55)
+0762  3a550e    ld      a,(#0e55) ; MSB da posição do tanque atual na VRAM.
 0765  ba        cp      d
 0766  da7507    jp      c,#0775
 0769  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
-076c  c28007    jp      nz,#0780 ; Não: desvia.
+076c  c28007    jp      nz,#0780 ; Não: Define movimento do outro tanque para baixo.
 076f  3a4e04    ld      a,(#044e) ; 'X' (para a esquerda).
 0772  c34507    jp      #0745
+
+;
 0775  cd2f0d    call    #0d2f ; Há parede acima do tanque?
 0778  ca6907    jp      z,#0769 ; Sim: desvia.
+; Define movimento do outro tanque para cima.
 077b  3e48      ld      a,#48 ; 'H' (para cima).
 077d  c34507    jp      #0745
+; Define movimento do outro tanque para baixo.
 0780  3e50      ld      a,#50 ; 'P' (para baixo).
 0782  c34507    jp      #0745
+
+; Outro tanque movendo-se à esquerda.
 0785  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
 0788  c2c907    jp      nz,#07c9 ; Não: desvia.
 078b  3a550e    ld      a,(#0e55)
 078e  ba        cp      d
 078f  da9b07    jp      c,#079b
 0792  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
-0795  c28007    jp      nz,#0780 ; Não: desvia.
-0798  c35707    jp      #0757
+0795  c28007    jp      nz,#0780 ; Não: Define movimento do outro tanque para baixo.
+0798  c35707    jp      #0757 ; Define movimento do outro tanque para a direita.
 079b  cd2f0d    call    #0d2f ; Há parede acima do tanque?
 079e  ca9207    jp      z,#0792 ; Sim: desvia.
-07a1  c37b07    jp      #077b
+07a1  c37b07    jp      #077b ; Define movimento do outro tanque para cima.
+
+; Outro tanque movendo-se para cima.
 07a4  cd2f0d    call    #0d2f ; Há parede acima do tanque?
 07a7  c2c907    jp      nz,#07c9 ; Não: desvia.
 07aa  7b        ld      a,e
@@ -1256,11 +1279,13 @@
 07b3  b9        cp      c
 07b4  dac007    jp      c,#07c0
 07b7  cd100d    call    #0d10 ; Há parede à direita do tanque?
-07ba  c25707    jp      nz,#0757 ; Não: desvia.
-07bd  c38007    jp      #0780
+07ba  c25707    jp      nz,#0757 ; Não: Define movimento do outro tanque para a direita.
+07bd  c38007    jp      #0780 ; Define movimento do outro tanque para baixo.
 07c0  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
 07c3  cab707    jp      z,#07b7 ; Sim: desvia.
-07c6  c35107    jp      #0751
+07c6  c35107    jp      #0751 ; Define movimento do outro tanque para a esquerda.
+
+;
 07c9  2a0701    ld      hl,(#0107) ; RANDOM.
 07cc  7c        ld      a,h
 07cd  85        add     a,l
@@ -1310,17 +1335,19 @@
 0828  cafe07    jp      z,#07fe
 082b  0648      ld      b,#48 ; 'H' (para cima).
 082d  c3fe07    jp      #07fe
+
+;
 0830  3a0701    ld      a,(#0107) ; RANDOM.
 0833  0f        rrca
 0834  da4708    jp      c,#0847
 0837  0f        rrca
-0838  da7b07    jp      c,#077b
+0838  da7b07    jp      c,#077b ; Define movimento do outro tanque para cima.
 083b  0f        rrca
-083c  da5707    jp      c,#0757
+083c  da5707    jp      c,#0757 ; Define movimento do outro tanque para a direita.
 083f  0f        rrca
-0840  da5107    jp      c,#0751
+0840  da5107    jp      c,#0751 ; Define movimento do outro tanque para a esquerda.
 0843  0f        rrca
-0844  da8007    jp      c,#0780
+0844  da8007    jp      c,#0780 ; Define movimento do outro tanque para baixo.
 0847  2a0701    ld      hl,(#0107) ; RANDOM.
 084a  7c        ld      a,h
 084b  85        add     a,l
@@ -1365,8 +1392,7 @@
 08b0  cd3f0e    call    #0e3f ; Procura slot de tiro disponível.
 08b3  3a560e    ld      a,(#0e56) ; Direção do tanque atual.
 08b6  c2d708    jp      nz,#08d7 ; Retorna se não há slot disponível.
-;
-08b9  cd630a    call    #0a63
+08b9  cd630a    call    #0a63 ; Registra novo tiro no slot.
 08bc  af        xor     a
 08bd  328a0e    ld      (#0e8a),a ; Contador de ciclos de espera para jogador 1.
 08c0  3a8b0e    ld      a,(#0e8b) ; Contador de ciclos de espera para jogador 2.
@@ -1377,7 +1403,7 @@
 08cc  0e40      ld      c,#40 ; '@' (tiro).
 08ce  cdce0d    call    #0dce ; Tecla foi pressionada?
 08d1  c2d708    jp      nz,#08d7 ; Não: desvia.
-08d4  cda406    call    #06a4
+08d4  cda406    call    #06a4 ; Posiciona novo tiro do outro tanque.
 08d7  218d0e    ld      hl,#0e8d
 08da  7e        ld      a,(hl)
 08db  feff      cp      #ff
@@ -1607,16 +1633,19 @@
 0a90  e1        pop     hl
 0a91  c9        ret
 
-;
+; Posição inicial do tiro à direita do tanque.
 0a92  210300    ld      hl,#0003 ; +3 colunas.
 0a95  c3730a    jp      #0a73
 
+; Posição inicial do tiro à esquerda do tanque.
 0a98  21fdff    ld      hl,#fffd ; -3 colunas.
 0a9b  c3730a    jp      #0a73
 
+; Posição inicial do tiro abaixo do tanque.
 0a9e  2a4f04    ld      hl,(#044f) ; +64: +2 linhas.
 0aa1  c3730a    jp      #0a73
 
+;
 0aa4  215e0e    ld      hl,#0e5e ; Contador de invulnerabilidade do jogador atual.
 0aa7  3e0b      ld      a,#0b
 0aa9  be        cp      (hl) ; É diferente de 11?
@@ -1721,7 +1750,7 @@
 0b79  cd4b0d    call    #0d4b ; Há parede abaixo do tanque?
 ;
 0b7c  c2c80b    jp      nz,#0bc8 ; Não: desvia.
-; Tanque impedido de ir para baixo por parede ou fim de tela.
+; Tanque impedido de se mover por parede ou fim de tela.
 0b7f  cde20d    call    #0de2 ; Apaga tanque atual.
 0b82  ca930b    jp      z,#0b93 ; Desvia se não houve colisão.
 ; Houve colisão.
@@ -1732,6 +1761,7 @@
 0b90  c3c80b    jp      #0bc8
 ;
 0b93  cdf30d    call    #0df3 ; SHAPON'.
+; Desacelera tanque impedido de se mover.
 ; if (m[0x0e5f] != 0) {
 ;   --m[0x0e5f];
 ; }
@@ -1742,6 +1772,7 @@
 0b9c  325f0e    ld      (#0e5f),a
 0b9f  c9        ret
 
+; Direção anterior era à direita.
 0ba0  7b        ld      a,e
 0ba1  e61f      and     #1f
 0ba3  fe1e      cp      #1e ; Tanque está na última coluna possível?
@@ -1749,19 +1780,26 @@
 0ba8  cd100d    call    #0d10 ; Há parede à direita do tanque?
 0bab  c37c0b    jp      #0b7c
 
+; Direção anterior era à esquerda.
 0bae  7b        ld      a,e
 0baf  e61f      and     #1f
-0bb1  fe01      cp      #01
-0bb3  ca7f0b    jp      z,#0b7f
+0bb1  fe01      cp      #01 ; Tanque está na primeira coluna possível?
+0bb3  ca7f0b    jp      z,#0b7f ; Sim: desvia.
 0bb6  cd290d    call    #0d29 ; Há parede à esquerda do tanque?
 0bb9  c37c0b    jp      #0b7c
 
+; Direção anterior era para cima?
 0bbc  cd2f0d    call    #0d2f ; Há parede acima do tanque?
 0bbf  c37c0b    jp      #0b7c
+
+;
 0bc2  013200    ld      bc,#0032 ; 50ms
 0bc5  cd48c0    call    #c048 ; DELAYB
 
-; if (++mem[0x0e60] < 16) {
+; Direção já definida.
+
+; Acelera tanque(?)
+; if (++mem[0x0e60] > 16) {
 ;   if (mem[0x0e5f] != 3) {
 ;     ++mem[0x0e5f];
 ;     mem[0x0e60] = 0;
@@ -1779,6 +1817,7 @@
 0bda  3c        inc     a
 0bdb  325f0e    ld      (#0e5f),a
 0bde  3600      ld      (hl),#00
+;
 0be0  cde20d    call    #0de2 ; Apaga tanque atual.
 0be3  caf40b    jp      z,#0bf4 ; Desvia se não houve colisão.
 0be6  3a5e0e    ld      a,(#0e5e) ; Contador de invulnerabilidade do jogador atual.
@@ -2213,7 +2252,9 @@
 0e81  30        db      #30 ; '0' (direita).
 0e82  48        db      #48 ; 'H' (cima).
 0e83  50        db      #50 ; 'P' (baixo).
-0e84  40        db      #40 ; '@' (tiro)
+0e84  40        db      #40 ; '@' (tiro).
+
+;
 0e85  ff        db      #ff
 0e86  ff        db      #ff
 0e87  ff        db      #ff
