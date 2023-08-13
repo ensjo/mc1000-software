@@ -1163,6 +1163,7 @@
 06d5  7a        ld      a,d
 06d6  bc        cp      h ; Os tanques estão na mesma linha (ou quase)?
 06d7  cafd06    jp      z,#06fd ; Sim: desvia.
+; Tanques em linhas diferentes.
 06da  7b        ld      a,e
 06db  e61f      and     #1f
 06dd  4f        ld      c,a
@@ -1175,31 +1176,34 @@
 06e7  3e48      ld      a,#48 ; 'H' (cima).
 06e9  daee06    jp      c,#06ee ; Abaixo: desvia.
 06ec  3e50      ld      a,#50 ; 'P' (baixo).
+; Registra movimento escolhido e desvia.
 06ee  321c01    ld      (#011c),a ; KEY0+1.
 06f1  3e01      ld      a,#01
 06f3  32850e    ld      (#0e85),a
 06f6  3d        dec     a
 06f7  32860e    ld      (#0e86),a
 06fa  c35808    jp      #0858
-
+; Tanques na mesma linha (ou quase).
 06fd  7b        ld      a,e
 06fe  e6e0      and     #e0
 0700  4f        ld      c,a
 0701  7d        ld      a,l
 0702  e6e0      and     #e0
-0704  b9        cp      c
-0705  c2da06    jp      nz,#06da
+0704  b9        cp      c ; Os tanques estão exatamente na mesma linha?
+0705  c2da06    jp      nz,#06da ; Não: desvia.
+; Tanques exatamente na mesma linha.
 0708  7b        ld      a,e
 0709  e61f      and     #1f
 070b  4f        ld      c,a
 070c  7d        ld      a,l
 070d  e61f      and     #1f
-070f  b9        cp      c
-0710  3e30      ld      a,#30
-0712  daee06    jp      c,#06ee
-0715  3e58      ld      a,#58
-0717  c3ee06    jp      #06ee
+070f  b9        cp      c ; O outro tanque está à direita do atual?
+0710  3e30      ld      a,#30 ; '0' (direita).
+0712  daee06    jp      c,#06ee ; À direita: desvia.
+0715  3e58      ld      a,#58 ; 'X' (esquerda).
+0717  c3ee06    jp      #06ee ; Registra movimento escolhido e desvia.
 
+;
 071a  eb        ex      de,hl
 071b  3a750e    ld      a,(#0e75) ; Direção do outro tanque.
 071e  a7        and     a ; A=0 (à direita)?
@@ -1336,7 +1340,7 @@
 082b  0648      ld      b,#48 ; 'H' (para cima).
 082d  c3fe07    jp      #07fe
 
-;
+; Define ação do outro tanque aleatoriamente.
 0830  3a0701    ld      a,(#0107) ; RANDOM.
 0833  0f        rrca
 0834  da4708    jp      c,#0847
@@ -1356,6 +1360,8 @@
 0850  c25808    jp      nz,#0858
 0853  3e40      ld      a,#40 ; '@' (tiro).
 0855  321d01    ld      (#011d),a ; KEY0+2.
+
+;
 0858  21b902    ld      hl,#02b9 ; Animação: Tanque amarelo para a direita.
 085b  22640e    ld      (#0e64),hl ; Animação: Tanque para a direita.
 085e  21e702    ld      hl,#02e7 ; Animação: Tanque amarelo para a esquerda.
@@ -2028,29 +2034,32 @@
 0d67  32560e    ld      (#0e56),a ; Direção do tanque atual.
 0d6a  21cd02    ld      hl,#02cd ; Animação: Explosão.
 0d6d  22570e    ld      (#0e57),hl ; Ponteiro p/ sprite do tanque atual a desenhar.
-0d70  cd740d    call    #0d74
+0d70  cd740d    call    #0d74 ; Apaga todos os tiros e libera os slots.
 0d73  c9        ret
- 
-0d74  218d0e    ld      hl,#0e8d
+
+; Apaga todos os tiros e libera os slots.
+0d74  218d0e    ld      hl,#0e8d ; Primeiro slot de tiro.
+;
 0d77  7e        ld      a,(hl)
-0d78  feff      cp      #ff
-0d7a  c8        ret     z
+0d78  feff      cp      #ff ; Chegou ao fim dos slots de tiro?
+0d7a  c8        ret     z ; Sim: retorna.
  
-0d7b  a7        and     a
-0d7c  c2850d    jp      nz,#0d85
-0d7f  23        inc     hl
+0d7b  a7        and     a ; Slot de tiro está livre?
+0d7c  c2850d    jp      nz,#0d85 ; Não: desvia.
+0d7f  23        inc     hl ; Passa ao próximo slot de tiro.
 0d80  23        inc     hl
 0d81  23        inc     hl
 0d82  c3770d    jp      #0d77
+;
 0d85  2b        dec     hl
-0d86  5e        ld      e,(hl)
+0d86  5e        ld      e,(hl) ; E = lsb do endereço do tiro na VRAM.
 0d87  af        xor     a
-0d88  77        ld      (hl),a
+0d88  77        ld      (hl),a ; Zera lsb do endereço do tiro na VRAM.
 0d89  23        inc     hl
-0d8a  56        ld      d,(hl)
-0d8b  77        ld      (hl),a
-0d8c  12        ld      (de),a
-0d8d  c3770d    jp      #0d77
+0d8a  56        ld      d,(hl) ; DE = endereço do tiro na VRAM.
+0d8b  77        ld      (hl),a ; Zera msb do endereço do tiro na VRAM. (libera slot)
+0d8c  12        ld      (de),a ; Apaga tiro na VRAM.
+0d8d  c3770d    jp      #0d77 ; Passa ao próximo slot de tiro.
 
 ; Exibe valor de A alinhado à esquerda.
 ; A = valor a exibir. DE = posição na VRAM do 2º dígito.
@@ -2371,28 +2380,28 @@
 0ee2  0e        db      #0e ; 00.00.11.10
 0ee3  ff        db      #ff
 
+; BGM/SFX? (Nunca usado?)
+0ee4  07        db      #07 ; Forma da envoltória = 0 (\___).
+0ee5  8020      dw      #2080 ; Período da envoltória = 8320.
+0ee7  00        db      #00 ; Valor para registrador de controle do gerador de ruído = 0.
 ;
-0ee4  07        rlca
-0ee5  80        add     a,b
-0ee6  2000      jr      nz,#0ee8        ; (0)
-0ee8  60        ld      h,b
-0ee9  0c        inc     c
-0eea  60        ld      h,b
-0eeb  0c        inc     c
-0eec  57        ld      d,a
-0eed  0c        inc     c
-0eee  ee07      xor     #07
-0ef0  80        add     a,b
-0ef1  2000      jr      nz,#0ef3        ; (0)
-0ef3  57        ld      d,a
-0ef4  0c        inc     c
-0ef5  60        ld      h,b
-0ef6  0c        inc     c
-0ef7  64        ld      h,h
-0ef8  0c        inc     c
-0ef9  67        ld      h,a
-0efa  0c        inc     c
-0efb  ee        db      #ee
+0ee8  600c      db      #60,#0c ; 6ª oitava, nota C, duração 12.
+0eea  600c      db      #60,#0c ; 6ª oitava, nota C, duração 12.
+0eec  570c      db      #57,#0c ; 5ª oitava, nota G, duração 12.
+;
+0eee  ee        db      #ee ; Repetir.
+
+; BGM/SFX? (Nunca usado?)
+0eef  07        db      #07 ; Forma da envoltória = 0 (\___).
+0ef0  8020      dw      #2080 ; Período da envoltória = 8320.
+0ef2  00        db      #00  ; Valor para registrador de controle do gerador de ruído = 0.
+;
+0ef3  570c      db      #57,#0c ; 5ª oitava, nota G, duração 12.
+0ef5  600c      db      #60,#0c ; 6ª oitava, nota C, duração 12.
+0ef7  640c      db      #64,#0c ; 6ª oitava, nota E, duração 12.
+0ef9  670c      db      #67,#0c ; 6ª oitava, nota G, duração 12.
+;
+0efb  ee        db      #ee ; Repetir
  
 ; Preenche uma área retangular de B bytes x A linhas
 ; com o valor de C a partir de HL.
