@@ -2919,9 +2919,9 @@ CF5E  2808      JR      Z,#CF68 ; (8)
 CF60  FEBE      CP      #BE ; token '+'
 CF62  2001      JR      NZ,#CF65 ; (1)
 CF64  23        INC     HL
-CF65  C399E9    JP      #E999 ; {ARGVL1} [GETINT] @GETBYT
+CF65  C399E9    JP      #E999 ; @GETBYT {ARGVL1} [GETINT]
 CF68  23        INC     HL
-CF69  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+CF69  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 CF6C  2F        CPL
 CF6D  3C        INC     A
 CF6E  C9        RET
@@ -2929,22 +2929,22 @@ CF6E  C9        RET
 ;
 CF6F  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 CF72  2C        DB      ','
-CF73  C399E9    JP      #E999 ; {ARGVL1} [GETINT] @GETBYT
+CF73  C399E9    JP      #E999 ; @GETBYT {ARGVL1} [GETINT]
 
 ; Lê os três parâmetros de TEMPO/SOUND: B, C, A.
 ; Retorna flags indicando número do canal (C=1, Z=2).
-CF76  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+CF76  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 CF79  47        LD      B,A
 CF7A  C5        PUSH    BC
 CF7B  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 CF7E  2C        DB      ','
-CF7F  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+CF7F  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 CF82  C1        POP     BC
 CF83  4F        LD      C,A
 CF84  C5        PUSH    BC
 CF85  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 CF88  2C        DB      ','
-CF89  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+CF89  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 ; Checa valor do canal (1~3).
 CF8C  FE01      CP      #01
 CF8E  DAF6DE    JP      C,#DEF6 ; PIERRO @FCERR {FCER} [FCERR]
@@ -3065,7 +3065,7 @@ D02D  2836      JR      Z,#D065         ; (54)
 D02F  FEBE      CP      #BE ; token '+'
 D031  2001      JR      NZ,#D034        ; (1)
 D033  23        INC     HL
-D034  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+D034  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 D037  E3        EX      (SP),HL
 D038  84        ADD     A,H ; A = último X + novo valor
 D039  67        LD      H,A
@@ -3078,7 +3078,7 @@ D042  282B      JR      Z,#D06F         ; (43)
 D044  FEBE      CP      #BE ; token '+'
 D046  2001      JR      NZ,#D049        ; (1)
 D048  23        INC     HL
-D049  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+D049  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 D04C  E3        EX      (SP),HL
 D04D  85        ADD     A,L ; A = último Y + novo valor
 D04E  47        LD      B,A ; novo Y
@@ -3102,7 +3102,7 @@ D063  E1        POP     HL
 D064  C9        RET
 ;
 D065  23        INC     HL
-D066  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+D066  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 D069  E3        EX      (SP),HL
 D06A  47        LD      B,A
 D06B  7C        LD      A,H ; A = último X – novo valor
@@ -3110,7 +3110,7 @@ D06C  90        SUB     B
 D06D  18CA      JR      #D039           ; (-54)
 ;
 D06F  23        INC     HL
-D070  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+D070  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 D073  E3        EX      (SP),HL
 D074  47        LD      B,A
 D075  7D        LD      A,L ; A = último Y – novo valor
@@ -3656,11 +3656,11 @@ D376  C9        RET
 ; SETXY
 ; Lê dois valores (0~255) separados por
 ; vírgula.
-D377  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+D377  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 D37A  F5        PUSH    AF
 D37B  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 D37E  2C        DB      ','
-D37F  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+D37F  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 ; Se modo gráfico = GR, checa limites
 ; x < 128, y < 64.
 D382  47        LD      B,A
@@ -3869,7 +3869,7 @@ D49B  C9        RET
 ; BPR#
 D49C  2B        DEC     HL
 D49D  CDA0DD    CALL    #DDA0 ; NEXTNSPC @CHRGTR {TCHAR} <NextChar> [GETCHR]
-D4A0  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+D4A0  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 D4A3  E5        PUSH    HL
 D4A4  CD93D4    CALL    #D493 ; DOPR#
 D4A7  E1        POP     HL
@@ -3899,7 +3899,7 @@ D4D0  3EC9      LD      A,#C9
 D4D2  323001    LD      (#0130),A ; JOBM
 D4D5  C9        RET
 
-; HGR
+; BHGR
 D4D6  C0        RET     NZ
 D4D7  3E02      LD      A,#02
 D4D9  C3ACD4    JP      #D4AC ; XGR
@@ -3955,7 +3955,7 @@ D51D  2B        DEC     HL
 D51E  CDA0DD    CALL    #DDA0 ; NEXTNSPC @CHRGTR {TCHAR} <NextChar> [GETCHR]
 D521  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 D524  C6        DB      #C6 ; token "="
-D525  C399E9    JP      #E999 ; {ARGVL1} [GETINT] @GETBYT
+D525  C399E9    JP      #E999 ; @GETBYT {ARGVL1} [GETINT]
 
 ; BCOLOR
 ; Lê parâmetro.
@@ -4409,7 +4409,7 @@ D824  C31CD8    JP      #D81C ; {LININ2} <CopyMemLoop>
 
 ; Verifica memória disponível
 ; para 2xC bytes.
-; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
+; @GETSTK {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
 D827  E5        PUSH    HL
 ; HL = início da área livre + 2 x C
 D828  2ABB03    LD      HL,(#03BB) ; {FSLPTR} <VAR_TOP> [ARREND]
@@ -5353,7 +5353,7 @@ DD05  F9        LD      SP,HL
 ; {FOR2}
 DD06  EB        EX      DE,HL
 DD07  0E08      LD      C,#08
-DD09  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
+DD09  CD27D8    CALL    #D827 ; @GETSTK {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
 DD0C  E5        PUSH    HL
 DD0D  CDC2DF    CALL    #DFC2 ; BDATA {DATA} <Data> [DATA]
 DD10  E3        EX      (SP),HL
@@ -5798,7 +5798,7 @@ DF6D  1810      JR      #DF7F           ; (16)
 
 ; BGOSUB
 DF6F  0E03      LD      C,#03
-DF71  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
+DF71  CD27D8    CALL    #D827 ; @GETSTK {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
 DF74  C1        POP     BC
 DF75  E5        PUSH    HL
 DF76  E5        PUSH    HL
@@ -5895,7 +5895,7 @@ DFDE  D5        PUSH    DE ; Preserva endereço do conteúdo da variável.
 DFDF  3A9003    LD      A,(#0390) ; @VALTYP {DATYPE} [TYPE]
 DFE2  F5        PUSH    AF ; Preserva tipo da variável.
 ; Avalia a expressão.
-DFE3  CDD0E2    CALL    #E2D0 ; EVAL {SNALY} <EvalExpression> [EVAL]
+DFE3  CDD0E2    CALL    #E2D0 ; EVAL @FRMEVL {SNALY} <EvalExpression> [EVAL]
 ;
 DFE6  F1        POP     AF ; Restaura tipo da variável.
 DFE7  E3        EX      (SP),HL ; Restaura endereço do conteúdo da variável e preserva ponteiro de execução do BASIC.
@@ -5911,7 +5911,7 @@ DFEF  CA27E0    JP      Z,#E027 ; {LET4} [LETNUM]
 ; Trata atribuição de string.
 ; {LET1} [LETSTR]
 DFF2  E5        PUSH    HL ; Preserva endereço do conteúdo da variável.
-DFF3  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] @FACLO ; Endereço do registro temporário na pilha (resultado da expressão).
+DFF3  2ABF03    LD      HL,(#03BF) ; @FACLO {WRA1} <FACCUM> [FPREG] ; Endereço do registro temporário na pilha (resultado da expressão).
 DFF6  E5        PUSH    HL ; Preserva.
 DFF7  23        INC     HL
 DFF8  23        INC     HL
@@ -5959,7 +5959,7 @@ E02C  E1        POP     HL
 E02D  C9        RET
 ;
 ; BON
-E02E  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+E02E  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 E031  7E        LD      A,(HL)
 E032  47        LD      B,A
 E033  FE8D      CP      #8D ; token "GOSUB"
@@ -5977,7 +5977,7 @@ E047  C0        RET     NZ
 E048  18F3      JR      #E03D           ; (-13)
 ;
 ; BIF
-E04A  CDD0E2    CALL    #E2D0 ; EVAL {SNALY} <EvalExpression> [EVAL]
+E04A  CDD0E2    CALL    #E2D0 ; EVAL @FRMEVL {SNALY} <EvalExpression> [EVAL]
 E04D  7E        LD      A,(HL)
 E04E  FE89      CP      #89 ; token "GOTO"
 E050  2805      JR      Z,#E057         ; (5)
@@ -6011,7 +6011,7 @@ E081  FE2C      CP      ','
 E083  CAE1E0    JP      Z,#E0E1 ; {FORMAT} [DOCOM]
 E086  FE3B      CP      ';'
 E088  CA20E1    JP      Z,#E120 ; {TAB4} [NEXITM]
-E08B  CDD0E2    CALL    #E2D0 ; EVAL {SNALY} <EvalExpression> [EVAL]
+E08B  CDD0E2    CALL    #E2D0 ; EVAL @FRMEVL {SNALY} <EvalExpression> [EVAL]
 E08E  C1        POP     BC ; Descarta ponto de interpretação salvo anteriormente.
 E08F  E5        PUSH    HL ; Salva ponto de interpretação atual (após expressão).
 E090  3A9003    LD      A,(#0390) ; @VALTYP {DATYPE} [TYPE] ; Desvia se for string.
@@ -6019,7 +6019,7 @@ E093  B7        OR      A
 E094  201E      JR      NZ,#E0B4 ; {PRINT4} [PRNTST]
 E096  CD96EE    CALL    #EE96 ; STRFLOAT @FOUT {NUMKON} [NUMASC] ; Converte número em texto em #03C4.
 E099  CDF5E6    CALL    #E6F5 ; NEWSTRREC @STRLIT {SLEN0} [CRTST] ; Cria string temporária.
-E09C  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] @FACLO ; Quebra linha se string não couber no resto da linha (WIDTH).
+E09C  2ABF03    LD      HL,(#03BF) ; @FACLO {WRA1} <FACCUM> [FPREG] ; Quebra linha se string não couber no resto da linha (WIDTH).
 E09F  3A4203    LD      A,(#0342) ; {LINLEN} [LWIDTH]
 E0A2  47        LD      B,A
 E0A3  3A8E03    LD      A,(#038E) ; {CURPOS} [CURPOS]
@@ -6410,14 +6410,14 @@ E2B9  CD75E2    CALL    #E275
 ; [Não retorna para cá; sai para [RUNCNT] ou laço.]
 
 ; {SNALY2} [GETNUM]
-E2BC  CDD0E2    CALL    #E2D0 ; EVAL {SNALY} <EvalExpression> [EVAL]
+E2BC  CDD0E2    CALL    #E2D0 ; EVAL @FRMEVL {SNALY} <EvalExpression> [EVAL]
 ; STR?TI : Gera erro de tipo incompatível
 ; se o tipo for string.
 ; {SNALY3} [TSTNUM] 
 ; A instrução abaixo oculta a instrução
 ; ; NUM?TI : Gera erro de tipo incompatível
 ; ; se o tipo for numérico.
-; ; {SNALY4} [TSTSTR] @CHKSTR
+; ; @CHKSTR {SNALY4} [TSTSTR]
 ; E2C0  37        SCF
 ; que só pode ser atingida por jump.
 E2BF  F637      OR      #37
@@ -6428,28 +6428,28 @@ E2C5  B7        OR      A
 E2C6  E8        RET     PE
 
 ; TIERRO
-; {TMER}
+; @TMERR {TMER}
 E2C7  1E18      LD      E,#18 ; erro "TI"
 ; {TMER1}
 E2C9  C356D8    JP      #D856 ; ERROE @ERROR {ERROO} <Error> [ERROR]
 
 ; EVALPAR: Avalia expressão iniciada com parênteses.
-; {SNALY6} [OPNPAR] @FRMPRN
+; @FRMPRN {SNALY6} [OPNPAR]
 E2CC  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 E2CF  28        DB      '('
 ; EVAL: Avalia uma expressão.
-; {SNALY} <EvalExpression> [EVAL]
+; @FRMEVL {SNALY} <EvalExpression> [EVAL]
 E2D0  2B        DEC     HL
 E2D1  1600      LD      D,#00 ; Valor de precedência no início da avaliação = 0.
-; {SNALY7} [EVAL1]
+; @LPOPER {SNALY7} [EVAL1]
 ; Avalia expressão até encontrar um operador com precedência menor do que D.
 E2D3  D5        PUSH    DE ; Preserva valor de precedência.
 E2D4  0E01      LD      C,#01 ; Verifica um nível de pilha.
-E2D6  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
-E2D9  CD44E3    CALL    #E344 ; {SNLY13} <EvalTerm> [OPRND] ; Obtém um operando.
-; {SNALY8} [EVAL2]
+E2D6  CD27D8    CALL    #D827 ; @GETSTK {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
+E2D9  CD44E3    CALL    #E344 ; @EVAL {SNLY13} <EvalTerm> [OPRND] ; Obtém um operando.
+; @TSTOP {SNALY8} [EVAL2]
 E2DC  22B103    LD      (#03B1),HL ; {NTOKPT} [NXTOPR] ; Preserva endereço do próximo operador.
-; {SNALY9} <ArithParse> [EVAL3]
+; @RETAOP {SNALY9} <ArithParse> [EVAL3]
 E2DF  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR] ; Restaura endereço do próximo operador.
 E2E2  C1        POP     BC ; Valor de precedência e operador.
 E2E3  78        LD      A,B ; Valor de precedência.
@@ -6506,7 +6506,7 @@ E329  23        INC     HL ; HL aponta para o endereço da rotina do operador.
 E32A  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM] ; Garante que operando é numérico.
 ; {SNLY12} [STKTHS]
 E32D  C5        PUSH    BC ; Preserva precedência e token do operador anterior.
-E32E  01DFE2    LD      BC,#E2DF ; {SNALY9} <ArithParse> [EVAL3] ; Forja retorno para quando uma precedência menor for encontrada.
+E32E  01DFE2    LD      BC,#E2DF ; @RETAOP {SNALY9} <ArithParse> [EVAL3] ; Forja retorno para quando uma precedência menor for encontrada.
 E331  C5        PUSH    BC
 E332  43        LD      B,E ; Preserva operador.
 E333  4A        LD      C,D ; Preserva precedência.
@@ -6519,9 +6519,9 @@ E33B  46        LD      B,(HL)
 E33C  23        INC     HL
 E33D  C5        PUSH    BC ; Preserva endereço da rotina do operador.
 E33E  2AA803    LD      HL,(#03A8) ; {LBYTEX} [CUROPR] ; Restaura endereço do operador atual.
-E341  C3D3E2    JP      #E2D3 ; {SNALY7} [EVAL1] ; Laço até encontrar uma precedência menor.
+E341  C3D3E2    JP      #E2D3 ; @LPOPER {SNALY7} [EVAL1] ; Laço até encontrar uma precedência menor.
 
-; {SNLY13} <EvalTerm> [OPRND]
+; @EVAL {SNLY13} <EvalTerm> [OPRND]
 ; Obtém um operando em uma expressão (ou uma subexpressão entre parênteses).
 E344  AF        XOR     A ; Tipo inicial assumido = numérico.
 E345  329003    LD      (#0390),A ; @VALTYP {DATYPE} [TYPE]
@@ -6533,7 +6533,7 @@ E350  DAEFED    JP      C,#EDEF ; {VALNRM} <FIn>  [ASCTFP] ; É dígito: interpr
 E353  CDDCDE    CALL    #DEDC ; @ISLET {CLETST} <CharIsAlpha> [CHKLTR]
 E356  D292E3    JP      NC,#E392 ; {SNLY17} <EvalVarTerm> [CONVAR] ; é letra: interpreta variável/matriz.
 E359  FEBE      CP      #BE ; token "+"
-E35B  28E7      JR      Z,#E344 ; {SNLY13} <EvalTerm> [OPRND] ; operador '+' unário: ignora e recomeça do próximo caracter.
+E35B  28E7      JR      Z,#E344 ; @EVAL {SNLY13} <EvalTerm> [OPRND] ; operador '+' unário: ignora e recomeça do próximo caracter.
 E35D  FE2E      CP      '.'
 E35F  CAEFED    JP      Z,#EDEF ; {VALNRM} <FIn> [ASCTFP] ; é ponto: interpreta literal numérico.
 E362  FEBF      CP      #BF ; token "-"
@@ -6545,10 +6545,10 @@ E36D  CA5FE4    JP      Z,#E45F ; {NOT} [EVNOT]
 E370  FEB8      CP      #B8 ; token "FN"
 E372  CA65E6    JP      Z,#E665 ; {FN} [DOFN]
 E375  D6C8      SUB     #C8 ; primeiro token de função ("SGN").
-E377  302A      JR      NC,#E3A3 ; {SNLY19} <EvalInlineFn> [FNOFST] ; Avalia função.
-; {SNLY14} <EvalBracketed> [EVLPAR] @PARCHK
+E377  302A      JR      NC,#E3A3 ; @NTMRND {SNLY19} <EvalInlineFn> [FNOFST] ; Avalia função.
+; @PARCHK {SNLY14} <EvalBracketed> [EVLPAR]
 ; Avalia expressão entre parênteses.
-E379  CDCCE2    CALL    #E2CC ; EVALPAR {SNALY6} [OPNPAR] @FRMPRN ; Consome abre-parêntese e primeiro argumento.
+E379  CDCCE2    CALL    #E2CC ; EVALPAR @FRMPRN {SNALY6} [OPNPAR] ; Consome abre-parêntese e primeiro argumento.
 E37C  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 E37F  29        DB      ')'
 E380  C9        RET
@@ -6556,11 +6556,11 @@ E380  C9        RET
 ; {SNLY15} <EvalMinusTerm> [MINUS]
 ; Avalia operador "menos" unário (-expr).
 E381  167D      LD      D,#7D ; Precedência de "-" = 125.
-E383  CDD3E2    CALL    #E2D3 ; {SNALY7} [EVAL1] ; Avalia até encontrar uma precedência menor.
+E383  CDD3E2    CALL    #E2D3 ; @LPOPER {SNALY7} [EVAL1] ; Avalia até encontrar uma precedência menor.
 E386  2AB103    LD      HL,(#03B1) ; {NTOKPT} [NXTOPR] ; Obtém endereço do próximo operador.
 E389  E5        PUSH    HL ; Preserva endereço do próximo operador.
 E38A  CDFCEC    CALL    #ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
-; {SNLY16} [RETNUM] @LABBCK
+; @LABBCK {SNLY16} [RETNUM]
 ; Checa se FLOAT contém valor numérico e retorna.
 E38D  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E390  E1        POP     HL ; Restaura endereço do próximo operador.
@@ -6572,14 +6572,14 @@ E392  CD84E4    CALL    #E484 ; @PTRGET {DIM1} <GetVar> [GETVAR] ; Obtém endere
 ; {SNLY18} [FRMEVL]
 E395  E5        PUSH    HL ; Preserva ponteiro de interpretação do BASIC.
 E396  EB        EX      DE,HL ; Endereço da variável em HL.
-E397  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG] @FACLO ; Preserva endereço da variável.
+E397  22BF03    LD      (#03BF),HL ; @FACLO {WRA1} <FACCUM> [FPREG] ; Preserva endereço da variável.
 E39A  3A9003    LD      A,(#0390) ; @VALTYP {DATYPE} [TYPE]
 E39D  B7        OR      A ; É tipo numérico?
 E39E  CC11ED    CALL    Z,#ED11 ; FLOATHL {OPKOP} <FLoadFromMem> [PHLTFP] ; Sim: Move conteúdo para FLOAT.
 E3A1  E1        POP     HL ; Restaura ponteiro de interpretação do BASIC.
 E3A2  C9        RET
 
-; {SNLY19} <EvalInlineFn> [FNOFST]
+; @NTMRND {SNLY19} <EvalInlineFn> [FNOFST]
 ; Avalia função do BASIC.
 ; A já contem o valor do token da função subtraído
 ; de $C8 (o valor do primeiro token de função).
@@ -6590,10 +6590,10 @@ E3A7  C5        PUSH    BC ; Salva na pilha.
 E3A8  CDA0DD    CALL    #DDA0 ; NEXTNSPC @CHRGTR {TCHAR} <NextChar> [GETCHR]
 E3AB  79        LD      A,C
 E3AC  FE29      CP      #29 ; Desvia se não for MID$, LEFT$ ou RIGHT$.
-E3AE  3818      JR      C,#E3C8 ; {SNLY29} [FNVAL] @OKNORM
+E3AE  3818      JR      C,#E3C8 ; @OKNORM {SNLY29} [FNVAL]
 
-; (Comentário GW-BASIC)
-; A maioria das funções recebem um só argumento.
+; @{
+; A maioria das funções recebe um só argumento.
 ; O endereço de retorno dessas funções é uma pequena rotina
 ; que checa se VALTYP é 0 (numérico) e desempilha
 ; o ponteiro de texto. Então funções normais que retornam strings (i.e. CHR$)
@@ -6610,31 +6610,32 @@ E3AE  3818      JR      C,#E3C8 ; {SNLY29} [FNVAL] @OKNORM
 ; O ponteiro para o descritor do argumento string
 ; é armazenado na pilha sob o valor do argumento
 ; inteiro (2 bytes).
+; }
 
 ;
 ; Prepara avaliação de MID$, LEFT$, RIGHT$.
-E3B0  CDCCE2    CALL    #E2CC ; EVALPAR {SNALY6} [OPNPAR] @FRMPRN ; Consome abre-parêntese e primeiro argumento.
+E3B0  CDCCE2    CALL    #E2CC ; EVALPAR @FRMPRN {SNALY6} [OPNPAR] ; Consome abre-parêntese e primeiro argumento.
 E3B3  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 E3B6  2C        DB      ','
-E3B7  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] @CHKSTR
+E3B7  CDC0E2    CALL    #E2C0 ; NUM?TI @CHKSTR {SNALY4} [TSTSTR]
 E3BA  EB        EX      DE,HL
-E3BB  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] @FACLO
+E3BB  2ABF03    LD      HL,(#03BF) ; @FACLO {WRA1} <FACCUM> [FPREG]
 E3BE  E3        EX      (SP),HL
 E3BF  E5        PUSH    HL
 E3C0  EB        EX      DE,HL
-E3C1  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+E3C1  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 E3C4  EB        EX      DE,HL
 E3C5  E3        EX      (SP),HL ; Recupera posição relativa do endereço da função na tabela de endereços.
-E3C6  1808      JR      #E3D0 ; {SNLY21} [GOFUNC] @FINGO
+E3C6  1808      JR      #E3D0 ; @FINGO {SNLY21} [GOFUNC]
 
-; {SNLY29} [FNVAL] @OKNORM
+; @OKNORM {SNLY29} [FNVAL]
 ; Prepara avaliação das demais funções.
-E3C8  CD79E3    CALL    #E379 ; {SNLY14} <EvalBracketed> [EVLPAR] @PARCHK ; Avalia parâmetro seguido de ")".
+E3C8  CD79E3    CALL    #E379 ; @PARCHK {SNLY14} <EvalBracketed> [EVLPAR] ; Avalia parâmetro seguido de ")".
 E3CB  E3        EX      (SP),HL ; Recupera posição relativa do endereço da função na tabela de endereços.
-E3CC  118DE3    LD      DE,#E38D ; {SNLY16} [RETNUM] @LABBCK ; Forja retorno para teste de valor numérico.
+E3CC  118DE3    LD      DE,#E38D ; @LABBCK {SNLY16} [RETNUM] ; Forja retorno para teste de valor numérico.
 E3CF  D5        PUSH    DE
 
-; {SNLY21} [GOFUNC] @FINGO
+; @FINGO {SNLY21} [GOFUNC]
 ; Salta para rotina que interpreta a função.
 E3D0  0161D5    LD      BC,#D561 ; @FUNDSP {ADRTB2} <KW_INLINE_FNS> [FNCTAB]
 ; @DISPAT
@@ -6759,7 +6760,7 @@ E45C  C3E5EC    JP      #ECE5 ; {SGN0} <FCharToFloat> [FLGREL]
 ; {NOT} [EVNOT]
 ; Avalia NOT.
 E45F  165A      LD      D,#5A
-E461  CDD3E2    CALL    #E2D3 ; {SNALY7} [EVAL1]
+E461  CDD3E2    CALL    #E2D3 ; @LPOPER {SNALY7} [EVAL1]
 E464  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E467  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT]
 E46A  7B        LD      A,E
@@ -6769,7 +6770,7 @@ E46D  7A        LD      A,D
 E46E  2F        CPL
 E46F  CD2FE6    CALL    #E62F ; FLOATAC {FRE2} [ACPASS]
 E472  C1        POP     BC
-E473  C3DFE2    JP      #E2DF ; {SNALY9} <ArithParse> [EVAL3]
+E473  C3DFE2    JP      #E2DF ; @RETAOP {SNALY9} <ArithParse> [EVAL3]
 
 ; Laço da instrução DIM. Verifica se
 ; há mais uma matriz a dimensionar.
@@ -6930,7 +6931,7 @@ E51C  C9        RET
 ; Já se chega aqui com A = 0.
 E51D  32C203    LD      (#03C2),A ; {WRA1+3} <FACCUM+3> [FPEXP] ; Número/tamanho da string = 0.
 E520  21E9D7    LD      HL,#D7E9 ; Endereço de um byte 0 na ROM.
-E523  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG] @FACLO
+E523  22BF03    LD      (#03BF),HL ; @FACLO {WRA1} <FACCUM> [FPREG]
 E526  E1        POP     HL ; Recupera ponto de interpretação do BASIC.
 E527  C9        RET     ; Continua a avaliação da expressão.
 
@@ -7029,7 +7030,7 @@ E58C  23        INC     HL
 E58D  70        LD      (HL),B
 E58E  23        INC     HL
 E58F  4F        LD      C,A
-E590  CD27D8    CALL    #D827 ; {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
+E590  CD27D8    CALL    #D827 ; @GETSTK {TMEMO} <CheckEnoughVarSpace> [CHKSTK]
 E593  23        INC     HL
 E594  23        INC     HL
 E595  22A803    LD      (#03A8),HL ; {LBYTEX} [CUROPR]
@@ -7149,6 +7150,7 @@ E622  5F        LD      E,A
 E623  7C        LD      A,H
 E624  9A        SBC     A,D
 E625  57        LD      D,A
+; FLOAT = DE e retorna.
 E626  AF        XOR     A
 E627  329003    LD      (#0390),A ; @VALTYP {DATYPE} [TYPE]
 E62A  0698      LD      B,#80+24 ; 24 bits.
@@ -7201,7 +7203,7 @@ E663  1838      JR      #E69D           ; (56)
 ; Avalia FN.
 E665  CDB0E6    CALL    #E6B0
 E668  D5        PUSH    DE
-E669  CD79E3    CALL    #E379 ; {SNLY14} <EvalBracketed> [EVLPAR] @PARCHK
+E669  CD79E3    CALL    #E379 ; @PARCHK {SNLY14} <EvalBracketed> [EVLPAR]
 E66C  CDBFE2    CALL    #E2BF ; STR?TI {SNALY3} [TSTNUM]
 E66F  E3        EX      (SP),HL
 E670  5E        LD      E,(HL)
@@ -7326,7 +7328,7 @@ E6F4  C9        RET
 ; * $0390 @VALTYP {DATYPE} [TYPE] recebe 1, indicando
 ; tipo string.
 ; * Os dois primeiros bytes de $3BF FLOAT
-; {WRA1} <FACCUM> [FPREG] @FACLO apontam para o
+; @FACLO {WRA1} <FACCUM> [FPREG] apontam para o
 ; registro temporário de string recém
 ; inserido na pilha.
 ; * HL (ponteiro de interpretação do BASIC)
@@ -7376,11 +7378,11 @@ E70E  23        INC     HL
 E70F  EB        EX      DE,HL ; DE = endereço inicial da string.
 E710  79        LD      A,C ; A = tamanho da string.
 E711  CDE9E6    CALL    #E6E9 ; {SADTB1} [CRTMST]; Cria registro temporário em #03A2 {STRDAT} [TMPSTR].
-; Empilha o registro temporário em #03A2 na pilha de descritores de strings.
+; Empilha o registro temporário em #03A2 na pilha de descritores de strings. (Destrói FLOAT.)
 ; {SLEN3} [TSTOPL]
 E714  11A203    LD      DE,#03A2 ; {STRDAT} [TMPSTR] ; DE = registro temporário recém criado.
 E717  2A9403    LD      HL,(#0394) ; {SPTPTR} [TMSTPT] ; HL = end. próximo espaço livre para registro de string.
-E71A  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG] @FACLO ; Será o ponteiro para o novo registro. Reserva.
+E71A  22BF03    LD      (#03BF),HL ; @FACLO {WRA1} <FACCUM> [FPREG] ; Será o ponteiro para o novo registro. Reserva.
 ; Assume tipo string.
 E71D  3E01      LD      A,#01
 E71F  329003    LD      (#0390),A ; @VALTYP {DATYPE} [TYPE]
@@ -7581,14 +7583,14 @@ E820  C378E7    JP      #E778
 ; {STRSNA} [CONCAT]
 E823  C5        PUSH    BC ; Preserva valor de precedência e operador.
 E824  E5        PUSH    HL ; Preserva ponteiro de interpretação do programa BASIC.
-E825  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] @FACLO ; Obtém ponteiro para registro de string atual (1º operando).
+E825  2ABF03    LD      HL,(#03BF) ; FLOAT @FACLO {WRA1} <FACCUM> [FPREG] ; Obtém ponteiro para registro de string atual (1º operando).
 E828  E3        EX      (SP),HL ; Preserva na pilha e restaura o ponteiro de interpretação do programa BASIC.
-E829  CD44E3    CALL    #E344 ; {SNLY13} <EvalTerm> [OPRND] ; Obtém operando seguinte ao operador "+" (ponteiro em FLOAT).
+E829  CD44E3    CALL    #E344 ; @EVAL {SNLY13} <EvalTerm> [OPRND] ; Obtém operando seguinte ao operador "+" (ponteiro em FLOAT).
 E82C  E3        EX      (SP),HL ; Preserva ponteiro de interpretação do programa BASIC e restaura o ponteiro para o registro de string do 1º operando.
-E82D  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] @CHKSTR ; ?TI ERRO se 2º operando não for do tipo string.
+E82D  CDC0E2    CALL    #E2C0 ; NUM?TI @CHKSTR {SNALY4} [TSTSTR] ; ?TI ERRO se 2º operando não for do tipo string.
 E830  7E        LD      A,(HL) ; Obtém comprimento do 1º operando.
 E831  E5        PUSH    HL ; Preserva ponteiro para registro de string do 1º operando.
-E832  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] @FACLO ; Obtém ponteiro para registro de string do 2º operando, armazenado em FLOAT.
+E832  2ABF03    LD      HL,(#03BF) ; FLOAT @FACLO {WRA1} <FACCUM> [FPREG] ; Obtém ponteiro para registro de string do 2º operando, armazenado em FLOAT.
 E835  E5        PUSH    HL ; Preserva ponteiro para registro de string do 2º operando.
 E836  86        ADD     A,(HL) ; Soma os comprimentos dos dois operandos.
 ; {LSER}
@@ -7632,7 +7634,7 @@ E869  13        INC     DE
 E86A  18F8      JR      #E864 ; {STRMV2} [TSALP]
 
 ; {STRZSP} [GETSTR]
-E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] @CHKSTR ; Assegura que seja string.
+E86C  CDC0E2    CALL    #E2C0 ; NUM?TI @CHKSTR {SNALY4} [TSTSTR] ; Assegura que seja string.
 ; POPTMPSTR:
 ; Faz HL apontar para o último registro
 ; na pilha de registros de string temporários.
@@ -7640,7 +7642,7 @@ E86C  CDC0E2    CALL    #E2C0 ; NUM?TI {SNALY4} [TSTSTR] @CHKSTR ; Assegura que 
 ; estiverem apontando para esse mesmo registro,
 ; desempilha-o.
 ; @FREFAC {STRZS1} [GSTRCU]
-E86F  2ABF03    LD      HL,(#03BF) ; FLOAT {WRA1} <FACCUM> [FPREG] @FACLO ; HL aponta para registro de string temporário "atual" (apontado pelos dois primeiros bytes de FLOAT). [Get current string]
+E86F  2ABF03    LD      HL,(#03BF) ; FLOAT @FACLO {WRA1} <FACCUM> [FPREG] ; HL aponta para registro de string temporário "atual" (apontado pelos dois primeiros bytes de FLOAT). [Get current string]
 ; {STRZS2} [GSTRHL]
 E872  EB        EX      DE,HL ; DE aponta para registro de string temporário "atual". [Save DE]
 ; {STRZS3} [GSTRDE]
@@ -7732,7 +7734,7 @@ E8C5  2AA403    LD      HL,(#03A4) ; {STRDAT+2}, [TMPSTR+2] ; HL = Endereço do 
 ;
 E8C8  73        LD      (HL),E ; Coloca o caracter em E no conteúdo da string.
 ; @FINBCK {CHR_1} [TOPOOL]
-E8C9  C1        POP     BC ; Desempilha retorno para {SNLY16} [RETNUM] @LABBCK teste de valor numérico.
+E8C9  C1        POP     BC ; Desempilha retorno para @LABBCK {SNLY16} [RETNUM] teste de valor numérico.
 E8CA  C314E7    JP      #E714 ; {SLEN3} [TSTOPL] ; Empilha o registro temporário em #03A2 na pilha de descritores de strings.
 
 ; BLEFT$
@@ -7798,7 +7800,7 @@ E912  FE29      CP      ')' ; Foi fornecido comprimento?
 E914  2807      JR      Z,#E91D ; {MID_1} [RSTSTR] ; Não: resto da string.
 E916  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 E919  2C        DB      ','
-E91A  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT ; Obtém inteiro 0-255.
+E91A  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT] ; Obtém inteiro 0-255.
 ; {MID_1} [RSTSTR]
 E91D  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 E920  29        DB      ')'
@@ -7879,7 +7881,7 @@ E972  CDA0DD    CALL    #DDA0 ; NEXTNSPC @CHRGTR {TCHAR} <NextChar> [GETCHR]
 E975  2807      JR      Z,#E97E ; {WAIT1} [NOXOR]
 E977  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 E97A  2C        DB      ','
-E97B  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+E97B  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 ; {WAIT1} [NOXOR]
 E97E  C1        POP     BC
 ; {WAIT2} [WAITLP]
@@ -7890,18 +7892,18 @@ E984  28F9      JR      Z,#E97F         ; (-7)
 E986  C9        RET
 
 ; [SETIO]
-E987  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+E987  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 E98A  323F03    LD      (#033F),A ; [INPORT]
 E98D  320703    LD      (#0307),A ; [OUTPORT]
 E990  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 E993  2C        DB      ','
-E994  1803      JR      #E999 ; {ARGVL1} [GETINT] @GETBYT
+E994  1803      JR      #E999 ; @GETBYT {ARGVL1} [GETINT]
 
 ; Avalia uma expressão numérica positiva e obtém seu valor
 ; inteiro 0~255 em A. Caso contrário, produz "PI ERRO".
 ; {ARGVAL} <GetSubscript> [FNDNUM]
 E996  CDA0DD    CALL    #DDA0 ; NEXTNSPC @CHRGTR {TCHAR} <NextChar> [GETCHR]
-; {ARGVL1} [GETINT] @GETBYT
+; @GETBYT {ARGVL1} [GETINT]
 E999  CDBCE2    CALL    #E2BC ; {SNALY2} [GETNUM] ; Avalia expressão numérica.
 ; Converte ponto flutuante em inteiro 0~255 (A, E).
 ; {ARGVL2} [MAKINT]
@@ -8017,9 +8019,9 @@ EA1F  2004      JR      NZ,#EA25        ; (4)
 EA21  23        INC     HL
 EA22  C388DE    JP      #DE88
 ; Elimina programa atual.
-EA25  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG] @FACLO
+EA25  22BF03    LD      (#03BF),HL ; @FACLO {WRA1} <FACCUM> [FPREG]
 EA28  CDA2D9    CALL    #D9A2 ; NEW [CLRPTR]
-EA2B  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] @FACLO
+EA2B  2ABF03    LD      HL,(#03BF) ; @FACLO {WRA1} <FACCUM> [FPREG]
 ; Coloca nome do programa em FILNAM.
 EA2E  7E        LD      A,(HL)
 EA2F  CDE2E9    CALL    #E9E2 ; STRFN5
@@ -8134,7 +8136,7 @@ EABA  67        LD      H,A
 EABB  F1        POP     AF
 EABC  CD5CEB    CALL    #EB5C
 EABF  B4        OR      H
-EAC0  21BF03    LD      HL,#03BF ; {WRA1} <FACCUM> [FPREG] @FACLO
+EAC0  21BF03    LD      HL,#03BF ; @FACLO {WRA1} <FACCUM> [FPREG]
 EAC3  F2D9EA    JP      P,#EAD9
 EAC6  CD3CEB    CALL    #EB3C ; {ADD19} [PLUCDE]
 EAC9  D21BEB    JP      NC,#EB1B
@@ -8382,7 +8384,7 @@ EBE8  E5        PUSH    HL
 EBE9  21F1EB    LD      HL,#EBF1
 EBEC  E5        PUSH    HL
 EBED  E5        PUSH    HL
-EBEE  21BF03    LD      HL,#03BF ; {WRA1} <FACCUM> [FPREG] @FACLO
+EBEE  21BF03    LD      HL,#03BF ; @FACLO {WRA1} <FACCUM> [FPREG]
 ;
 EBF1  7E        LD      A,(HL)
 EBF2  23        INC     HL
@@ -8657,7 +8659,7 @@ ED03  C9        RET
 ; flutuante FLOAT na pilha do processador.
 ; {OPARST} <FPush> [STAKFP]
 ED04  EB        EX      DE,HL
-ED05  2ABF03    LD      HL,(#03BF) ; {WRA1} <FACCUM> [FPREG] @FACLO
+ED05  2ABF03    LD      HL,(#03BF) ; @FACLO {WRA1} <FACCUM> [FPREG]
 ED08  E3        EX      (SP),HL
 ED09  E5        PUSH    HL
 ED0A  2AC103    LD      HL,(#03C1) ; {WRA1+2} <FACCUM+2> [FPREG+2]
@@ -8675,7 +8677,7 @@ ED11  CD22ED    CALL    #ED22 ; BCDEHL {OPLAD} <FLoadBCDEFromMem> [LOADFP]
 ; flutuante em BCDE em FLOAT.
 ; {OPKOP1} <FLoadFromBCDE> [FPBCDE]
 ED14  EB        EX      DE,HL
-ED15  22BF03    LD      (#03BF),HL ; {WRA1} <FACCUM> [FPREG] @FACLO
+ED15  22BF03    LD      (#03BF),HL ; @FACLO {WRA1} <FACCUM> [FPREG]
 ED18  60        LD      H,B
 ED19  69        LD      L,C
 ED1A  22C103    LD      (#03C1),HL ; {WRA1+2} <FACCUM+2> [FPREG+2]
@@ -8685,7 +8687,7 @@ ED1E  C9        RET
 ; BCDEFLOAT: Copia o número de ponto
 ; flutuante em FLOAT para BCDE.
 ; {OPLAD0} <FCopyToBCDE> [BCDEFP]
-ED1F  21BF03    LD      HL,#03BF ; {WRA1} <FACCUM> [FPREG] @FACLO
+ED1F  21BF03    LD      HL,#03BF ; @FACLO {WRA1} <FACCUM> [FPREG]
 
 ; BCDEHL: Copia para BCDE o número de
 ; ponto flutuante apontado por HL.
@@ -8705,7 +8707,7 @@ ED2A  C9        RET
 ; por HL o número de ponto flutuante
 ; armazenado em FLOAT.
 ; {OPTRAN} <FCopyToMem> [FPTHL]
-ED2B  11BF03    LD      DE,#03BF ; {WRA1} <FACCUM> [FPREG] @FACLO
+ED2B  11BF03    LD      DE,#03BF ; @FACLO {WRA1} <FACCUM> [FPREG]
 ; LD4HLDE: Copia 4 bytes de (DE) para (HL).
 ; (HL)~(HL+3) <- (DE)~(DE+3)
 ; No fim, DE e HL estão incrementados em 4.
@@ -8896,7 +8898,7 @@ EDA4  C9        RET
 EDA5  21C203    LD      HL,#03C2 ; {WRA1+3} <FACCUM+3> [FPEXP]
 EDA8  7E        LD      A,(HL)
 EDA9  FE98      CP      #98
-EDAB  3ABF03    LD      A,(#03BF) ; {WRA1} <FACCUM> [FPREG] @FACLO
+EDAB  3ABF03    LD      A,(#03BF) ; @FACLO {WRA1} <FACCUM> [FPREG]
 EDAE  D0        RET     NC
 EDAF  7E        LD      A,(HL)
 ; "Converte FACCUM em um inteiro em CDE.
@@ -8948,7 +8950,7 @@ EDE1  CDF0DE    CALL    #DEF0 ; {EPRVL3} [DEINT]
 EDE4  D5        PUSH    DE
 EDE5  CD11DC    CALL    #DC11 ; CHKSYN @SYNCHR {CPSTX} <SyntaxCheck> [CHKSYN] @SYNCHR
 EDE8  2C        DB      ','
-EDE9  CD99E9    CALL    #E999 ; {ARGVL1} [GETINT] @GETBYT
+EDE9  CD99E9    CALL    #E999 ; @GETBYT {ARGVL1} [GETINT]
 EDEC  D1        POP     DE
 EDED  12        LD      (DE),A
 EDEE  C9        RET
@@ -9374,7 +9376,7 @@ EFB5  1F        RRA
 EFB6  E1        POP     HL
 EFB7  22C103    LD      (#03C1),HL ; {WRA1+2} <FACCUM+2> [FPREG+2]
 EFBA  E1        POP     HL
-EFBB  22BF03    LD      (#03BF),HL ; FLOAT {WRA1} <FACCUM> [FPREG] @FACLO
+EFBB  22BF03    LD      (#03BF),HL ; FLOAT @FACLO {WRA1} <FACCUM> [FPREG]
 EFBE  DC7CEF    CALL    C,#EF7C ; {EXPO3} [NEGAFT]
 EFC1  CCFCEC    CALL    Z,#ECFC ; NEGFLOAT {ABS1} <FNegate> [INVSGN]
 EFC4  D5        PUSH    DE

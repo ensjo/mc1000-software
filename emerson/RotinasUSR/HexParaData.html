@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<title>Conversor INTEL HEX para DATA do BASIC do MC1000</title>
+	
+<script>
+function hexParaBas(textoHex) {
+	var resultado = [];
+	var ultimoEndereco;
+	var bloco = null;
+	
+	// Divide texto em linhas.
+	var linhasHex = textoHex.split(/\r?\n/);
+	
+	// Para cada linha...
+	for(let linhaHex of linhasHex) {
+		console.log(linhaHex);
+		// Extrai endereço e dados de registro do tipo 00 (dados).
+		let resultadoRegexp = linhaHex.match(/^:[0-9A-F]{2}([0-9A-F]{4})00((?:[0-9A-F]{2})*)[0-9A-F]{2}$/);
+		if (resultadoRegexp) {
+			endereco = parseInt(resultadoRegexp[1], 16);
+			bytes = resultadoRegexp[2].match(/../g).map((x) => parseInt(x, 16));
+			
+			// Agrega os dados em blocos contínuos.
+			if (!bloco || bloco.enderecoFim != endereco) {
+				resultado.push(
+					bloco = {
+						'dados': bytes,
+						'enderecoIni': endereco,
+						'enderecoFim': endereco + bytes.length
+					}
+				);
+			} else {
+				bloco.dados = bloco.dados.concat(bytes);
+				bloco.enderecoFim += bytes.length;
+			}
+		}
+	}
+	
+	if (resultado.length) {
+		bloco = resultado[0];
+		let textoBas = `1  CLEAR 512,${bloco.enderecoIni - 1}: GOSUB 65000
+64999  STOP 
+65000  REM INSTALADOR
+65010  TEXT : HOME : PRINT "INSTALANDO ROTINAS USR. AGUARDE."
+65020  RESTORE 65100
+65030  READ E: IF E =  - 1 THEN  RETURN 
+65040  READ B: IF B =  - 1 THEN 65030
+65050  POKE E,B:E = E + 1: GOTO 65040
+65100  REM CONFIGURA USR()
+65110  DATA 771
+65120  DATA 195,${bloco.enderecoIni & 0xff},${(bloco.enderecoIni & 0xff00) >> 8},-1
+65130  REM PACOTE DE ROTINAS USR
+`;
+		let numeroLinha = 65140;
+		let tamanhoMaxDados = 246; // 255 - 5 (número de linha) - 4 ("DATA").
+
+		// Para cada bloco...
+		for (bloco of resultado) {
+			// Adiciona a linha DATA com o endereço inicial do bloco.
+			textoBas += `${numeroLinha}  DATA ${bloco.enderecoIni}
+`;
+			numeroLinha += 10;
+			// Converte o array de bytes do bloco em uma string com uma
+			// sequência de números em decimal, substituindo números '0' por ''
+			// para economizar bytes na memória.
+			// Adiciona ',-1' no final para indicar o fim do bloco.
+			let textoDados = bloco.dados.toString().replaceAll(/\b0\b/g, '') + ',-1';
+			
+			// Divide os números em mais de uma linha DATA, para que a linha do
+			// BASIC não ultrapasse o limite de uma linha digitada no
+			// MC1000 (255 bytes).
+			while (true) {
+				if (textoDados.length <= tamanhoMaxDados) {
+					textoBas += `${numeroLinha}  DATA ${textoDados}
+`;
+					numeroLinha += 10;
+					break;
+				} else {
+					let resultadoRegexp = textoDados.match(/^(.{0,246}),(.*)/);
+					textoBas += `${numeroLinha}  DATA ${resultadoRegexp[1]}
+`;
+					numeroLinha += 10;
+					textoDados = resultadoRegexp[2];
+				}
+			}
+		}
+		
+		textoBas += `${numeroLinha}  DATA -1
+`;
+			
+		return(textoBas);
+	}
+	return('');
+}
+</script>
+</head>
+
+<body>
+<h1>Conversor INTEL HEX para DATA do BASIC MC1000</h1>
+
+<p>Este formulário converte o conteúdo de um arquivo .HEX gerado pelo
+compilador <a href="https://www.asm80.com/" target="_blank">
+https://www.asm80.com/</a> em um programa BASIC do MC1000 que:</p>
+
+<ol>
+<li>reserva espaço no topo da RAM para os dados (linha 1);</li>
+<li>chama uma subrotina para injetar dados na memória (linhas 65000–65050),
+a saber:
+<ol>
+<li>configura a função <code>USR()</code> (linhas 65100–65120) para chamar
+o endereço inicial dos dados;</li>
+<li>o restante dos dados (linhas 65130–).</li>
+</ol>
+</li>
+</ol>
+
+<form>
+
+<textarea id="textoHex" rows="10" cols="100">
+:103FA800E1E37EFEA32805FEA4372048F5CDA0DD79
+:103FB800CDF0DEF1D5F5CDCCE2CDC0E2E5CDA1E87E
+:103FC800CAF6DE23235E2356E1D57EFE2C0E0020A2
+:103FD80007CDA0DDCD99E94FCD11DC29D1F1E3CD95
+:103FE80086C8D4BACCDCD7CCCD79C83A2501CD3F28
+:073FF800E6E1E3E9C348D84C
+:00000001FF
+</textarea>
+
+<div>
+	<button type="button" onclick="document.getElementById('textoBas').value = hexParaBas(document.getElementById('textoHex').value)">Converter</button>
+</div>
+
+<textarea id="textoBas" rows="10" cols="100"></textarea>
+
+</form>
+</body>

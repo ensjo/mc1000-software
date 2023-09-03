@@ -1,0 +1,837 @@
+; PACOTE DE ROTINAS USR PARA CCE MC1000.
+; Emerson José Silveira da Costa - 2023-08-30.
+
+; (Nos exemplos abaixo a variável A é usada onde o parâmetro da função USR é
+; ignorado, ou onde a função USR retorna um valor sem nenhum significado.)
+
+; A = USR(A) INPUT RUN
+;   Ativa a fluidez de teclado do MC1000 (interpretador BASIC não para quando
+;   uma tecla é pressionada).
+; A = USR(A) INPUT
+;   Similar à função INKEY$: Retorna uma string com a tecla pressionada, ou "".
+; A = USR(A) INPUT STOP
+;   Restaura o funcionamento normal do teclado do MC1000.
+
+; A = USR(A) SOUND RUN
+;   Desativa as interrupções periódicas ($0038) do MC1000. Com isso o rotina
+;   INTRUP da ROM deixa de ser chamada (o comando SOUND do BASIC não funciona)
+;   e podemos configurar os registradores do processador AY-3-8910 à vontade.
+; A = USR(R) SOUND(V)
+;   Similar à instrução SOUND R,V do MSX: Atribui o valor V ao registrador R do
+;   AY-3-8910.
+;   ATENÇÃO: Os dois bits mais significativos do registrador 7 devem estar
+;   adequadamente configurados para o funcionamento do teclado do MC1000. Por
+;   isso, ao atribuir algum valor para o registrador 7, convém usar a expressão:
+;   A = USR(7) SOUND(64 OR (V AND 63))
+; A = USR(A) SOUND STOP
+;   Restaura o funcionamento normal do som do MC1000.
+
+; A = USR(E) DRAW(F$)
+;   Desenha a partir do endereço E da VRAM a figura definida em F$, usando a
+;   rotina SHAPON da ROM do MC1000. O primeiro byte (caracter) de F$ é
+;   tomado como um inteiro com sinal (-128~+127), e esse valor é somado ao
+;   endereço atual para deslocá-lo. O byte seguinte é copiado diretamente para
+;   o endereço atual. E assim sucessivamente: desloca endereço, copia byte...
+;   A figura termina quando o byte de deslocamento é -1 (255).
+; C = USR(E) UNDRAW(F$[,B])
+;   Apaga uma figura desenhada previamente por USR DRAW, substituindo os bytes
+;   da figura na VRAM pelo byte B (default=0), usando a rotina SHAPOF da ROM do
+;   MC1000.
+;   Detecção de colisão: Se algum byte na VRAM não estava igual aos bytes da
+;   definição da figura (F$), isso significa que algo foi desenhado sobre a
+;   figura em algum momento. Pode ter havido uma colisão de figuras na tela.
+;   Neste caso a função retorna 1. Se todos os bytes estavam iguais, retorna 0.
+
+; A = USR(T$) PRINT
+;   Imprime a string T$ na tela gráfica usando uma tabela de caracteres de 1
+;   byte x 8 linhas. Os comandos INVERSE e NORMAL funcionam.
+;   A posição do cursor usa a mesma variável do sistema que guarda as
+;   coordenadas do último ponto plotado. Por isso o cursor pode ser posicionado
+;   com a instrução SET X,Y (mas com X e Y em unidades de caracteres, e não de
+;   pixels).
+;   Todos os caracteres de controle são ignorados, exceto CHR$(10), que causa
+;   uma quebra de linha.
+;   Ocorre quebra de linha automaticamente após a coluna 31, e scroll após a
+;   linha 23. (Nota-se que não funcionará muito bem nos modos gráficos com 16
+;   bytes por linha, ou nos que têm menos de 192 pixels na vertical.)
+; E = USR(A) PRINT CHR$
+;   Retorna o endereço da tabela de caracteres, a partir do caracter 32 (espaço).
+;   Com essa referência o programador pode modificar algum caracter se quiser.
+
+; Para compilar com https://www.asm80.com/.
+
+; ------------------------------------------------------------------------------
+
+; Configuração da compilação.
+
+	; SIMPLESMENTE DEFINA OS VALORES ABAIXO ANTES DE COMPILAR!
+	; NÃO É PRECISO MUDAR MAIS NADA!
+	
+    UsarINPUT    = 0 ; Incluir USR INPUT? (0=Não, 1=Sim.)
+    UsarSOUND    = 0 ; Incluir USR SOUND? (0=Não, 1=Sim.)
+    UsarDRAW     = 1 ; Incluir USR DRAW/UNDRAW? (0=Não, 1=Sim.)
+    UsarPRINT    = 0 ; Incluir USR PRINT? (0=Não, 1=Sim.)
+    UsarPRINT60a7F = 0 ; Incluir caracteres ASCII na faixa de $60 a $7f (minúsculas)?
+    MaisCaracteres = 0 ; Reservar espaço para quantos caracteres depois dos já incluídos?
+    FimDaRAM = $3fff ; $3fff (16KB) ou $bfff (48KB)
+    ; Selecionar UMA (1) fonte.
+    FonteAppleII = 0
+    FonteAtari   = 0
+    FonteC64     = 0
+    FonteCGA     = 0
+    FonteCourier = 0
+    FonteGothic  = 0
+    FonteMC6847  = 1
+    FonteMSX     = 0
+    FonteNintendo = 0
+    FonteRoman   = 0
+    FonteZXSpectrum = 0
+    FonteColor4x8 = 0 ; Fonte para modos gráficos coloridos.
+
+; ------------------------------------------------------------------------------
+
+; Variáveis temporárias.
+    UsarConfiguraJump := UsarINPUT | UsarSOUND
+    
+    ; Usa o tamanho de cada parte para determinar o endereço de início (org).
+    ; Se o código for modificado pode ser preciso atualizar estes valores.
+    
+    BytesBasico := 6
+
+.if UsarINPUT
+    BytesINPUT := 115
+.else
+    BytesINPUT := 0
+.endif
+
+.if UsarSOUND
+    BytesSOUND := 69
+.else
+    BytesSOUND := 0
+.endif
+
+.if UsarConfiguraJump
+    BytesConfiguraJump := 27
+.else
+    BytesConfiguraJump := 0
+.endif
+
+.if UsarDRAW
+    BytesDRAW := 81
+.else
+    BytesDRAW := 0
+.endif
+
+.if UsarPRINT
+    BytesPRINT := 692
+.else
+    BytesPRINT := 0
+.endif
+
+.if UsarPRINT & UsarPRINT60a7F
+    BytesPRINT60a7F := 256
+.else
+    BytesPRINT60a7F := 0
+.endif
+
+.if UsarPRINT & (MaisCaracteres != 0)
+    BytesMaisCaracteres := MaisCaracteres * 8
+.else
+    BytesMaisCaracteres := 0
+.endif
+
+    EnderecoInicial := FimDaRAM - BytesBasico - BytesINPUT - BytesSOUND - BytesConfiguraJump - BytesDRAW - BytesPRINT - BytesPRINT60a7F - BytesMaisCaracteres
+    
+; ------------------------------------------------------------------------------
+
+; Tokens de palavras reservadas do BASIC.
+    TokenINPUT   = $85 ; Token de INPUT.
+    TokenRUN     = $8A ; Token de RUN.
+    TokenSTOP    = $90 ; Token de STOP.
+    ;TokenON      = $92 ; Token de ON.
+    TokenPRINT   = $97 ; Token de PRINT.
+    TokenSOUND   = $99 ; Token de SOUND.
+    ;TokenSET     = $A1 ; Token de SET.
+    TokenDRAW    = $A3 ; Token de DRAW.
+    TokenUNDRAW  = $A4 ; Token de UNDRAW.
+    TokenCHR_    = $DC ; Token de CHR$.
+; Portas de E/S.
+    REG          = $20 ; Seleciona registrador do AY-3-8910.
+    WR           = $60 ; Escreve no registrador do AY-3-8910 selecionado por REG.
+; Variáveis do sistema.
+    Key0         = $011b ; Última tecla pressionada.
+    JOB          = $0120 ; Hook durante a leitura do teclado.
+    FlagColisao  = $0125 ; Após SHAPOF, 0=não houve colisão; 1=houve colisão.
+    FlagINVERSE  = $0352
+    UltimoYX     = $0359 ; Coordenada do último ponto plotado na tela gráfica.
+    UltimoY      = UltimoYX+0
+    UltimoX      = UltimoYX+1
+    TipoDado     = $0390 ; 0 = Número de ponto flutuante, 1 = string.
+    StringTemp   = $03A2 ; Registro temporário de string.
+; Outros endereços de memória.
+    ;ramtop      = $3fff
+    VRAM         = $8000 ; Início da VRAM.
+; Rotinas na ROM.
+    SKEY_        = $c37f ; Rotina "SKEY?": Lê status do teclado.
+    DesativaVRAM = $c879 ; Destiva o banco de VRAM.
+    AtivaVRAM    = $c886 ; Ativa o banco de VRAM.
+    SHAPON       = $ccba ; Desenha figura na VRAM.
+    SHAPOF       = $ccd7 ; Apaga figura da VRAM.
+    EmiteSNErro  = $d848 ; Emite erro de sintaxe.
+    ChecaSintaxe = $dc11 ; Verifica presença de caracter ou emite erro de sintaxe.
+    Resto        = $dd61
+    ProximoCar   = $dda0 ; Obtém próximo caracter do programa BASIC (não espaço).
+    TeclaP       = $dddf
+    PFaDE        = $def0 ; Converte o valor em ponto flutuante para UINT16 em DE.
+    EmitePIErro  = $def6 ; Emite erro de parâmetro ilegal.
+    ChecaString  = $e2c0 ; Emite erro de tipo incompatível se não for string.
+    AvaliaParen  = $e2cc ; Consome '(' e avalia expressão.
+    RetornaNulo  = $e51d ; Coloca 0 ou string nula no registro de ponto flutuante
+                         ; (requer A=0) e retorna à rotina de interpretação de
+                         ; expressões.
+    DEaPF        = $e626 ; Converte o valor de DE (UINT16) para ponto flutuante.
+    AaPF         = $e63f ; Converte o valor de A (UINT8) para ponto flutuante.
+    AlocaStrTemp = $e6e6 ; Aloca A bytes e cria registro de string temporário.
+    EmpilhaStrTemp = $e714 ; Empilha o registro de string temporário e retorna à
+                         ; rotina de interpretação de expressões.
+    ALen         = $e8a1 ; Obtém o comprimento da string em A.
+    AvaliaA      = $e999 ; Avalia expressão e converte para UINT8 em A.
+    PFaA         = $e99c ; Converte o valor em ponto flutuante para UINT8 em A e E.
+
+; ------------------------------------------------------------------------------
+
+    org EnderecoInicial
+
+; CONFIGURAÇÃO: O endereço de entrada da função USR (0x0303) deve conter um jump
+; para este endereço.
+
+Inicio:
+; Logo após USR(<expressão>), o topo da pilha do Z80 contém:
+; - Endereço de retorno da rotina USR. Procedimentos antes de continuar a
+;   interpretação da expressão onde a função USR está inserida.
+; - Ponteiro de interpretação do código BASIC: Endereço do primeiro caracter
+;   diferente de espaço depois do fecha-parêntese.
+; - Endereço de retorno para a continuação da interpretação da expressão
+;   onde a função USR está inserida.
+
+    pop hl ; Retira da pilha...
+    ex (sp),hl ; ...o ponteiro do BASIC.
+    ld a,(hl) ; Obtém próximo caracter do BASIC.
+
+; ------------------------------------------------------------------------------
+
+.if UsarINPUT
+ChecaINPUT:
+    cp TokenINPUT ; Encontrou token de INPUT?
+    jp nz,NaoTokenINPUT ; Não: Checa outro token.
+
+USRINPUT:
+; Sintaxe:
+;   USR (<exprNum>) INPUT RUN
+; Ativa a leitura fluida de teclado.
+; O valor do parâmetro é ignorado.
+;   USR (<exprNum>) INPUT STOP
+; Desativa a leitura fluida de teclado.
+; O valor do parâmetro é ignorado.
+;   USR (<exprNum>) INPUT
+; Com a leitura fluida ativada, retorna uma string com a última tecla pressionada
+; (=INKEY$).
+; O valor do parâmetro é ignorado.
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de INPUT.
+    
+    cp TokenRUN ; Token de RUN?
+    jr z,USRINPUTRUNSTOP ; Sim: Desvia.
+    cp TokenSTOP ; Token de STOP?
+    scf ; Flag de carry = 1 para distinguir STOP de RUN.
+    jr z,USRINPUTRUNSTOP ; Sim: Desvia.
+    
+    ex (sp),hl ; Preserva ponteiro do BASIC, descarta endereço de retorno
+        ; (checagem de tipo numérico).
+    ld a,(Key0+4)
+    or a
+    jr nz,AlgumaTecla
+NenhumaTecla:
+    ld hl,TipoDado ; O valor de retorno será string.
+    ld (hl),1
+    ; Já temos A = 0, necessário para a chamada a seguir.
+    jp RetornaNulo ; Produz string nula e retorna à interpretação da expressão BASIC.
+AlgumaTecla:
+    ld a,1 ; 1 byte a alocar.
+    call AlocaStrTemp ; Aloca A bytes e cria registro temporário de string.
+    ld a,(Key0) ; Última tecla pressionada.
+    ld hl,(StringTemp+2) ; Endereço do conteúdo da string.
+    ld (hl),a ; Armazena o caracter na string.
+    jp EmpilhaStrTemp ; Empilha string temporária e retorna à interpretação da expressão BASIC.
+
+USRINPUTRUNSTOP:
+    ; Se flag de carry = 0 (RUN):
+    ;   Se CopiaJOB estiver vazio (primeiro byte = 0):
+    ;     Configurar o hook JOB (3 bytes) para chamar ChecaCallKey:
+    ;     - Preserva o conteúdo original de JOB copiando-o para CopiaJOB.
+    ;     - Copia o conteudo de ModeloJOB (jump para ChecaCallKey) para JOB.
+    ; Se flag de carry = 1 (STOP):
+    ;   Se CopiaJOB não estiver vazio (primeiro byte <> 0):
+    ;     Desconfigurar o hook JOB, restaurando seu conteúdo original:
+    ;     - Copia o conteúdo de CopiaJOB para JOB.
+    ;     - Zera CopiaJOB.
+    push hl ; Preserva ponteiro de interpretação do BASIC.
+    ld hl,JOB ; Jump a configurar (RUN) / desconfigurar (STOP).
+    ld de,CopiaJOB ; Onde o conteúdo original do hook está/será preservado.
+    ld bc,ModeloJOB ; Valor a substituir o conteúdo original do hook JOB (RUN).
+    call ConfiguraJump
+    pop hl ; Recupera ponteiro de interpretação do BASIC.
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de RUN/STOP.
+    ex (sp),hl ; Repõe ponteiro do BASIC na pilha, recupera endereço de retorno.
+    jp (hl) ; Retorna à interpretação da expressão BASIC.
+    
+CopiaJOB:
+    ; Variável que armazenará uma cópia do conteúdo original do hook JOB.
+    db 0,0,0
+ModeloJOB:
+    ; Conteúdo constante a ser transferido para o hook JOB na configuração.
+    jp ChecaCallKey
+
+; CONFIGURAÇÃO: O hook "JOB" (0x0120) chamado durante a leitura do teclado deve
+; conter um jump para este endereço.
+
+ChecaCallKey:
+; Verifica se estamos em meio ao CALL KEY? feito em 0xdd5a.
+    ld hl,+14
+    add hl,sp
+    ld a,(hl)
+    cp $5d
+    ret nz
+    inc hl
+    ld a,(hl)
+    cp $dd
+    ret nz
+; Sim: Modifica a pilha do Z80 para que, ao final da rotina SKEY?, o controle
+; não volte para KEY?, mas para nossa rotina personalizada "DesviaCallKey".
+	ld hl,+8
+    add hl,sp
+    ld (hl),lsb(DesviaCallKey)
+    inc hl
+    ld (hl),msb(DesviaCallKey)
+    ret
+
+DesviaCallKey:
+; Restaura pilha e registradores como estariam ao final da execução de KEY?, e
+; desvia para os pontos apropriados do interpretador BASIC, evitando o CALL KEY
+; em 0xdddc.
+    pop bc ; Desempilha valores empilhados por KEY?...
+    pop de ; ...para os devidos registradores.
+ 
+    inc sp ; Descarta...
+    inc sp ; ...o endereço de retorno original.
+ 
+    ld (Key0+4),a ; FUNCIONALIDADE ADICIONAL:
+                  ; Salva em KEY0+4 a informação sobre se uma tecla foi
+                  ; pressionada (0xFF) ou não (0x00).
+    or a
+ 
+    ld a,(Key0)   ; Copia código da tecla em KEY0+1.
+    ld (Key0+1),a ; (É algo que a rotina KEY? faz.)
+ 
+    call nz,TeclaP ; Se tecla pressionada, chama rotina de tratamento situada
+                   ; logo depois a problemática instrução CALL KEY.
+    jp Resto       ; Retorna para o interpretador BASIC.
+
+NaoTokenINPUT:
+.endif
+
+; ------------------------------------------------------------------------------
+
+.if UsarSOUND
+ChecaSOUND:
+    cp TokenSOUND ; Encontrou token de SOUND?
+    jr nz,NaoTokenSOUND ; Não: Checa outro token.
+    
+; CONFIGURAÇÃO: O endereço de entrada da interrupção periódica (0x0038), que por
+; padrão contém um jump à rotina INTRUP na ROM, deve ser alterado para conter
+; a instrução RETI (0Xed, 0x4d). A rotina INTRUP administra a música de fundo
+; dos jogos em linguagem de máquina e o comando SOUND do BASIC do MC1000, e
+; modifica continuamente os registradores so AY-3-8910. Para podermos ter
+; controle sobre o valor dos registradores, é preciso inibir as chamadas a
+; INTRUP.
+
+USRSOUND:
+; Sintaxe:
+;   USR (<exprNum>) SOUND RUN
+; Desativa as chamadas periódicas à rotina INTRUP (responsável pela gerência do
+; som do MC1000) para podermos controlar o AY-3-8910.
+; O comando SOUND original não pode mais ser usado.
+; O valor do parâmetro é ignorado.
+;   USR (<exprNum>) SOUND STOP
+; Reativa as chamadas periódicas à rotina INTRUP.
+; O valor do parâmetro é ignorado.
+;   USR (<exprNum1>) SOUND (<exprNum2>)
+; Envia o valor <exprNum2> para o registrador <exprNum1> do AY-3-8910.
+
+    ; Trata parâmetro do USR, já lido (número do registrador do AY-3-8910):
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de "SOUND".
+    
+    cp TokenRUN ; Token de RUN?
+    jr z,USRSOUNDRUNSTOP ; Sim: Desvia.
+    cp TokenSTOP ; Token de STOP?
+    scf ; Carry flag = 1 para distinguir STOP de RUN.
+    jr z,USRSOUNDRUNSTOP ; Sim: Desvia.
+    
+    call PFaA ; Converte o valor em ponto flutuante para UINT8 em A (e E).
+    push de ; Preserva número do registrador.
+
+    ; Lê e trata o segundo parâmetro (valor a atribuir ao registrador).
+    call ChecaSintaxe
+    db '('
+    call AvaliaA
+    pop de ; Restaura número do registrador em E.
+    ld d,a ; Preserva valor a atribuir em D.
+    call ChecaSintaxe
+    db ')'
+    ; Atribui valor ao registrador.
+    di
+    ld a,e
+    out (REG),a ; Seleciona registrador do AY-3-8910.
+    ld a,d
+    out (WR),a ; Escreve valor no registrador selecionado.
+    ei
+    ; Restaura pilha e retorna à interpretação da expressão BASIC.
+    ex (sp),hl
+    jp (hl)
+
+USRSOUNDRUNSTOP:
+    ; Se flag de carry = 0 (RUN):
+    ;   Se Copia0038 estiver vazio (primeiro byte = 0):
+    ;     Configurar a interrupção $0038 para RETI:
+    ;     - Preserva o conteúdo original de $0038 copiando-o para Copia0038.
+    ;     - Copia o conteudo de Modelo0038 (instrução RETI) para $0038.
+    ; Se flag de carry = 1 (STOP):
+    ;   Se Copia0038 não estiver vazio (primeiro byte <> 0):
+    ;     Desconfigurar a interrupção $0038, restaurando seu conteúdo original:
+    ;     - Copia o conteúdo de Copia0038 para $0038.
+    ;     - Zera Copia0038.
+    push hl ; Preserva ponteiro de interpretação do BASIC.
+    ld hl,$0038 ; Jump a configurar (RUN) / desconfigurar (STOP).
+    ld de,Copia0038 ; Onde o conteúdo original do vetor de interrupção está/será preservado.
+    ld bc,Modelo0038 ; Valor a substituir o conteúdo original do vetor de interrupção $0038 (RUN).
+    di
+    call ConfiguraJump
+    ei
+    pop hl ; Recupera ponteiro de interpretação do BASIC.
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de RUN/STOP.
+    ex (sp),hl ; Repõe ponteiro do BASIC na pilha, recupera endereço de retorno.
+    jp (hl) ; Retorna à interpretação da expressão BASIC.
+    
+Copia0038:
+    ; Variável que armazenará uma cópia do conteúdo original do vetor de
+    ; interrupção $0038.
+    db 0,0,0
+Modelo0038:
+    ; Valor a ser transferido para o vetor de interrupção $0038 na configuração.
+    ; Basta que os dois primeiros bytes sejam a instrução RETI, o terceiro pode
+    ; ser o que quer que haja na memória a seguir.
+    reti
+    ;nop
+
+NaoTokenSOUND:
+.endif
+
+; ------------------------------------------------------------------------------
+
+.if UsarDRAW
+    cp TokenDRAW
+    jr z,USRDRAWUNDRAW
+    cp TokenUNDRAW
+    scf ; Carry flag = 1 para distinguir UNDRAW de DRAW.
+    jr nz,NaoDRAWTokenUNDRAW
+
+USRDRAWUNDRAW:
+    push af ; Preserva flag de carry (0 = DRAW, 1 = UNDRAW).
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de PRINT.
+    
+    ; 1ª argumento: Endereço na VRAM onde iniciar o desenho.
+    call PFaDE ; Converte o valor em ponto flutuante para UINT16 em DE.
+    pop af ; Restaura flag de carry (0 = DRAW, 1 = UNDRAW).
+    push de ; Preserva endereço na VRAM onde iniciar o desenho.
+    push af ; Preserva flag de carry (0 = DRAW, 1 = UNDRAW).
+    
+    ; Lê e trata 2º argumento: String contendo bytes da figura.
+    call AvaliaParen ; Consome '(' e avalia expressão.
+    call ChecaString ; Emite erro de tipo incompatível se não for string.
+    push hl ; Salva ponto de interpretação do BASIC.
+    call ALen ; Desempilha string.
+    jp z,EmitePIErro ; Emite erro de parâmetro ilegal se "".
+    ; DE = endereço dos caracteres da string (dados da figura).
+    inc hl
+    inc hl
+    ld e,(hl)
+    inc hl
+    ld d,(hl)
+    ; Lê e trata 3º parâmetro: Byte para preencher a VRAM ao apagar.
+    ; (Opcional, default = 0).
+    pop hl ; Restaura ponteiro de interpretação do BASIC.
+    push de ; Preserva endereço dos dados da figura.
+    ld a,(hl)
+    cp ',' ; Vírgula após 2º parâmetro?
+    ld c,0 ; Default = 0.
+    jr nz,USRDRAWUNDRAW1 ; Sem vírgula: desvia.
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após a vírgula.
+    call AvaliaA ; Avalia expressão e converte em UINT8 em A.
+    ld c,a ; Armazena byte de apagamento em C.
+USRDRAWUNDRAW1:
+    call ChecaSintaxe
+    db ')'
+    ; Desenha/apaga a figura.
+    pop de ; Restaura endereço dos dados da figura.
+    pop af ; Restaura flag de carry (0 = DRAW, 1 = UNDRAW).
+    ex (sp),hl ; Restaura endereço na VRAM onde iniciar o desenho;
+        ; preserva ponteiro de interpretação do BASIC.
+    call AtivaVRAM
+    call nc,SHAPON ; Desenha a figura. (Retorna com flag de carry = 0).
+    call c,SHAPOF ; Apaga a figura.
+    call DesativaVRAM
+    ; Retorna valor do flag de colisão.
+    ld a,(FlagColisao) ; Após SHAPOF, 0=não houve colisão; 1=houve colisão.
+    call AaPF ; Converte o valor de A (UINT8) para ponto flutuante.
+    ; Restaura pilha e retorna à interpretação da expressão BASIC.
+    pop hl ; Restaura ponto de interpretação do BASIC.
+    ex (sp),hl ; Preserva ponto de interpretação do BASIC;
+        ; restaura endereço de retorno.
+    jp (hl)
+
+NaoDRAWTokenUNDRAW:
+.endif
+
+; ------------------------------------------------------------------------------
+
+.if UsarPRINT
+ChecaPRINT:
+    cp TokenPRINT ; Encontrou token de PRINT?
+    jp nz,NaoTokenPRINT ; Não: Checa outro token.
+
+USRPRINT:
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de PRINT.
+    
+    cp TokenCHR_ ; É token de CHR$?
+    jp z,USRPRINTCHR_ ; Sim: Desvia.
+    
+    ex (sp),hl ; Repõe ponteiro do BASIC na pilha, recupera endereço de retorno.
+    push hl ; Repõe endereço de retorno à interpretação da expressão BASIC.
+    ; Desempilha string. Termina se "".
+    call ALen
+    ret z
+    ; B = tamanho da string (quantidade de caracteres a imprimir).
+    ld b,a
+    ; HL = endereço dos caracteres da string.
+    inc hl
+    inc hl
+    ld c,(hl)
+    inc hl
+    ld h,(hl)
+    ld l,c
+    ; DE = coordenadas do cursor. (D=y, E=x)
+    ld de,(UltimoYX)
+    ld a,d
+    ld d,e
+    ld e,a
+    ; Habilita VRAM para escrita.
+    call AtivaVRAM
+USRPRINTLoop1:
+    ; Obtém próximo caracter da string.
+    ld a,(hl)
+    inc hl
+    ; Trata linefeed.
+    cp 10
+    jr nz,USRPRINTNaoLinefeed
+    ld e,32 ; Força ida do cursor para o início da próxima linha.
+    call USRPRINTNormalizaCoordenadas
+    xor a
+USRPRINTNaoLinefeed:
+    ; Ignora outros caracteres de controle (ASCII < 32).
+    sub 32
+    jr c,USRPRINTProximoCaracter
+    ; Caracter imprimível.
+    ld c,a ; Preserva caracter a imprimir.
+    call USRPRINTNormalizaCoordenadas
+    ld a,c ; Restaura caracer a imprimir.
+    ; Preserva dados do laço externo.
+    push hl ; Preserva endereço dos caracteres da string.
+    push de ; Preserva coordenadas do cursor.
+    push bc ; Preserva quantidade de caracteres a imprimir.
+    ; DE = endereço do caracter na VRAM: VRAM + y * 8 * 32 + x.
+    ld hl,VRAM
+    add hl,de
+    ex de,hl
+    ; Calcula posição na tabela de caracteres:
+    ; USRPRINTTabelaCaracteres + A * 8.
+    ld h,0
+    ld l,a
+    add hl,hl
+    add hl,hl
+    add hl,hl
+    ld bc,USRPRINTTabelaCaracteres
+    add hl,bc
+    ; C = $00 (NORMAL) ou $FF (INVERSE).
+    ld a,(FlagINVERSE)
+    sub 1
+    sbc a,a
+    cpl
+    ld c,a
+    ; Transfere os 8 bytes do caracter para a VRAM.
+    ld b,8
+USRPRINTLoop2:
+    ld a,(hl)
+    xor c ; NORMAL/INVERSE
+    ld (de),a
+    inc hl
+    ld a,e
+    add a,32
+    ld e,a
+    ;ld a,d
+    ;adc a,0
+    ;ld d,a
+    djnz USRPRINTLoop2
+    ; Restaura dados do laço externo.
+    pop bc
+    pop de
+    pop hl
+    ; Avança cursor para a direita.
+    inc de
+USRPRINTProximoCaracter:
+    djnz USRPRINTLoop1
+    ; Atualiza variável do sistema com coordenadas do cursor.
+    ld h,e
+    ld l,d
+    ld (UltimoYX),hl
+    ; Desabilita VRAM e retorna.
+    jp DesativaVRAM
+
+USRPRINTNormalizaCoordenadas:
+    ; Trata quebra de linha.
+    ; x no intervalo 0-31, e soma o excedente (int(x/32)) a y.
+    ld a,e ; Valor de x.
+    and $e0 ; Há excedente?
+    jr z,USRPRINTChecaScroll ; Não: Desvia.
+    rlca ; Calcula excedente...
+    rlca
+    rlca
+    add a,d ; ...e soma a y.
+    ld d,a
+    ld a,e ; Normaliza x (0-31).
+    and $1f
+    ld e,a
+USRPRINTChecaScroll:
+    ; Trata scroll.
+    ; y no intervalo 0-23, realiza scroll com o excedente (int(y/24)).
+    ld a,d ; Valor de y.
+    sub 24 ; Além da última linha da tela?
+    ret c ; Não: Retorna. (Scroll não necessário.)
+    ld d,23 ; Normaliza y (última linha).
+    push hl ; Preserva endereço dos caracteres da string.
+    push de ; Preserva coordenadas do cursor.
+    push bc ; Preserva tamanho da string.
+    inc a
+    cp 24 ; Se o excedente for maior que 23...
+    jr c,USRPRINTScroll1
+    ld a,24 ; ...limita o scroll a 24 linhas.
+USRPRINTScroll1:
+    ; Realiza scroll, parte 1: Move bytes da VRAM para cima.
+    ld b,a ; BC = <linhas a rolar> * 32 * 8. (Tamanho da área a apagar.)
+    ld c,0
+    ld de,VRAM
+    ld h,d ; HL = VRAM + <linhas a rolar> * 32 * 8.
+    ld l,e
+    add hl,bc
+    ld a,24
+    sub b
+    jr z,USRPRINTScroll2 ; Scroll da tela inteira, não precisa mover nada, só apagar.
+    push bc ; Preserva tamanho da área a apagar.
+    ld b,a ; BC = (24 - <linhas a rolar>) * 32 * 8. (Tamanho da área a mover.)
+    ldir ; Move conteúdo da tela para cima.
+    pop bc ; Restaura tamanho da área a apagar.
+USRPRINTScroll2:
+    ; Realiza scroll, parte 2: Apaga o resto da tela.
+    ld h,d
+    ld l,e
+    ld (hl),c ; Zera primeiro byte da área a apagar.
+    inc de
+    dec bc
+    ldir
+    pop bc ; Restaura tamanho da string.
+    pop de ; Restaura coordenadas do cursor.
+    pop hl ; Restaura endereço dos caracteres da string.
+    ret
+    
+USRPRINTCHR_:
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de CHR$.
+    ex (sp),hl ; Repõe ponteiro do BASIC na pilha, recupera endereço de retorno.
+    push hl ; Repõe endereço de retorno à interpretação da expressão BASIC.
+
+    ld de,USRPRINTTabelaCaracteres
+    jp DEaPF
+
+NaoTokenPRINT:
+.endif
+
+; ------------------------------------------------------------------------------
+
+; Nenhum token esperado encontrado.
+; Emitir erro de sintaxe.
+    jp EmiteSNErro
+
+; ------------------------------------------------------------------------------
+
+.if UsarConfiguraJump
+ConfiguraJump:
+; Rotina para configurar/desconfigurar jumps em preparação para outras
+; funcionalidades.
+; HL aponta para o jump (3 bytes) a ser configurado/desconfigurado.
+; DE aponta para o local onde uma cópia do jump será/está preservada.
+; BC aponta para o valor que substituirá o valor original do jump.
+; Flag de carry:
+; - 0 = Operação de configuração:
+;   Se o primeiro byte apontado por DE for vazio (ainda não houve configuração):
+;   - Transfere 3 bytes de HL para DE (preserva o valor original do jump).
+;   - Transfere 3 bytes de BC para DE (configura o jump com o valor desejado).
+; - 1 = Operação de desconfiguração:
+;   Se o primeiro byte apontado por DE não for vazio (já houve configuração):
+;   - Transfere 3 bytes de DE para HL (restaura o valor original do jump).
+;   - Transfere 3 bytes 0 para DE (apaga a cópia).
+    ld a,(de) ; Obtém o primeiro byte da cópia.
+    jr nc,ConfiguraJump1 ; Flag de carry=0? Desvia.
+    ex de,hl ; Inverte a direção da transferência.
+    ld bc,ByteZero
+    cp 1 ; Se A=0...
+    sbc a,a ; ...então A=$FF, senão A=0.
+ConfiguraJump1:
+    or a
+    ret nz
+    ; Transfere 3 bytes de DE para HL, e então de BC para DE.
+    push bc ; Preserva endereço de origem da 2ª transferência.
+    push hl ; Preserva endereço de origem da 1ª transferência.
+    ld bc,3 ; 3 bytes a transferir.
+    push bc ; Preseva quantidade de bytes a transferir.
+    ldir ; Transfere bytes.
+    pop bc ; Recupera quantidade de bytes a copiar.
+    pop de ; Recupera endereço de destino da 2ª transferência (=endereço de origem da 1ª transferência).
+    pop hl ; Recupera endereço de origem da 2ª transferência.
+    ldir ; Transfere bytes.
+    ret
+
+ByteZero:
+    ; Basta que o primeiro byte seja 0, os outros dois podem ser o que quer que
+    ; haja na memória a seguir.
+    db 0
+.endif
+
+; ------------------------------------------------------------------------------
+
+; Tabela de caracteres.
+USRPRINTTabelaCaracteres:
+
+.if UsarPRINT & FonteAppleII
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$10,$10,$10,$10,$10,$00,$10,$00,$28,$28,$28,$00,$00,$00,$00,$00,$28,$28,$7c,$28,$7c,$28,$28,$00,$10,$3c,$50,$38,$14,$78,$10,$00,$60,$64,$08,$10,$20,$4c,$0c,$00,$20,$50,$50,$20,$54,$48,$34,$00,$10,$10,$10,$00,$00,$00,$00,$00,$08,$10,$20,$20,$20,$10,$08,$00,$20,$10,$08,$08,$08,$10,$20,$00,$10,$54,$38,$10,$38,$54,$10,$00,$00,$10,$10,$7c,$10,$10,$00,$00,$00,$00,$00,$00,$10,$10,$20,$00,$00,$00,$00,$7c,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$10,$00,$00,$04,$08,$10,$20,$40,$00,$00,$38,$44,$4c,$54,$64,$44,$38,$00,$10,$30,$10,$10,$10,$10,$38,$00,$38,$44,$04,$18,$20,$40,$7c,$00,$7c,$04,$08,$18,$04,$44,$38,$00,$08,$18,$28,$48,$7c,$08,$08,$00,$7c,$40,$78,$04,$04,$44,$38,$00,$1c,$20,$40,$78,$44,$44,$38,$00,$7c,$04,$08,$10,$20,$20,$20,$00,$38,$44,$44,$38,$44,$44,$38,$00,$38,$44,$44,$3c,$04,$08,$70,$00,$00,$00,$10,$00,$10,$00,$00,$00,$00,$00,$10,$00,$10,$10,$20,$00,$08,$10,$20,$40,$20,$10,$08,$00,$00,$00,$7c,$00,$7c,$00,$00,$00,$20,$10,$08,$04,$08,$10,$20,$00,$38,$44,$08,$10,$10,$00,$10,$00,$38,$44,$54,$5c,$58,$40,$3c,$00,$10,$28,$44,$44,$7c,$44,$44,$00,$78,$44,$44,$78,$44,$44,$78,$00,$38,$44,$40,$40,$40,$44,$38,$00,$78,$44,$44,$44,$44,$44,$78,$00,$7c,$40,$40,$78,$40,$40,$7c,$00,$7c,$40,$40,$78,$40,$40,$40,$00,$3c,$40,$40,$40,$4c,$44,$3c,$00,$44,$44,$44,$7c,$44,$44,$44,$00,$38,$10,$10,$10,$10,$10,$38,$00,$04,$04,$04,$04,$04,$44,$38,$00,$44,$48,$50,$60,$50,$48,$44,$00,$40,$40,$40,$40,$40,$40,$7c,$00,$44,$6c,$54,$54,$44,$44,$44,$00,$44,$44,$64,$54,$4c,$44,$44,$00,$38,$44,$44,$44,$44,$44,$38,$00,$78,$44,$44,$78,$40,$40,$40,$00,$38,$44,$44,$44,$54,$48,$34,$00,$78,$44,$44,$78,$50,$48,$44,$00,$38,$44,$40,$38,$04,$44,$38,$00,$7c,$10,$10,$10,$10,$10,$10,$00,$44,$44,$44,$44,$44,$44,$38,$00,$44,$44,$44,$44,$44,$28,$10,$00,$44,$44,$44,$54,$54,$6c,$44,$00,$44,$44,$28,$10,$28,$44,$44,$00,$44,$44,$28,$10,$10,$10,$10,$00,$7c,$04,$08,$10,$20,$40,$7c,$00,$7c,$60,$60,$60,$60,$60,$7c,$00,$00,$40,$20,$10,$08,$04,$00,$00,$7c,$0c,$0c,$0c,$0c,$0c,$7c,$00,$00,$00,$10,$28,$44,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$7f ; _
+.endif
+.if UsarPRINT & FonteAppleII & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $20,$10,$08,$00,$00,$00,$00,$00,$00,$00,$38,$04,$3c,$44,$3c,$00,$40,$40,$78,$44,$44,$44,$78,$00,$00,$00,$3c,$40,$40,$40,$3c,$00,$04,$04,$3c,$44,$44,$44,$3c,$00,$00,$00,$38,$44,$7c,$40,$3c,$00,$18,$24,$20,$78,$20,$20,$20,$00,$00,$00,$38,$44,$44,$3c,$04,$38,$40,$40,$78,$44,$44,$44,$44,$00,$10,$00,$30,$10,$10,$10,$38,$00,$08,$00,$18,$08,$08,$08,$48,$30,$40,$40,$44,$48,$70,$48,$44,$00,$30,$10,$10,$10,$10,$10,$38,$00,$00,$00,$6c,$54,$54,$54,$44,$00,$00,$00,$78,$44,$44,$44,$44,$00,$00,$00,$38,$44,$44,$44,$38,$00,$00,$00,$78,$44,$44,$78,$40,$40,$00,$00,$3c,$44,$44,$3c,$04,$04,$00,$00,$5c,$60,$40,$40,$40,$00,$00,$00,$3c,$40,$38,$04,$78,$00,$20,$20,$78,$20,$20,$24,$18,$00,$00,$00,$44,$44,$44,$4c,$34,$00,$00,$00,$44,$48,$28,$30,$10,$00,$00,$00,$44,$44,$54,$54,$6c,$00,$00,$00,$44,$28,$10,$28,$44,$00,$00,$00,$44,$48,$28,$30,$10,$60,$00,$00,$7c,$08,$10,$20,$7c,$00,$1c,$30,$30,$60,$30,$30,$1c,$00,$10,$10,$10,$00,$10,$10,$10,$00,$70,$18,$18,$0c,$18,$18,$70,$00,$2c,$50,$00,$00,$00,$00,$00,$00,$00,$10,$24,$48,$10,$24,$48,$00 ; DEL
+.endif
+
+.if UsarPRINT & FonteAtari
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$00,$18,$00,$00,$66,$66,$66,$00,$00,$00,$00,$00,$66,$ff,$66,$66,$ff,$66,$00,$18,$3e,$60,$3c,$06,$7c,$18,$00,$00,$66,$6c,$18,$30,$66,$46,$00,$1c,$36,$1c,$38,$6f,$66,$3b,$00,$00,$18,$18,$18,$00,$00,$00,$00,$00,$0e,$1c,$18,$18,$1c,$0e,$00,$00,$70,$38,$18,$18,$38,$70,$00,$00,$66,$3c,$ff,$3c,$66,$00,$00,$00,$18,$18,$7e,$18,$18,$00,$00,$00,$00,$00,$00,$00,$18,$18,$30,$00,$00,$00,$7e,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$00,$00,$06,$0c,$18,$30,$60,$40,$00,$00,$3c,$66,$6e,$76,$66,$3c,$00,$00,$18,$38,$18,$18,$18,$7e,$00,$00,$3c,$66,$0c,$18,$30,$7e,$00,$00,$7e,$0c,$18,$0c,$66,$3c,$00,$00,$0c,$1c,$3c,$6c,$7e,$0c,$00,$00,$7e,$60,$7c,$06,$66,$3c,$00,$00,$3c,$60,$7c,$66,$66,$3c,$00,$00,$7e,$06,$0c,$18,$30,$30,$00,$00,$3c,$66,$3c,$66,$66,$3c,$00,$00,$3c,$66,$3e,$06,$0c,$38,$00,$00,$00,$18,$18,$00,$18,$18,$00,$00,$00,$18,$18,$00,$18,$18,$30,$06,$0c,$18,$30,$18,$0c,$06,$00,$00,$00,$7e,$00,$00,$7e,$00,$00,$60,$30,$18,$0c,$18,$30,$60,$00,$00,$3c,$66,$0c,$18,$00,$18,$00,$00,$3c,$66,$6e,$6e,$60,$3e,$00,$00,$18,$3c,$66,$66,$7e,$66,$00,$00,$7c,$66,$7c,$66,$66,$7c,$00,$00,$3c,$66,$60,$60,$66,$3c,$00,$00,$78,$6c,$66,$66,$6c,$78,$00,$00,$7e,$60,$7c,$60,$60,$7e,$00,$00,$7e,$60,$7c,$60,$60,$60,$00,$00,$3e,$60,$60,$6e,$66,$3e,$00,$00,$66,$66,$7e,$66,$66,$66,$00,$00,$7e,$18,$18,$18,$18,$7e,$00,$00,$0e,$06,$06,$06,$66,$3c,$00,$00,$66,$6c,$78,$78,$6c,$66,$00,$00,$60,$60,$60,$60,$60,$7e,$00,$00,$63,$77,$7f,$6b,$63,$63,$00,$00,$66,$76,$7e,$7e,$6e,$66,$00,$00,$3c,$66,$66,$66,$66,$3c,$00,$00,$7c,$66,$66,$7c,$60,$60,$00,$00,$3c,$66,$66,$66,$6c,$36,$00,$00,$7c,$66,$66,$7c,$6c,$66,$00,$00,$3c,$60,$3c,$06,$06,$3c,$00,$00,$7e,$18,$18,$18,$18,$18,$00,$00,$66,$66,$66,$66,$66,$7e,$00,$00,$66,$66,$66,$66,$3c,$18,$00,$00,$63,$63,$6b,$7f,$77,$63,$00,$00,$66,$66,$3c,$3c,$66,$66,$00,$00,$66,$66,$3c,$18,$18,$18,$00,$00,$7e,$0c,$18,$30,$60,$7e,$00,$00,$1e,$18,$18,$18,$18,$1e,$00,$00,$40,$60,$30,$18,$0c,$06,$00,$00,$78,$18,$18,$18,$18,$78,$00,$00,$08,$1c,$36,$63,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff,$00
+.endif
+.if UsarPRINT & FonteAtari & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $00,$30,$18,$0c,$00,$00,$00,$00,$00,$00,$3c,$06,$3e,$66,$3e,$00,$00,$60,$60,$7c,$66,$66,$7c,$00,$00,$00,$3c,$60,$60,$60,$3c,$00,$00,$06,$06,$3e,$66,$66,$3e,$00,$00,$00,$3c,$66,$7e,$60,$3c,$00,$00,$0e,$18,$3e,$18,$18,$18,$00,$00,$00,$3e,$66,$66,$3e,$06,$7c,$00,$60,$60,$7c,$66,$66,$66,$00,$00,$18,$00,$38,$18,$18,$3c,$00,$00,$06,$00,$06,$06,$06,$06,$3c,$00,$60,$60,$6c,$78,$6c,$66,$00,$00,$38,$18,$18,$18,$18,$3c,$00,$00,$00,$66,$7f,$7f,$6b,$63,$00,$00,$00,$7c,$66,$66,$66,$66,$00,$00,$00,$3c,$66,$66,$66,$3c,$00,$00,$00,$7c,$66,$66,$7c,$60,$60,$00,$00,$3e,$66,$66,$3e,$06,$06,$00,$00,$7c,$66,$60,$60,$60,$00,$00,$00,$3e,$60,$3c,$06,$7c,$00,$00,$18,$7e,$18,$18,$18,$0e,$00,$00,$00,$66,$66,$66,$66,$3e,$00,$00,$00,$66,$66,$66,$3c,$18,$00,$00,$00,$63,$6b,$7f,$3e,$36,$00,$00,$00,$66,$3c,$18,$3c,$66,$00,$00,$00,$66,$66,$66,$3e,$0c,$78,$00,$00,$7e,$0c,$18,$30,$7e,$00,$0e,$18,$18,$70,$18,$18,$0e,$00,$18,$18,$18,$18,$18,$18,$18,$18,$70,$18,$18,$0e,$18,$18,$70,$00,$00,$3b,$6e,$00,$00,$00,$00,$00,$aa,$55,$aa,$55,$aa,$55,$aa,$55
+.endif
+
+.if UsarPRINT & FonteC64
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$00,$00,$18,$00,$66,$66,$66,$00,$00,$00,$00,$00,$66,$66,$ff,$66,$ff,$66,$66,$00,$18,$3e,$60,$3c,$06,$7c,$18,$00,$62,$66,$0c,$18,$30,$66,$46,$00,$3c,$66,$3c,$38,$67,$66,$3f,$00,$06,$0c,$18,$00,$00,$00,$00,$00,$0c,$18,$30,$30,$30,$18,$0c,$00,$30,$18,$0c,$0c,$0c,$18,$30,$00,$00,$66,$3c,$ff,$3c,$66,$00,$00,$00,$18,$18,$7e,$18,$18,$00,$00,$00,$00,$00,$00,$00,$18,$18,$30,$00,$00,$00,$7e,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$00,$00,$03,$06,$0c,$18,$30,$60,$00,$3c,$66,$6e,$76,$66,$66,$3c,$00,$18,$18,$38,$18,$18,$18,$7e,$00,$3c,$66,$06,$0c,$30,$60,$7e,$00,$3c,$66,$06,$1c,$06,$66,$3c,$00,$06,$0e,$1e,$66,$7f,$06,$06,$00,$7e,$60,$7c,$06,$06,$66,$3c,$00,$3c,$66,$60,$7c,$66,$66,$3c,$00,$7e,$66,$0c,$18,$18,$18,$18,$00,$3c,$66,$66,$3c,$66,$66,$3c,$00,$3c,$66,$66,$3e,$06,$66,$3c,$00,$00,$00,$18,$00,$00,$18,$00,$00,$00,$00,$18,$00,$00,$18,$18,$30,$0e,$18,$30,$60,$30,$18,$0e,$00,$00,$00,$7e,$00,$7e,$00,$00,$00,$70,$18,$0c,$06,$0c,$18,$70,$00,$3c,$66,$06,$0c,$18,$00,$18,$00,$3c,$66,$6e,$6e,$60,$62,$3c,$00,$18,$3c,$66,$7e,$66,$66,$66,$00,$7c,$66,$66,$7c,$66,$66,$7c,$00,$3c,$66,$60,$60,$60,$66,$3c,$00,$78,$6c,$66,$66,$66,$6c,$78,$00,$7e,$60,$60,$78,$60,$60,$7e,$00,$7e,$60,$60,$78,$60,$60,$60,$00,$3e,$63,$60,$6e,$66,$66,$3e,$00,$66,$66,$66,$7e,$66,$66,$66,$00,$3c,$18,$18,$18,$18,$18,$3c,$00,$1e,$0c,$0c,$0c,$0c,$6c,$38,$00,$66,$6c,$78,$70,$78,$6c,$66,$00,$60,$60,$60,$60,$60,$60,$7e,$00,$63,$77,$7f,$6b,$63,$63,$63,$00,$66,$76,$7e,$7e,$6e,$66,$66,$00,$3c,$66,$66,$66,$66,$66,$3c,$00,$7c,$66,$66,$7c,$60,$60,$60,$00,$3c,$66,$66,$66,$66,$3c,$0e,$00,$7c,$66,$66,$7c,$78,$6c,$66,$00,$3c,$66,$60,$3c,$06,$66,$3c,$00,$7e,$18,$18,$18,$18,$18,$18,$00,$66,$66,$66,$66,$66,$66,$7e,$00,$66,$66,$66,$66,$66,$3c,$18,$00,$63,$63,$63,$6b,$7f,$77,$63,$00,$66,$66,$3c,$18,$3c,$66,$66,$00,$66,$66,$66,$3c,$18,$18,$18,$00,$7e,$06,$0c,$18,$30,$60,$7e,$00,$3c,$30,$30,$30,$30,$30,$3c,$00,$00,$60,$30,$18,$0c,$06,$03,$00,$3c,$0c,$0c,$0c,$0c,$0c,$3c,$00,$00,$18,$3c,$66,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff
+.endif
+.if UsarPRINT & FonteC64 & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $60,$30,$18,$00,$00,$00,$00,$00,$00,$00,$3c,$06,$3e,$66,$3e,$00,$00,$60,$60,$7c,$66,$66,$7c,$00,$00,$00,$3c,$60,$60,$60,$3c,$00,$00,$06,$06,$3e,$66,$66,$3e,$00,$00,$00,$3c,$66,$7e,$60,$3c,$00,$00,$0e,$18,$3e,$18,$18,$18,$00,$00,$00,$3e,$66,$66,$3e,$06,$7c,$00,$60,$60,$7c,$66,$66,$66,$00,$00,$18,$00,$38,$18,$18,$3c,$00,$00,$0c,$00,$0c,$0c,$0c,$0c,$38,$00,$60,$60,$6c,$78,$6c,$66,$00,$00,$38,$18,$18,$18,$18,$3c,$00,$00,$00,$66,$7f,$7f,$6b,$63,$00,$00,$00,$7c,$66,$66,$66,$66,$00,$00,$00,$3c,$66,$66,$66,$3c,$00,$00,$00,$7c,$66,$66,$7c,$60,$60,$00,$00,$3e,$66,$66,$3e,$06,$06,$00,$00,$7c,$66,$60,$60,$60,$00,$00,$00,$3e,$60,$3c,$06,$7c,$00,$00,$18,$7e,$18,$18,$18,$0e,$00,$00,$00,$66,$66,$66,$66,$3e,$00,$00,$00,$66,$66,$66,$3c,$18,$00,$00,$00,$63,$6b,$7f,$3e,$36,$00,$00,$00,$66,$3c,$18,$3c,$66,$00,$00,$00,$66,$66,$66,$3e,$0c,$78,$00,$00,$7e,$0c,$18,$30,$7e,$00,$0e,$18,$18,$70,$18,$18,$0e,$00,$18,$18,$18,$18,$18,$18,$18,$18,$70,$18,$18,$0e,$18,$18,$70,$00,$32,$7e,$4c,$00,$00,$00,$00,$00,$aa,$55,$aa,$55,$aa,$55,$aa,$55
+.endif
+ 
+.if UsarPRINT & FonteCGA
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$18,$3c,$3c,$18,$18,$00,$18,$00,$66,$66,$24,$00,$00,$00,$00,$00,$6c,$6c,$fe,$6c,$fe,$6c,$6c,$00,$18,$3e,$60,$3c,$06,$7c,$18,$00,$00,$c6,$cc,$18,$30,$66,$c6,$00,$38,$6c,$38,$76,$dc,$cc,$76,$00,$18,$18,$30,$00,$00,$00,$00,$00,$0c,$18,$30,$30,$30,$18,$0c,$00,$30,$18,$0c,$0c,$0c,$18,$30,$00,$00,$66,$3c,$ff,$3c,$66,$00,$00,$00,$18,$18,$7e,$18,$18,$00,$00,$00,$00,$00,$00,$00,$18,$18,$30,$00,$00,$00,$7e,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$00,$06,$0c,$18,$30,$60,$c0,$80,$00,$38,$6c,$c6,$d6,$c6,$6c,$38,$00,$18,$38,$18,$18,$18,$18,$7e,$00,$7c,$c6,$06,$1c,$30,$66,$fe,$00,$7c,$c6,$06,$3c,$06,$c6,$7c,$00,$1c,$3c,$6c,$cc,$fe,$0c,$1e,$00,$fe,$c0,$c0,$fc,$06,$c6,$7c,$00,$38,$60,$c0,$fc,$c6,$c6,$7c,$00,$fe,$c6,$0c,$18,$30,$30,$30,$00,$7c,$c6,$c6,$7c,$c6,$c6,$7c,$00,$7c,$c6,$c6,$7e,$06,$0c,$78,$00,$00,$18,$18,$00,$00,$18,$18,$00,$00,$18,$18,$00,$00,$18,$18,$30,$06,$0c,$18,$30,$18,$0c,$06,$00,$00,$00,$7e,$00,$00,$7e,$00,$00,$60,$30,$18,$0c,$18,$30,$60,$00,$7c,$c6,$0c,$18,$18,$00,$18,$00,$7c,$c6,$de,$de,$de,$c0,$78,$00,$38,$6c,$c6,$fe,$c6,$c6,$c6,$00,$fc,$66,$66,$7c,$66,$66,$fc,$00,$3c,$66,$c0,$c0,$c0,$66,$3c,$00,$f8,$6c,$66,$66,$66,$6c,$f8,$00,$fe,$62,$68,$78,$68,$62,$fe,$00,$fe,$62,$68,$78,$68,$60,$f0,$00,$3c,$66,$c0,$c0,$ce,$66,$3a,$00,$c6,$c6,$c6,$fe,$c6,$c6,$c6,$00,$3c,$18,$18,$18,$18,$18,$3c,$00,$1e,$0c,$0c,$0c,$cc,$cc,$78,$00,$e6,$66,$6c,$78,$6c,$66,$e6,$00,$f0,$60,$60,$60,$62,$66,$fe,$00,$c6,$ee,$fe,$fe,$d6,$c6,$c6,$00,$c6,$e6,$f6,$de,$ce,$c6,$c6,$00,$7c,$c6,$c6,$c6,$c6,$c6,$7c,$00,$fc,$66,$66,$7c,$60,$60,$f0,$00,$7c,$c6,$c6,$c6,$c6,$ce,$7c,$0e,$fc,$66,$66,$7c,$6c,$66,$e6,$00,$3c,$66,$30,$18,$0c,$66,$3c,$00,$7e,$7e,$5a,$18,$18,$18,$3c,$00,$c6,$c6,$c6,$c6,$c6,$c6,$7c,$00,$c6,$c6,$c6,$c6,$c6,$6c,$38,$00,$c6,$c6,$c6,$d6,$d6,$fe,$6c,$00,$c6,$c6,$6c,$38,$6c,$c6,$c6,$00,$66,$66,$66,$3c,$18,$18,$3c,$00,$fe,$c6,$8c,$18,$32,$66,$fe,$00,$3c,$30,$30,$30,$30,$30,$3c,$00,$c0,$60,$30,$18,$0c,$06,$02,$00,$3c,$0c,$0c,$0c,$0c,$0c,$3c,$00,$10,$38,$6c,$c6,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff
+.endif
+.if UsarPRINT & FonteCGA & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $30,$18,$0c,$00,$00,$00,$00,$00,$00,$00,$78,$0c,$7c,$cc,$76,$00,$e0,$60,$7c,$66,$66,$66,$dc,$00,$00,$00,$7c,$c6,$c0,$c6,$7c,$00,$1c,$0c,$7c,$cc,$cc,$cc,$76,$00,$00,$00,$7c,$c6,$fe,$c0,$7c,$00,$3c,$66,$60,$f8,$60,$60,$f0,$00,$00,$00,$76,$cc,$cc,$7c,$0c,$f8,$e0,$60,$6c,$76,$66,$66,$e6,$00,$18,$00,$38,$18,$18,$18,$3c,$00,$06,$00,$06,$06,$06,$66,$66,$3c,$e0,$60,$66,$6c,$78,$6c,$e6,$00,$38,$18,$18,$18,$18,$18,$3c,$00,$00,$00,$ec,$fe,$d6,$d6,$d6,$00,$00,$00,$dc,$66,$66,$66,$66,$00,$00,$00,$7c,$c6,$c6,$c6,$7c,$00,$00,$00,$dc,$66,$66,$7c,$60,$f0,$00,$00,$76,$cc,$cc,$7c,$0c,$1e,$00,$00,$dc,$76,$60,$60,$f0,$00,$00,$00,$7e,$c0,$7c,$06,$fc,$00,$30,$30,$fc,$30,$30,$36,$1c,$00,$00,$00,$cc,$cc,$cc,$cc,$76,$00,$00,$00,$c6,$c6,$c6,$6c,$38,$00,$00,$00,$c6,$d6,$d6,$fe,$6c,$00,$00,$00,$c6,$6c,$38,$6c,$c6,$00,$00,$00,$c6,$c6,$c6,$7e,$06,$fc,$00,$00,$7e,$4c,$18,$32,$7e,$00,$0e,$18,$18,$70,$18,$18,$0e,$00,$18,$18,$18,$18,$18,$18,$18,$00,$70,$18,$18,$0e,$18,$18,$70,$00,$76,$dc,$00,$00,$00,$00,$00,$00,$10,$38,$6c,$c6,$c6,$c6,$fe,$00
+.endif
+ 
+.if UsarPRINT & FonteCourier
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$08,$08,$08,$08,$08,$00,$08,$00,$14,$14,$14,$00,$00,$00,$00,$00,$14,$14,$3e,$14,$14,$3e,$14,$14,$08,$1c,$20,$1c,$02,$3c,$08,$08,$18,$24,$18,$3e,$0c,$12,$0c,$00,$00,$0c,$10,$10,$1a,$24,$1f,$00,$08,$08,$08,$00,$00,$00,$00,$00,$08,$08,$10,$10,$10,$08,$08,$00,$10,$10,$08,$08,$08,$10,$10,$00,$08,$3e,$08,$14,$00,$00,$00,$00,$00,$08,$08,$3e,$08,$08,$00,$00,$00,$00,$00,$00,$00,$00,$08,$10,$00,$00,$00,$3e,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$08,$00,$02,$04,$04,$08,$10,$10,$20,$00,$1c,$22,$22,$22,$22,$22,$1c,$00,$18,$28,$08,$08,$08,$08,$3e,$00,$1c,$22,$02,$04,$08,$10,$3e,$00,$1c,$22,$02,$0c,$02,$22,$1c,$00,$04,$0c,$14,$24,$3e,$04,$0e,$00,$3e,$20,$20,$3c,$02,$22,$1c,$00,$0c,$10,$20,$3c,$22,$22,$1c,$00,$3e,$22,$02,$04,$04,$08,$08,$00,$1c,$22,$22,$1c,$22,$22,$1c,$00,$1c,$22,$22,$1e,$02,$04,$18,$00,$00,$00,$08,$00,$00,$08,$00,$00,$00,$00,$08,$00,$00,$08,$18,$00,$00,$02,$0c,$30,$0c,$02,$00,$00,$00,$00,$3e,$00,$3e,$00,$00,$00,$00,$20,$18,$06,$18,$20,$00,$00,$1c,$22,$02,$04,$08,$00,$08,$00,$0c,$12,$26,$2a,$2a,$26,$10,$0c,$38,$08,$14,$14,$3e,$22,$77,$00,$7c,$22,$22,$3c,$22,$22,$7c,$00,$1e,$22,$40,$40,$40,$22,$1c,$00,$78,$24,$22,$22,$22,$24,$78,$00,$7e,$22,$28,$38,$28,$22,$7e,$00,$7e,$22,$28,$38,$28,$20,$70,$00,$1e,$22,$40,$40,$4f,$22,$1c,$00,$77,$22,$22,$3e,$22,$22,$77,$00,$3e,$08,$08,$08,$08,$08,$3e,$00,$07,$02,$02,$02,$22,$22,$1c,$00,$77,$22,$24,$38,$24,$22,$77,$00,$70,$20,$20,$20,$22,$22,$7e,$00,$63,$22,$36,$2a,$2a,$22,$77,$00,$67,$32,$32,$2a,$26,$26,$72,$00,$1c,$22,$41,$41,$41,$22,$1c,$00,$7c,$22,$22,$3c,$20,$20,$70,$00,$1c,$22,$41,$41,$22,$1c,$0d,$12,$7c,$22,$22,$22,$3c,$22,$71,$00,$1e,$22,$20,$1c,$02,$22,$3c,$00,$7f,$49,$08,$08,$08,$08,$1c,$00,$77,$22,$22,$22,$22,$22,$1c,$00,$77,$22,$22,$22,$14,$14,$08,$00,$77,$22,$2a,$2a,$1c,$14,$14,$00,$77,$22,$14,$08,$14,$22,$77,$00,$77,$22,$14,$08,$08,$08,$1c,$00,$3e,$22,$04,$08,$10,$22,$3e,$00,$0c,$08,$08,$08,$08,$08,$0c,$00,$20,$10,$10,$08,$04,$04,$02,$00,$18,$08,$08,$08,$08,$08,$18,$00,$00,$08,$14,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff
+.endif
+.if UsarPRINT & FonteCourier & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $18,$0c,$00,$00,$00,$00,$00,$00,$00,$00,$1c,$02,$1e,$22,$1f,$00,$60,$20,$2c,$32,$22,$22,$7c,$00,$00,$00,$1e,$22,$20,$20,$1e,$00,$06,$02,$1a,$26,$22,$22,$1f,$00,$00,$00,$1c,$22,$3e,$20,$1e,$00,$0e,$10,$3c,$10,$10,$10,$3c,$00,$00,$00,$1b,$26,$22,$1e,$02,$1c,$60,$20,$2c,$32,$22,$22,$77,$00,$08,$00,$18,$08,$08,$08,$3e,$00,$08,$00,$3c,$04,$04,$04,$04,$38,$30,$10,$16,$14,$18,$14,$36,$00,$18,$08,$08,$08,$08,$08,$3e,$00,$00,$00,$74,$2a,$2a,$2a,$6b,$00,$00,$00,$6c,$32,$22,$22,$67,$00,$00,$00,$1c,$22,$22,$22,$1c,$00,$00,$00,$6c,$32,$22,$3c,$20,$70,$00,$00,$1b,$26,$22,$1e,$02,$07,$00,$00,$37,$18,$10,$10,$38,$00,$00,$00,$1e,$22,$1c,$02,$7c,$00,$10,$3c,$10,$10,$10,$12,$0c,$00,$00,$00,$66,$22,$22,$26,$1b,$00,$00,$00,$77,$22,$14,$14,$08,$00,$00,$00,$77,$22,$2a,$1c,$14,$00,$00,$00,$77,$14,$08,$14,$77,$00,$00,$00,$77,$22,$14,$14,$08,$3c,$00,$00,$3e,$24,$08,$12,$3e,$00,$04,$08,$08,$10,$08,$08,$04,$00,$08,$08,$08,$08,$08,$08,$08,$08,$10,$08,$08,$04,$08,$08,$10,$00,$00,$00,$00,$12,$2c,$00,$00,$00,$aa,$55,$aa,$55,$aa,$55,$aa,$55
+.endif
+ 
+.if UsarPRINT & FonteGothic
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$10,$10,$10,$10,$00,$00,$10,$00,$6c,$6c,$6c,$00,$00,$00,$00,$00,$28,$28,$7c,$28,$7c,$28,$28,$00,$10,$3c,$50,$38,$14,$78,$10,$00,$00,$c4,$c8,$10,$20,$4c,$8c,$00,$10,$28,$28,$20,$50,$48,$34,$00,$30,$30,$30,$00,$00,$00,$00,$00,$08,$10,$20,$20,$20,$10,$08,$00,$20,$10,$08,$08,$08,$10,$20,$00,$10,$54,$38,$7c,$38,$54,$10,$00,$00,$10,$10,$7c,$10,$10,$00,$00,$00,$00,$00,$00,$00,$10,$10,$20,$00,$00,$00,$7c,$00,$00,$00,$00,$00,$00,$00,$00,$00,$30,$30,$00,$00,$04,$08,$10,$20,$40,$80,$00,$38,$44,$4c,$54,$64,$44,$38,$00,$10,$30,$50,$10,$10,$10,$7c,$00,$38,$44,$04,$08,$30,$40,$7c,$00,$38,$44,$04,$18,$04,$44,$38,$00,$08,$18,$28,$48,$fc,$08,$08,$00,$7c,$40,$40,$78,$04,$44,$38,$00,$18,$20,$40,$78,$44,$44,$38,$00,$7c,$44,$08,$10,$10,$10,$10,$00,$38,$44,$44,$38,$44,$44,$38,$00,$38,$44,$44,$3c,$04,$08,$30,$00,$00,$00,$10,$00,$00,$10,$00,$00,$00,$00,$10,$00,$00,$10,$10,$20,$0c,$10,$20,$40,$20,$10,$0c,$00,$00,$00,$7c,$00,$7c,$00,$00,$00,$60,$10,$08,$04,$08,$10,$60,$00,$38,$44,$04,$08,$10,$00,$10,$00,$38,$44,$54,$6c,$58,$40,$3c,$00,$60,$90,$28,$44,$7c,$44,$82,$00,$b8,$44,$84,$f8,$84,$44,$b8,$00,$38,$44,$a8,$a0,$a0,$44,$38,$00,$b0,$c8,$84,$84,$84,$c8,$b0,$00,$b8,$44,$80,$f0,$80,$44,$b8,$00,$b8,$44,$40,$f0,$40,$40,$80,$00,$38,$44,$80,$bc,$c4,$7c,$04,$0c,$38,$44,$40,$78,$44,$44,$84,$00,$02,$7c,$90,$10,$12,$7c,$80,$00,$02,$04,$04,$04,$44,$88,$70,$00,$84,$48,$50,$e0,$50,$48,$84,$00,$30,$48,$40,$40,$40,$42,$bc,$00,$a8,$54,$54,$d4,$54,$54,$80,$00,$82,$64,$54,$d4,$54,$54,$88,$00,$38,$44,$a2,$a2,$a2,$44,$38,$00,$b8,$44,$44,$f8,$40,$40,$80,$00,$78,$a4,$42,$02,$0c,$32,$fc,$00,$b8,$44,$44,$f8,$48,$44,$84,$00,$02,$7c,$80,$7c,$02,$7c,$80,$00,$02,$fc,$60,$a0,$a0,$42,$3c,$00,$42,$a4,$24,$24,$24,$24,$18,$00,$4c,$b2,$22,$22,$22,$14,$08,$00,$80,$5c,$52,$52,$52,$54,$28,$00,$42,$a4,$18,$10,$30,$4a,$84,$00,$42,$a4,$24,$24,$1a,$82,$7c,$00,$7c,$04,$08,$10,$20,$40,$7c,$00,$78,$40,$40,$40,$40,$40,$78,$00,$00,$80,$40,$20,$10,$08,$04,$00,$78,$08,$08,$08,$08,$08,$78,$00,$10,$38,$54,$10,$10,$10,$10,$00,$00,$00,$00,$00,$00,$00,$00,$fe
+.endif
+.if UsarPRINT & FonteGothic & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $20,$10,$08,$00,$00,$00,$00,$00,$00,$00,$70,$08,$78,$88,$74,$00,$40,$40,$58,$64,$44,$64,$58,$00,$00,$00,$38,$44,$40,$44,$38,$00,$04,$04,$34,$4c,$44,$4c,$34,$00,$00,$00,$38,$44,$7c,$40,$38,$00,$18,$24,$20,$f8,$20,$20,$20,$00,$00,$00,$34,$4c,$4c,$34,$04,$38,$40,$40,$58,$64,$44,$44,$44,$00,$10,$00,$30,$10,$10,$10,$38,$00,$04,$00,$0c,$04,$04,$04,$44,$38,$40,$40,$44,$48,$50,$68,$44,$00,$30,$10,$10,$10,$10,$10,$38,$00,$00,$00,$f8,$54,$54,$54,$54,$00,$00,$00,$58,$64,$44,$44,$44,$00,$00,$00,$38,$44,$44,$44,$38,$00,$00,$00,$58,$64,$64,$58,$40,$40,$00,$00,$34,$4c,$4c,$34,$04,$04,$00,$00,$58,$64,$40,$40,$40,$00,$00,$00,$3c,$40,$38,$04,$78,$00,$20,$20,$f8,$20,$20,$24,$18,$00,$00,$00,$44,$44,$44,$4c,$34,$00,$00,$00,$44,$44,$44,$28,$10,$00,$00,$00,$44,$54,$54,$54,$6c,$00,$00,$00,$44,$28,$10,$28,$44,$00,$00,$00,$44,$44,$44,$3c,$04,$38,$00,$00,$7c,$08,$10,$20,$7c,$00,$1c,$20,$20,$40,$20,$20,$1c,$00,$10,$10,$10,$10,$10,$10,$10,$10,$70,$08,$08,$04,$08,$08,$70,$00,$28,$50,$00,$00,$00,$00,$00,$00,$fe,$fe,$fe,$fe,$fe,$fe,$fe,$fe
+.endif
+ 
+.if UsarPRINT & FonteMC6847
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$08,$08,$08,$08,$08,$00,$08,$00,$14,$14,$14,$00,$00,$00,$00,$00,$14,$14,$36,$00,$36,$14,$14,$00,$08,$1e,$20,$1c,$02,$3c,$08,$00,$32,$32,$04,$08,$10,$26,$26,$00,$10,$28,$28,$10,$2a,$24,$1a,$00,$18,$18,$18,$00,$00,$00,$00,$00,$08,$10,$20,$20,$20,$10,$08,$00,$08,$04,$02,$02,$02,$04,$08,$00,$00,$08,$1c,$3e,$1c,$08,$00,$00,$00,$08,$08,$3e,$08,$08,$00,$00,$00,$00,$00,$30,$30,$10,$20,$00,$00,$00,$00,$3e,$00,$00,$00,$00,$00,$00,$00,$00,$00,$30,$30,$00,$02,$02,$04,$08,$10,$20,$20,$00,$18,$24,$24,$24,$24,$24,$18,$00,$08,$18,$08,$08,$08,$08,$1c,$00,$1c,$22,$02,$1c,$20,$20,$3e,$00,$1c,$22,$02,$0c,$02,$22,$1c,$00,$04,$0c,$14,$3e,$04,$04,$04,$00,$3e,$20,$3c,$02,$02,$22,$1c,$00,$1c,$20,$20,$3c,$22,$22,$1c,$00,$3e,$02,$04,$08,$10,$20,$20,$00,$1c,$22,$22,$1c,$22,$22,$1c,$00,$1c,$22,$22,$1e,$02,$02,$1c,$00,$00,$18,$18,$00,$18,$18,$00,$00,$18,$18,$00,$18,$18,$08,$10,$00,$04,$08,$10,$20,$10,$08,$04,$00,$00,$00,$3e,$00,$3e,$00,$00,$00,$10,$08,$04,$02,$04,$08,$10,$00,$18,$24,$04,$08,$08,$00,$08,$00,$1c,$22,$02,$1a,$2a,$2a,$1c,$00,$08,$14,$22,$22,$3e,$22,$22,$00,$3c,$12,$12,$1c,$12,$12,$3c,$00,$1c,$22,$20,$20,$20,$22,$1c,$00,$3c,$12,$12,$12,$12,$12,$3c,$00,$3e,$20,$20,$3c,$20,$20,$3e,$00,$3e,$20,$20,$3c,$20,$20,$20,$00,$1e,$20,$20,$26,$22,$22,$1e,$00,$22,$22,$22,$3e,$22,$22,$22,$00,$1c,$08,$08,$08,$08,$08,$1c,$00,$02,$02,$02,$02,$22,$22,$1c,$00,$22,$24,$28,$30,$28,$24,$22,$00,$20,$20,$20,$20,$20,$20,$3e,$00,$22,$36,$2a,$2a,$22,$22,$22,$00,$22,$32,$2a,$26,$22,$22,$22,$00,$3e,$22,$22,$22,$22,$22,$3e,$00,$3c,$22,$22,$3c,$20,$20,$20,$00,$1c,$22,$22,$22,$2a,$24,$1a,$00,$3c,$22,$22,$3c,$28,$24,$22,$00,$1c,$22,$10,$08,$04,$22,$1c,$00,$3e,$08,$08,$08,$08,$08,$08,$00,$22,$22,$22,$22,$22,$22,$1c,$00,$22,$22,$22,$14,$14,$08,$08,$00,$22,$22,$22,$2a,$2a,$36,$22,$00,$22,$22,$14,$08,$14,$22,$22,$00,$22,$22,$14,$08,$08,$08,$08,$00,$3e,$02,$04,$08,$10,$20,$3e,$00,$38,$20,$20,$20,$20,$20,$38,$00,$20,$20,$10,$08,$04,$02,$02,$00,$0e,$02,$02,$02,$02,$02,$0e,$00,$08,$14,$22,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff ; _
+.endif
+.if UsarPRINT & FonteMC6847 & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $10,$08,$04,$00,$00,$00,$00,$00,$00,$00,$1c,$02,$1e,$22,$1e,$00,$20,$20,$3c,$22,$22,$22,$3c,$00,$00,$00,$1c,$20,$20,$20,$1c,$00,$02,$02,$1e,$22,$22,$22,$1e,$00,$00,$00,$1c,$22,$3e,$20,$1c,$00,$0c,$12,$10,$38,$10,$10,$10,$00,$00,$1e,$22,$22,$22,$1e,$02,$1c,$20,$20,$3c,$22,$22,$22,$22,$00,$08,$00,$18,$08,$08,$08,$1c,$00,$04,$00,$0c,$04,$04,$04,$24,$18,$20,$20,$24,$28,$38,$24,$22,$00,$18,$08,$08,$08,$08,$08,$1c,$00,$00,$00,$3c,$2a,$2a,$2a,$2a,$00,$00,$00,$2c,$32,$22,$22,$22,$00,$00,$00,$1c,$22,$22,$22,$1c,$00,$00,$3c,$22,$22,$22,$3c,$20,$20,$00,$1e,$22,$22,$22,$1e,$02,$03,$00,$00,$2c,$32,$20,$20,$20,$00,$00,$00,$1e,$20,$1c,$02,$3c,$00,$10,$3c,$10,$10,$10,$12,$0c,$00,$00,$00,$22,$22,$22,$26,$1a,$00,$00,$00,$22,$22,$14,$14,$08,$00,$00,$00,$22,$2a,$2a,$1c,$14,$00,$00,$00,$22,$14,$08,$14,$22,$00,$00,$22,$22,$22,$22,$1e,$02,$1c,$00,$00,$3e,$04,$08,$10,$3e,$00,$08,$10,$10,$20,$10,$10,$08,$00,$08,$08,$08,$00,$08,$08,$08,$00,$08,$04,$04,$02,$04,$04,$08,$00,$30,$49,$06,$00,$00,$00,$00,$00,$aa,$55,$aa,$55,$aa,$55,$aa,$55 ; DEL
+.endif
+
+.if UsarPRINT & FonteMSX
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$20,$20,$20,$20,$00,$00,$20,$00,$50,$50,$50,$00,$00,$00,$00,$00,$50,$50,$f8,$50,$f8,$50,$50,$00,$20,$78,$a0,$70,$28,$f0,$20,$00,$c0,$c8,$10,$20,$40,$98,$18,$00,$40,$a0,$40,$a8,$90,$98,$60,$00,$10,$20,$40,$00,$00,$00,$00,$00,$10,$20,$40,$40,$40,$20,$10,$00,$40,$20,$10,$10,$10,$20,$40,$00,$20,$a8,$70,$20,$70,$a8,$20,$00,$00,$20,$20,$f8,$20,$20,$00,$00,$00,$00,$00,$00,$00,$20,$20,$40,$00,$00,$00,$78,$00,$00,$00,$00,$00,$00,$00,$00,$00,$60,$60,$00,$00,$00,$08,$10,$20,$40,$80,$00,$70,$88,$98,$a8,$c8,$88,$70,$00,$20,$60,$a0,$20,$20,$20,$f8,$00,$70,$88,$08,$10,$60,$80,$f8,$00,$70,$88,$08,$30,$08,$88,$70,$00,$10,$30,$50,$90,$f8,$10,$10,$00,$f8,$80,$e0,$10,$08,$10,$e0,$00,$30,$40,$80,$f0,$88,$88,$70,$00,$f8,$88,$10,$20,$20,$20,$20,$00,$70,$88,$88,$70,$88,$88,$70,$00,$70,$88,$88,$78,$08,$10,$60,$00,$00,$00,$20,$00,$00,$20,$00,$00,$00,$00,$20,$00,$00,$20,$20,$40,$18,$30,$60,$c0,$60,$30,$18,$00,$00,$00,$f8,$00,$f8,$00,$00,$00,$c0,$60,$30,$18,$30,$60,$c0,$00,$70,$88,$08,$10,$20,$00,$20,$00,$70,$88,$08,$68,$a8,$a8,$70,$00,$20,$50,$88,$88,$f8,$88,$88,$00,$f0,$48,$48,$70,$48,$48,$f0,$00,$30,$48,$80,$80,$80,$48,$30,$00,$e0,$50,$48,$48,$48,$50,$e0,$00,$f8,$80,$80,$f0,$80,$80,$f8,$00,$f8,$80,$80,$f0,$80,$80,$80,$00,$70,$88,$80,$b8,$88,$88,$70,$00,$88,$88,$88,$f8,$88,$88,$88,$00,$70,$20,$20,$20,$20,$20,$70,$00,$38,$10,$10,$10,$90,$90,$60,$00,$88,$90,$a0,$c0,$a0,$90,$88,$00,$80,$80,$80,$80,$80,$80,$f8,$00,$88,$d8,$a8,$a8,$88,$88,$88,$00,$88,$c8,$c8,$a8,$98,$98,$88,$00,$70,$88,$88,$88,$88,$88,$70,$00,$f0,$88,$88,$f0,$80,$80,$80,$00,$70,$88,$88,$88,$a8,$90,$68,$00,$f0,$88,$88,$f0,$a0,$90,$88,$00,$70,$88,$80,$70,$08,$88,$70,$00,$f8,$20,$20,$20,$20,$20,$20,$00,$88,$88,$88,$88,$88,$88,$70,$00,$88,$88,$88,$88,$50,$50,$20,$00,$88,$88,$88,$a8,$a8,$d8,$88,$00,$88,$88,$50,$20,$50,$88,$88,$00,$88,$88,$88,$70,$20,$20,$20,$00,$f8,$08,$10,$20,$40,$80,$f8,$00,$70,$40,$40,$40,$40,$40,$70,$00,$00,$00,$80,$40,$20,$10,$08,$00,$70,$10,$10,$10,$10,$10,$70,$00,$20,$50,$88,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$f8,$00 ; _
+.endif
+.if UsarPRINT & FonteMSX & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $40,$20,$10,$00,$00,$00,$00,$00,$00,$00,$70,$08,$78,$88,$78,$00,$80,$80,$b0,$c8,$88,$c8,$b0,$00,$00,$00,$70,$88,$80,$88,$70,$00,$08,$08,$68,$98,$88,$98,$68,$00,$00,$00,$70,$88,$f8,$80,$70,$00,$10,$28,$20,$f8,$20,$20,$20,$00,$00,$00,$68,$98,$98,$68,$08,$70,$80,$80,$f0,$88,$88,$88,$88,$00,$20,$00,$60,$20,$20,$20,$70,$00,$10,$00,$30,$10,$10,$10,$90,$60,$40,$40,$48,$50,$60,$50,$48,$00,$60,$20,$20,$20,$20,$20,$70,$00,$00,$00,$d0,$a8,$a8,$a8,$a8,$00,$00,$00,$b0,$c8,$88,$88,$88,$00,$00,$00,$70,$88,$88,$88,$70,$00,$00,$00,$b0,$c8,$c8,$b0,$80,$80,$00,$00,$68,$98,$98,$68,$08,$08,$00,$00,$b0,$c8,$80,$80,$80,$00,$00,$00,$78,$80,$f0,$08,$f0,$00,$40,$40,$f0,$40,$40,$48,$30,$00,$00,$00,$90,$90,$90,$90,$68,$00,$00,$00,$88,$88,$88,$50,$20,$00,$00,$00,$88,$a8,$a8,$a8,$50,$00,$00,$00,$88,$50,$20,$50,$88,$00,$00,$00,$88,$88,$98,$68,$08,$70,$00,$00,$f8,$10,$20,$40,$f8,$00,$18,$20,$20,$40,$20,$20,$18,$00,$20,$20,$20,$00,$20,$20,$20,$00,$c0,$20,$20,$10,$20,$20,$c0,$00,$40,$a8,$10,$00,$00,$00,$00,$00,$aa,$55,$aa,$55,$aa,$55,$aa,$55 ; DEL
+.endif
+ 
+.if UsarPRINT & FonteNintendo
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$18,$18,$18,$00,$18,$00,$6c,$6c,$24,$48,$00,$00,$00,$00,$6c,$fe,$6c,$6c,$fe,$6c,$00,$00,$18,$3e,$60,$3c,$06,$7c,$18,$00,$62,$66,$0c,$18,$30,$66,$46,$00,$38,$6c,$38,$70,$de,$cc,$76,$00,$18,$18,$08,$10,$00,$00,$00,$00,$06,$0c,$18,$18,$18,$0c,$06,$00,$60,$30,$18,$18,$18,$30,$60,$00,$00,$66,$3c,$7e,$3c,$66,$00,$00,$00,$18,$18,$7e,$18,$18,$00,$00,$00,$00,$00,$00,$18,$18,$08,$10,$00,$00,$00,$7e,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$00,$02,$06,$0c,$18,$30,$60,$40,$00,$38,$4c,$c6,$c6,$c6,$64,$38,$00,$18,$38,$18,$18,$18,$18,$7e,$00,$7c,$c6,$0e,$3c,$78,$e0,$fe,$00,$7e,$0c,$18,$3c,$06,$c6,$7c,$00,$1c,$3c,$6c,$cc,$fe,$0c,$0c,$00,$fc,$c0,$fc,$06,$06,$c6,$7c,$00,$3c,$60,$c0,$fc,$c6,$c6,$7c,$00,$fe,$c6,$0c,$18,$30,$30,$30,$00,$78,$c4,$e4,$78,$86,$86,$7c,$00,$7c,$c6,$c6,$7e,$06,$0c,$78,$00,$00,$18,$18,$00,$18,$18,$00,$00,$00,$18,$18,$00,$18,$18,$08,$10,$06,$0c,$18,$30,$18,$0c,$06,$00,$00,$00,$7e,$00,$7e,$00,$00,$00,$60,$30,$18,$0c,$18,$30,$60,$00,$7c,$c6,$06,$1c,$30,$00,$30,$00,$3c,$66,$ce,$d6,$ce,$60,$3c,$00,$38,$6c,$c6,$c6,$fe,$c6,$c6,$00,$fc,$c6,$c6,$fc,$c6,$c6,$fc,$00,$3c,$66,$c0,$c0,$c0,$66,$3c,$00,$f8,$cc,$c6,$c6,$c6,$cc,$f8,$00,$fe,$c0,$c0,$fc,$c0,$c0,$fe,$00,$fe,$c0,$c0,$fc,$c0,$c0,$c0,$00,$3e,$60,$c0,$ce,$c6,$66,$3e,$00,$c6,$c6,$c6,$fe,$c6,$c6,$c6,$00,$3c,$18,$18,$18,$18,$18,$3c,$00,$1e,$06,$06,$06,$06,$c6,$7c,$00,$c6,$cc,$d8,$f0,$d8,$cc,$c6,$00,$60,$60,$60,$60,$60,$60,$7e,$00,$c6,$ee,$fe,$fe,$d6,$c6,$c6,$00,$c6,$e6,$f6,$fe,$de,$ce,$c6,$00,$7c,$c6,$c6,$c6,$c6,$c6,$7c,$00,$fc,$c6,$c6,$fc,$c0,$c0,$c0,$00,$7c,$c6,$c6,$c6,$de,$cc,$7a,$00,$fc,$c6,$c6,$fc,$d8,$cc,$c6,$00,$78,$cc,$c0,$7c,$06,$c6,$7c,$00,$7e,$18,$18,$18,$18,$18,$18,$00,$c6,$c6,$c6,$c6,$c6,$c6,$7c,$00,$c6,$c6,$c6,$ee,$7c,$38,$10,$00,$c6,$c6,$d6,$fe,$fe,$ee,$c6,$00,$c6,$ee,$7c,$38,$7c,$ee,$c6,$00,$66,$66,$66,$3c,$18,$18,$18,$00,$fe,$0e,$1c,$38,$70,$e0,$fe,$00,$1e,$18,$18,$18,$18,$18,$1e,$00,$40,$60,$30,$18,$0c,$06,$02,$00,$78,$18,$18,$18,$18,$18,$78,$00,$10,$38,$6c,$c6,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff
+.endif
+.if UsarPRINT & FonteNintendo & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $30,$18,$0c,$00,$00,$00,$00,$00,$00,$00,$3c,$06,$3e,$66,$3e,$00,$60,$60,$7c,$66,$66,$66,$7c,$00,$00,$00,$3c,$60,$60,$60,$3c,$00,$06,$06,$3e,$66,$66,$66,$3e,$00,$00,$00,$3c,$66,$7e,$60,$3c,$00,$1e,$30,$7c,$30,$30,$30,$30,$00,$00,$00,$3e,$66,$66,$3e,$06,$7c,$60,$60,$7c,$66,$66,$66,$66,$00,$18,$00,$38,$18,$18,$18,$3c,$00,$18,$00,$18,$18,$18,$18,$18,$70,$60,$60,$66,$6c,$78,$6c,$66,$00,$38,$18,$18,$18,$18,$18,$3c,$00,$00,$00,$ec,$fe,$d6,$c6,$c6,$00,$00,$00,$7c,$66,$66,$66,$66,$00,$00,$00,$3c,$66,$66,$66,$3c,$00,$00,$00,$7c,$66,$66,$66,$7c,$60,$00,$00,$3e,$66,$66,$66,$3e,$06,$00,$00,$7c,$66,$60,$60,$60,$00,$00,$00,$3e,$60,$3c,$06,$7c,$00,$00,$18,$7e,$18,$18,$18,$0e,$00,$00,$00,$66,$66,$66,$66,$3e,$00,$00,$00,$66,$66,$66,$3c,$18,$00,$00,$00,$c6,$c6,$d6,$7c,$6c,$00,$00,$00,$66,$3c,$18,$3c,$66,$00,$00,$00,$66,$66,$66,$3e,$06,$7c,$00,$00,$7e,$0c,$18,$30,$7e,$00,$0e,$18,$18,$30,$18,$18,$0e,$00,$18,$18,$18,$18,$18,$18,$18,$00,$70,$18,$18,$0c,$18,$18,$70,$00,$00,$00,$60,$f2,$9e,$0c,$00,$00,$aa,$55,$aa,$55,$aa,$55,$aa,$55
+.endif
+ 
+.if UsarPRINT & FonteRoman
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$10,$10,$10,$10,$00,$00,$10,$00,$24,$24,$24,$00,$00,$00,$00,$00,$28,$28,$7c,$28,$7c,$28,$28,$00,$10,$3c,$50,$38,$14,$78,$10,$00,$00,$c4,$c8,$10,$20,$4c,$8c,$00,$10,$28,$28,$20,$54,$48,$34,$00,$10,$10,$20,$00,$00,$00,$00,$00,$08,$10,$20,$20,$20,$10,$08,$00,$20,$10,$08,$08,$08,$10,$20,$00,$10,$54,$38,$7c,$38,$54,$10,$00,$00,$10,$10,$7c,$10,$10,$00,$00,$00,$00,$00,$00,$00,$10,$10,$20,$00,$00,$00,$7c,$00,$00,$00,$00,$00,$00,$00,$00,$00,$30,$30,$00,$00,$04,$08,$10,$20,$40,$80,$00,$38,$44,$4c,$54,$64,$44,$38,$00,$30,$10,$10,$10,$10,$10,$7c,$00,$38,$44,$04,$18,$20,$44,$7c,$00,$38,$44,$04,$18,$04,$44,$38,$00,$08,$18,$28,$48,$fc,$08,$1c,$00,$7c,$44,$40,$78,$04,$44,$38,$00,$38,$44,$40,$78,$44,$44,$38,$00,$7c,$44,$08,$10,$10,$10,$10,$00,$38,$44,$44,$38,$44,$44,$38,$00,$38,$44,$44,$3c,$04,$44,$38,$00,$00,$00,$10,$00,$00,$10,$00,$00,$00,$00,$10,$00,$00,$10,$10,$20,$0c,$10,$20,$40,$20,$10,$0c,$00,$00,$00,$7c,$00,$7c,$00,$00,$00,$60,$10,$08,$04,$08,$10,$60,$00,$38,$44,$04,$08,$10,$00,$10,$00,$78,$84,$b4,$cc,$b8,$80,$7c,$00,$10,$28,$44,$7c,$44,$44,$ee,$00,$f8,$44,$44,$78,$44,$44,$f8,$00,$38,$44,$40,$40,$40,$44,$38,$00,$f8,$44,$44,$44,$44,$44,$f8,$00,$fc,$44,$50,$70,$50,$44,$fc,$00,$fc,$44,$48,$78,$48,$40,$e0,$00,$38,$44,$40,$4e,$44,$44,$38,$00,$ee,$44,$44,$7c,$44,$44,$ee,$00,$7c,$54,$10,$10,$10,$54,$7c,$00,$1c,$08,$08,$08,$88,$88,$70,$00,$c6,$48,$50,$60,$50,$48,$e6,$00,$e0,$40,$40,$40,$40,$44,$fc,$00,$c6,$6c,$54,$54,$44,$44,$ee,$00,$c4,$64,$54,$4c,$44,$44,$ee,$00,$38,$44,$44,$44,$44,$44,$38,$00,$f8,$44,$44,$78,$40,$40,$e0,$00,$78,$84,$84,$84,$94,$88,$74,$00,$f8,$44,$44,$78,$48,$44,$ee,$00,$78,$8c,$80,$78,$04,$c4,$78,$00,$fe,$92,$10,$10,$10,$10,$38,$00,$ee,$44,$44,$44,$44,$44,$38,$00,$ee,$44,$44,$44,$44,$28,$10,$00,$c6,$44,$44,$54,$54,$6c,$44,$00,$c6,$44,$28,$10,$28,$44,$c6,$00,$ee,$44,$44,$28,$10,$10,$38,$00,$7c,$44,$08,$10,$20,$44,$7c,$00,$78,$40,$40,$40,$40,$40,$78,$00,$00,$80,$40,$20,$10,$08,$04,$00,$78,$08,$08,$08,$08,$08,$78,$00,$10,$28,$44,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$fe
+.endif
+.if UsarPRINT & FonteRoman & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $20,$10,$08,$00,$00,$00,$00,$00,$00,$00,$70,$08,$78,$88,$74,$00,$c0,$40,$58,$64,$44,$64,$d8,$00,$00,$00,$38,$44,$40,$44,$38,$00,$06,$04,$34,$4c,$44,$4c,$36,$00,$00,$00,$38,$44,$7c,$40,$3c,$00,$18,$24,$20,$78,$20,$20,$70,$00,$00,$00,$34,$4c,$4c,$34,$04,$78,$c0,$40,$58,$64,$44,$44,$ee,$00,$10,$00,$30,$10,$10,$10,$38,$00,$04,$00,$0c,$04,$04,$04,$44,$38,$c0,$40,$4c,$48,$50,$68,$c4,$00,$30,$10,$10,$10,$10,$10,$38,$00,$00,$00,$f8,$54,$54,$54,$d4,$00,$00,$00,$d8,$64,$44,$44,$c4,$00,$00,$00,$38,$44,$44,$44,$38,$00,$00,$00,$d8,$64,$64,$58,$40,$c0,$00,$00,$36,$4c,$4c,$34,$04,$06,$00,$00,$d8,$64,$40,$40,$e0,$00,$00,$00,$3c,$40,$38,$04,$78,$00,$20,$20,$f8,$20,$20,$24,$18,$00,$00,$00,$e6,$44,$44,$4c,$36,$00,$00,$00,$66,$44,$44,$28,$10,$00,$00,$00,$c6,$54,$54,$54,$6c,$00,$00,$00,$c6,$28,$10,$28,$c6,$00,$00,$00,$e6,$44,$44,$3c,$04,$78,$00,$00,$7c,$48,$10,$24,$7c,$00,$1c,$20,$20,$40,$20,$20,$1c,$00,$10,$10,$10,$10,$10,$10,$10,$10,$70,$08,$08,$04,$08,$08,$70,$00,$28,$50,$00,$00,$00,$00,$00,$00,$fe,$fe,$fe,$fe,$fe,$fe,$fe,$fe
+.endif
+
+.if UsarPRINT & FonteZXSpectrum
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$00,$10,$10,$10,$10,$00,$10,$00,$00,$24,$24,$00,$00,$00,$00,$00,$00,$24,$7e,$24,$24,$7e,$24,$00,$00,$08,$3e,$28,$3e,$0a,$3e,$08,$00,$62,$64,$08,$10,$26,$46,$00,$00,$10,$28,$10,$2a,$44,$3a,$00,$00,$08,$10,$00,$00,$00,$00,$00,$00,$04,$08,$08,$08,$08,$04,$00,$00,$20,$10,$10,$10,$10,$20,$00,$00,$00,$14,$08,$3e,$08,$14,$00,$00,$00,$08,$08,$3e,$08,$08,$00,$00,$00,$00,$00,$00,$08,$08,$10,$00,$00,$00,$00,$3e,$00,$00,$00,$00,$00,$00,$00,$00,$18,$18,$00,$00,$00,$02,$04,$08,$10,$20,$00,$00,$3c,$46,$4a,$52,$62,$3c,$00,$00,$18,$28,$08,$08,$08,$3e,$00,$00,$3c,$42,$02,$3c,$40,$7e,$00,$00,$3c,$42,$0c,$02,$42,$3c,$00,$00,$08,$18,$28,$48,$7e,$08,$00,$00,$7e,$40,$7c,$02,$42,$3c,$00,$00,$3c,$40,$7c,$42,$42,$3c,$00,$00,$7e,$02,$04,$08,$10,$10,$00,$00,$3c,$42,$3c,$42,$42,$3c,$00,$00,$3c,$42,$42,$3e,$02,$3c,$00,$00,$00,$00,$10,$00,$00,$10,$00,$00,$00,$10,$00,$00,$10,$10,$20,$00,$00,$04,$08,$10,$08,$04,$00,$00,$00,$00,$3e,$00,$3e,$00,$00,$00,$00,$10,$08,$04,$08,$10,$00,$00,$3c,$42,$04,$08,$00,$08,$00,$00,$3c,$4a,$56,$5e,$40,$3c,$00,$00,$3c,$42,$42,$7e,$42,$42,$00,$00,$7c,$42,$7c,$42,$42,$7c,$00,$00,$3c,$42,$40,$40,$42,$3c,$00,$00,$78,$44,$42,$42,$44,$78,$00,$00,$7e,$40,$7c,$40,$40,$7e,$00,$00,$7e,$40,$7c,$40,$40,$40,$00,$00,$3c,$42,$40,$4e,$42,$3c,$00,$00,$42,$42,$7e,$42,$42,$42,$00,$00,$3e,$08,$08,$08,$08,$3e,$00,$00,$02,$02,$02,$42,$42,$3c,$00,$00,$44,$48,$70,$48,$44,$42,$00,$00,$40,$40,$40,$40,$40,$7e,$00,$00,$42,$66,$5a,$42,$42,$42,$00,$00,$42,$62,$52,$4a,$46,$42,$00,$00,$3c,$42,$42,$42,$42,$3c,$00,$00,$7c,$42,$42,$7c,$40,$40,$00,$00,$3c,$42,$42,$52,$4a,$3c,$00,$00,$7c,$42,$42,$7c,$44,$42,$00,$00,$3c,$40,$3c,$02,$42,$3c,$00,$00,$fe,$10,$10,$10,$10,$10,$00,$00,$42,$42,$42,$42,$42,$3c,$00,$00,$42,$42,$42,$42,$24,$18,$00,$00,$42,$42,$42,$42,$5a,$24,$00,$00,$42,$24,$18,$18,$24,$42,$00,$00,$82,$44,$28,$10,$10,$10,$00,$00,$7e,$04,$08,$10,$20,$7e,$00,$00,$0e,$08,$08,$08,$08,$0e,$00,$00,$00,$40,$20,$10,$08,$04,$00,$00,$70,$10,$10,$10,$10,$70,$00,$00,$10,$28,$44,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff
+.endif
+.if UsarPRINT & FonteZXSpectrum & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $00,$10,$08,$00,$00,$00,$00,$00,$00,$00,$38,$04,$3c,$44,$3c,$00,$00,$20,$20,$3c,$22,$22,$3c,$00,$00,$00,$1c,$20,$20,$20,$1c,$00,$00,$04,$04,$3c,$44,$44,$3c,$00,$00,$00,$38,$44,$78,$40,$3c,$00,$00,$0c,$10,$18,$10,$10,$10,$00,$00,$00,$3c,$44,$44,$3c,$04,$38,$00,$40,$40,$78,$44,$44,$44,$00,$00,$10,$00,$30,$10,$10,$38,$00,$00,$04,$00,$04,$04,$04,$24,$18,$00,$20,$28,$30,$30,$28,$24,$00,$00,$10,$10,$10,$10,$10,$0c,$00,$00,$00,$68,$54,$54,$54,$54,$00,$00,$00,$78,$44,$44,$44,$44,$00,$00,$00,$38,$44,$44,$44,$38,$00,$00,$00,$78,$44,$44,$78,$40,$40,$00,$00,$3c,$44,$44,$3c,$04,$06,$00,$00,$1c,$20,$20,$20,$20,$00,$00,$00,$38,$40,$38,$04,$78,$00,$00,$10,$38,$10,$10,$10,$0c,$00,$00,$00,$44,$44,$44,$44,$38,$00,$00,$00,$44,$44,$28,$28,$10,$00,$00,$00,$44,$54,$54,$54,$28,$00,$00,$00,$44,$28,$10,$28,$44,$00,$00,$00,$44,$44,$44,$3c,$04,$38,$00,$00,$7c,$08,$10,$20,$7c,$00,$00,$0e,$08,$30,$08,$08,$0e,$00,$00,$08,$08,$08,$08,$08,$08,$00,$00,$70,$10,$0c,$10,$10,$70,$00,$00,$14,$28,$00,$00,$00,$00,$00,$aa,$55,$aa,$55,$aa,$55,$aa,$55 ; DEL
+.endif
+
+.if UsarPRINT & FonteColor4x8
+    ;  $20 SPACE                       $21 !                           $22 "                           $23 #                           $24 $                           $25 %                           $26 &                           $27 '                           $28 (                           $29 )                           $2a *                           $2b +                           $2c ,                           $2d -                           $2e .                           $2f /                           $30 0                           $31 1                           $32 2                           $33 3                           $34 4                           $35 5                           $36 6                           $37 7                           $38 8                           $39 9                           $3a :                           $3b ;                           $3c <                           $3d =                           $3e >                           $3f ?                           $40 @                           $41 A                           $42 B                           $43 C                           $44 D                           $45 E                           $46 F                           $47 G                           $48 H                           $49 I                           $4a J                           $4b K                           $4c L                           $4d M                           $4e N                           $4f O                           $50 P                           $51 Q                           $52 R                           $53 S                           $54 T                           $55 U                           $56 V                           $57 W                           $58 X                           $59 Y                           $5a Z                           $5b [                           $5c \                           $5d ]                           $5e ^                           $5f _
+    db $00,$00,$00,$00,$00,$00,$00,$00,$30,$30,$30,$30,$30,$00,$30,$00,$cc,$cc,$cc,$00,$00,$00,$00,$00,$00,$cc,$fc,$cc,$fc,$cc,$00,$00,$30,$fc,$c0,$30,$0c,$fc,$30,$00,$cc,$0c,$30,$30,$30,$c0,$cc,$00,$30,$cc,$cc,$30,$33,$cc,$3c,$0f,$3c,$0c,$30,$00,$00,$00,$00,$00,$0c,$30,$c0,$c0,$c0,$30,$0c,$00,$c0,$30,$0c,$0c,$0c,$30,$c0,$00,$00,$cc,$30,$fc,$30,$cc,$00,$00,$00,$30,$30,$fc,$30,$30,$00,$00,$00,$00,$00,$00,$00,$3c,$0c,$30,$00,$00,$00,$fc,$00,$00,$00,$00,$00,$00,$00,$00,$00,$30,$30,$00,$0c,$0c,$30,$30,$30,$c0,$c0,$00,$30,$cc,$fc,$cc,$cc,$cc,$30,$00,$30,$f0,$30,$30,$30,$30,$fc,$00,$30,$cc,$0c,$30,$30,$c0,$fc,$00,$30,$cc,$0c,$30,$0c,$cc,$30,$00,$0c,$cc,$cc,$fc,$0c,$0c,$0c,$00,$fc,$c0,$f0,$0c,$0c,$cc,$30,$00,$30,$cc,$c0,$f0,$cc,$cc,$30,$00,$fc,$0c,$0c,$30,$30,$c0,$c0,$00,$30,$cc,$cc,$30,$cc,$cc,$30,$00,$30,$cc,$cc,$3c,$0c,$cc,$30,$00,$00,$30,$30,$00,$00,$30,$30,$00,$00,$30,$30,$00,$00,$30,$30,$c0,$03,$0c,$30,$c0,$30,$0c,$03,$00,$00,$00,$fc,$00,$fc,$00,$00,$00,$c0,$30,$0c,$03,$0c,$30,$c0,$00,$30,$cc,$0c,$30,$30,$00,$30,$00,$30,$cc,$cc,$fc,$fc,$c0,$3c,$00,$30,$cc,$cc,$fc,$cc,$cc,$cc,$00,$f0,$cc,$cc,$f0,$cc,$cc,$f0,$00,$30,$cc,$c0,$c0,$c0,$cc,$30,$00,$f0,$cc,$cc,$cc,$cc,$cc,$f0,$00,$fc,$c0,$c0,$f0,$c0,$c0,$fc,$00,$fc,$c0,$c0,$f0,$c0,$c0,$c0,$00,$30,$cc,$c0,$fc,$cc,$cc,$30,$00,$cc,$cc,$cc,$fc,$cc,$cc,$cc,$00,$fc,$30,$30,$30,$30,$30,$fc,$00,$0c,$0c,$0c,$0c,$0c,$cc,$30,$00,$cc,$cc,$f0,$f0,$cc,$cc,$cc,$00,$c0,$c0,$c0,$c0,$c0,$c0,$fc,$00,$cc,$fc,$fc,$cc,$cc,$cc,$cc,$00,$0c,$cc,$fc,$fc,$cc,$cc,$cc,$00,$fc,$cc,$cc,$cc,$cc,$cc,$fc,$00,$f0,$cc,$cc,$f0,$c0,$c0,$c0,$00,$30,$cc,$cc,$cc,$cc,$cc,$30,$0c,$f0,$cc,$cc,$f0,$cc,$cc,$cc,$00,$30,$cc,$c0,$30,$0c,$cc,$30,$00,$fc,$30,$30,$30,$30,$30,$30,$00,$cc,$cc,$cc,$cc,$cc,$cc,$fc,$00,$cc,$cc,$cc,$cc,$cc,$30,$30,$00,$cc,$cc,$cc,$cc,$fc,$fc,$cc,$00,$cc,$cc,$fc,$30,$fc,$cc,$cc,$00,$cc,$cc,$cc,$30,$30,$30,$30,$00,$fc,$0c,$0c,$30,$c0,$c0,$fc,$00,$3c,$30,$30,$30,$30,$30,$3c,$00,$c0,$c0,$30,$30,$30,$0c,$0c,$00,$3c,$0c,$0c,$0c,$0c,$0c,$3c,$00,$00,$30,$fc,$cc,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff
+.endif
+.if UsarPRINT & FonteColor4x8 & UsarPRINT60a7F
+    ;  $60 `                           $61 a                           $62 b                           $63 c                           $64 d                           $65 e                           $66 f                           $67 g                           $68 h                           $69 i                           $6a j                           $6b k                           $6c l                           $6d m                           $6e n                           $6f o                           $70 p                           $71 q                           $72 r                           $73 s                           $74 t                           $75 u                           $76 v                           $77 w                           $78 x                           $79 y                           $7a z                           $7b {                           $7c |                           $7d }                           $7e ~                           $7f DEL
+    db $3c,$30,$0c,$00,$00,$00,$00,$00,$00,$00,$f0,$0c,$3c,$cc,$3c,$00,$c0,$c0,$f0,$cc,$cc,$cc,$f0,$00,$00,$00,$30,$cc,$c0,$cc,$30,$00,$0c,$0c,$3c,$cc,$cc,$cc,$3c,$00,$00,$00,$30,$cc,$fc,$c0,$3c,$00,$0c,$30,$30,$fc,$30,$30,$30,$00,$00,$00,$3c,$cc,$cc,$3c,$0c,$f0,$c0,$c0,$f0,$cc,$cc,$cc,$cc,$00,$30,$00,$f0,$30,$30,$30,$fc,$00,$0c,$00,$3c,$0c,$0c,$0c,$cc,$30,$c0,$c0,$cc,$cc,$f0,$cc,$cc,$00,$f0,$30,$30,$30,$30,$30,$fc,$00,$00,$00,$cc,$fc,$fc,$cc,$cc,$00,$00,$00,$f0,$cc,$cc,$cc,$cc,$00,$00,$00,$30,$cc,$cc,$cc,$30,$00,$00,$00,$f0,$cc,$cc,$f0,$c0,$c0,$00,$00,$3c,$cc,$cc,$3c,$0c,$0c,$00,$00,$f0,$cc,$c0,$c0,$c0,$00,$00,$00,$3c,$c0,$30,$0c,$f0,$00,$00,$30,$fc,$30,$30,$30,$0c,$00,$00,$00,$cc,$cc,$cc,$cc,$3c,$00,$00,$00,$cc,$cc,$cc,$30,$30,$00,$00,$00,$cc,$cc,$fc,$fc,$cc,$00,$00,$00,$cc,$cc,$30,$cc,$cc,$00,$00,$00,$cc,$cc,$cc,$3c,$0c,$f0,$00,$00,$fc,$0c,$30,$c0,$fc,$00,$0c,$30,$30,$c0,$30,$30,$0c,$00,$30,$30,$30,$00,$30,$30,$30,$00,$c0,$30,$30,$0c,$30,$30,$c0,$00,$33,$cc,$00,$00,$00,$00,$00,$00,$cc,$33,$cc,$33,$cc,$33,$cc,$33
+.endif

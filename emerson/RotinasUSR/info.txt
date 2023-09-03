@@ -1,0 +1,48 @@
+O arquivo RotinasUSR.z80 implementa rotinas úteis a serem chamadas com a função
+USR() do BASIC do MC1000, por exemplo:
+
+A = USR (X$) PRINT -- imprime a string X$ na tela gráfica.
+
+X$ = USR(0) INPUT -- retorna uma string com a tecla pressionada (=INKEY$).
+
+A = USR(E) DRAW (X$) -- desenha a figura definida em X$ a partir do endereço E da VRAM.
+
+A = USR(R) SOUND (V) -- atribui o valor V ao registrador R do AY-3-8910.
+
+Examina os comentários iniciais do arquivo RotinasUSR.z80 para saber quais são
+as rotinas e como usá-las.
+
+Para gerar rotinas apenas com o necessário para o que quiseres fazer, podes
+compilar o arquivo.
+
+No início do arquivo há um conjunto de definições com as quais podes ajustar
+o resultado da compilação às tuas necessidades:
+
+- Escolher quais rotinas incluir.
+- Informar o tamanho da memória RAM (16KB ou 48KB), uma vez que a rotina será
+  posicionada no topo da RAM.
+- Se USR PRINT for usada, escolher se serão incluídos caracteres minúsculos.
+- Se USR PRINT for usada, escolher se será reservado espaço para caracteres
+  definidos pelo usuário.
+- Se USR PRINT for usada, escolher a fonte utilizada.
+
+O arquivo foi criado para ser compilado no compilador online ASM80.com
+(sítio https://www.asm80.com/).
+
+Quando o arquivo for compilado, será gerado um arquivo RotinasUSR.z80.hex.
+
+Aqui também disponibilizo o arquivo HexParaBas.html. Abre esse arquivo num
+navegador web. Será apresentada uma página HTML com um formuário.
+
+Na primeira caixa de texto, cola o conteúdo do arquivo RotinasUSR.z80.hex e
+pressiona o botão "Converter". Será gerado um programa BASIC na segunda caixa
+de texto.
+
+Esse programa BASIC usa POKEs para colocar as rotinas na memória e configurar
+a função USR() para chamá-las.
+
+Ele pode ser executado independentemente e depois apagado com NEW. A
+configuração permanecerá para os programas seguintes.
+
+Ou, se quantidade de memória RAM não for um problema, podes combiná-lo com o
+teu próprio programa.
