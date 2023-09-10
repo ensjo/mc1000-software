@@ -1,0 +1,44 @@
+Adventure de tela única (labirinto) com comandos digitados.
+
+Requer 64KB.
+Modo de vídeo HGR.
+Efeitos sonoros.
+Utiliza RotinasUSR: https://github.com/ensjo/mc1000-software/tree/master/emerson/RotinasUSR
+
+Teclas para ações:
+<1> - Lista o que há no local.
+<2> - Lista o que tens (inventário).
+<3> - Move para cima.
+<4> - Move para baixo.
+<,> - Move para a esquerda.
+<.> - Move para a direita.
+<0> - Sai do jogo.
+
+Para digitar um comando escrito, simplesmente comece a digitar as letras.
+
+TIPOS DE COMANDOS:
+- <verbo> <substantivo>
+  Ex.: PEGUE LENCOL
+- <verbo> <substantivo1> <preposição> <substantivo2>
+  (A preposição é ignorada e pode ser suprimida.)
+  Ex.: DE LENCOL PARA GUARDA ou DE LENCOL GUARDA
+  Ex.: COLOQUE LENCOL NA CAMA ou COLOQUE LENCOL CAMA
+  Ex.: ABRA GRADES COM CHAVE ou ABRA GRADES CHAVE
+
+IMPORTANTE: Algumas ações PRECISAM do 2º substantivo.
+Digitar apenas ABRA GRADES não funcionará, mesmo que tenhas a chave.
+É preciso digitar ABRA GRADES CHAVE.
+
+VOCABULÁRIO DO JOGO:
+- Verbos: ABRA, AMARRE, AMEACE, BEBA, CAVE, COLOQUE, COMA, CORTE, DE, DISPARE,
+  ENTRE, EXAMINE, JOGUE, LIGUE, MATE, PECA, PEGUE, PUXE, QUEBRE, QUEIME,
+  RASGUE, SOLTE, TIRE, VISTA.
+- Substantivos: AGUA, ALARME, BARALHO, BEBIDA, CAES, CAMA, CARCEREIRO, CHAVE,
+  COBERTOR, COMIDA, DINHEIRO, ESPELHO, FITA, FOGO, FOSFOROS, GRADES, GRAVADOR,
+  GUARDA, JORNAL, LANTERNA, LENCOL, LUZ, OSSO, PA, PILHA, POCO, PORTA,
+  PRESIDIARIO, REVOLVER, ROUPA, SERRA, TERRA, TIRAS, TOMADA.
+
+(Dou aqui uma dica porque o comando é um tanto contraintuitivo: Para ligar
+a serra (elétrica) à tomada, é preciso digitar COLOQUE SERRA TOMADA.)
+
+Adaptado da versão para MSX: http://marmsx.msxall.com/cursos/jogos/alcatraz/index.html
