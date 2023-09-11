@@ -9,6 +9,9 @@
 ;   uma tecla é pressionada).
 ; A = USR(A) INPUT
 ;   Similar à função INKEY$: Retorna uma string com a tecla pressionada, ou "".
+; A = USR(A) INPUT WAIT
+;   Espera uma tecla ser pressionada e depois liberada. Retorna uma string com
+;   a tecla que foi pressionada.
 ; A = USR(A) INPUT STOP
 ;   Restaura o funcionamento normal do teclado do MC1000.
 
@@ -67,13 +70,13 @@
 	; SIMPLESMENTE DEFINA OS VALORES ABAIXO ANTES DE COMPILAR!
 	; NÃO É PRECISO MUDAR MAIS NADA!
 	
-    UsarINPUT    = 0 ; Incluir USR INPUT? (0=Não, 1=Sim.)
-    UsarSOUND    = 0 ; Incluir USR SOUND? (0=Não, 1=Sim.)
+    UsarINPUT    = 1 ; Incluir USR INPUT? (0=Não, 1=Sim.)
+    UsarSOUND    = 1 ; Incluir USR SOUND? (0=Não, 1=Sim.)
     UsarDRAW     = 1 ; Incluir USR DRAW/UNDRAW? (0=Não, 1=Sim.)
-    UsarPRINT    = 0 ; Incluir USR PRINT? (0=Não, 1=Sim.)
+    UsarPRINT    = 1 ; Incluir USR PRINT? (0=Não, 1=Sim.)
     UsarPRINT60a7F = 0 ; Incluir caracteres ASCII na faixa de $60 a $7f (minúsculas)?
     MaisCaracteres = 0 ; Reservar espaço para quantos caracteres depois dos já incluídos?
-    FimDaRAM = $3fff ; $3fff (16KB) ou $bfff (48KB)
+    FimDaRAM = $cfff ; $3fff (16KB) ou $bfff (48KB)
     ; Selecionar UMA (1) fonte.
     FonteAppleII = 0
     FonteAtari   = 0
@@ -94,12 +97,13 @@
     UsarConfiguraJump := UsarINPUT | UsarSOUND
     
     ; Usa o tamanho de cada parte para determinar o endereço de início (org).
-    ; Se o código for modificado pode ser preciso atualizar estes valores.
+    ; IMPORTANTE! Se o código for modificado pode ser preciso atualizar estes
+    ; valores.
     
     BytesBasico := 6
 
 .if UsarINPUT
-    BytesINPUT := 115
+    BytesINPUT := 145
 .else
     BytesINPUT := 0
 .endif
@@ -149,6 +153,7 @@
     TokenRUN     = $8A ; Token de RUN.
     TokenSTOP    = $90 ; Token de STOP.
     ;TokenON      = $92 ; Token de ON.
+    TokenWAIT    = $94 ; Token de WAIT.
     TokenPRINT   = $97 ; Token de PRINT.
     TokenSOUND   = $99 ; Token de SOUND.
     ;TokenSET     = $A1 ; Token de SET.
@@ -159,10 +164,11 @@
     REG          = $20 ; Seleciona registrador do AY-3-8910.
     WR           = $60 ; Escreve no registrador do AY-3-8910 selecionado por REG.
 ; Variáveis do sistema.
+    HEAD         = $0106 ; Seletor modo BASIC ($FF) / modo jogo.
     Key0         = $011b ; Última tecla pressionada.
     JOB          = $0120 ; Hook durante a leitura do teclado.
     FlagColisao  = $0125 ; Após SHAPOF, 0=não houve colisão; 1=houve colisão.
-    FlagINVERSE  = $0352
+    FlagINVERSE  = $0352 ; Modo de impressão: 0 = NORMAL, <> 0 = INVERSE.
     UltimoYX     = $0359 ; Coordenada do último ponto plotado na tela gráfica.
     UltimoY      = UltimoYX+0
     UltimoX      = UltimoYX+1
@@ -172,7 +178,8 @@
     ;ramtop      = $3fff
     VRAM         = $8000 ; Início da VRAM.
 ; Rotinas na ROM.
-    SKEY_        = $c37f ; Rotina "SKEY?": Lê status do teclado.
+    KEY          = $c006 ; Rotina "KEY": Espera uma tecla ser pressionada e liberada.
+    SKEY_        = $c027 ; Rotina "SKEY?": Lê status do teclado.
     DesativaVRAM = $c879 ; Destiva o banco de VRAM.
     AtivaVRAM    = $c886 ; Ativa o banco de VRAM.
     SHAPON       = $ccba ; Desenha figura na VRAM.
@@ -237,6 +244,9 @@ USRINPUT:
 ; Com a leitura fluida ativada, retorna uma string com a última tecla pressionada
 ; (=INKEY$).
 ; O valor do parâmetro é ignorado.
+;   USR (<exprNum>) INPUT WAIT
+; Espera uma tecla ser pressionada e liberada, e retorna uma string com essa
+; tecla.
     call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de INPUT.
     
     cp TokenRUN ; Token de RUN?
@@ -245,11 +255,34 @@ USRINPUT:
     scf ; Flag de carry = 1 para distinguir STOP de RUN.
     jr z,USRINPUTRUNSTOP ; Sim: Desvia.
     
+    cp TokenWAIT ; Token de WAIT?
+    jr nz,USRINPUT1 ; Não: Desvia.
+USRINPUTWAIT:
+    call ProximoCar ; Avança ponteiro do BASIC ao caracter após o token de WAIT.
+    push hl ; Preserva ponteiro do BASIC.
+    ; /----
+    ; Reproduzo aqui a parte inicial da rotina "KEY" da ROM (aguarda uma tecla
+    ; ser pressionada e depois liberada) sem a parte que produz o bip.
+KEYSemBip:
+    ld a,($012e) ; Há uma tecla pressionada?
+    or a
+    jr nz,KEYSemBip1 ; Sim: Desvia.
+    call $c347 ; Rotina "KEY?".
+    jr KEYSemBip ; Repete até uma tecla ser pressionada.
+KEYSemBip1:
+    call $c339 ; Aguarda a tecla ser liberada.
+    ; \----
+    pop hl
+    ld a,$ff
+    jr USRINPUT2
+USRINPUT1:
+    call SKEY_ ; Lê status do  teclado.
+USRINPUT2:
     ex (sp),hl ; Preserva ponteiro do BASIC, descarta endereço de retorno
         ; (checagem de tipo numérico).
-    ld a,(Key0+4)
-    or a
-    jr nz,AlgumaTecla
+    ld (Key0+4),a
+    or a ; Tecla pressionada?
+    jr nz,AlgumaTecla ; Sim: Desvia.
 NenhumaTecla:
     ld hl,TipoDado ; O valor de retorno será string.
     ld (hl),1

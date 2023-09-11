@@ -39,12 +39,12 @@ function hexParaBas(textoHex) {
 	
 	if (resultado.length) {
 		bloco = resultado[0];
-		let textoBas = `1  CLEAR 512,${bloco.enderecoIni - 1}: GOSUB 65000
+		let textoBas = `1  CLEAR 512,${bloco.enderecoIni - 1}: GOSUB 65000: CLEAR 
 64999  STOP 
 65000  REM INSTALADOR
-65010  TEXT : HOME : PRINT "INSTALANDO ROTINAS USR. AGUARDE."
+65010  POKE 836,0: TEXT : HOME : PRINT "INSTALANDO ROTINAS USR. AGUARDE.";
 65020  RESTORE 65100
-65030  READ E: IF E =  - 1 THEN  RETURN 
+65030  READ E: IF E =  - 1 THEN  PRINT "OK.": RETURN 
 65040  READ B: IF B =  - 1 THEN 65030
 65050  POKE E,B:E = E + 1: GOTO 65040
 65100  REM CONFIGURA USR()
