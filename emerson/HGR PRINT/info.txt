@@ -1,31 +1,31 @@
-Rotina em código de máquina para imprimir caracteres de 8×8 pixels numa grade de 32 colunas × 24 linhas no modo HGR.
+Rotina em cï¿½digo de mï¿½quina para imprimir caracteres de 8ï¿½8 pixels numa grade de 32 colunas ï¿½ 24 linhas no modo HGR.
 
-(Neste sentido é interessante uma rotina para TRS-80 Color Computer chamada ChaChars que imprime caracteres de 5×8 pixels numa grade de 51 colunas × 24 linhas — http://sourceforge.net/projects/cachars/. Pensar numa futura adaptação.)
+(Neste sentido ï¿½ interessante uma rotina para TRS-80 Color Computer chamada ChaChars que imprime caracteres de 5ï¿½8 pixels numa grade de 51 colunas ï¿½ 24 linhas ï¿½ http://sourceforge.net/projects/cachars/. Pensar numa futura adaptaï¿½ï¿½o.)
 
-Para "instalar" esta rotina na memória, é necessário aumentar o espaço para dados binários do usuário no final da RAM após a área de strings. Por isso o comando CLEAR 512,15535 definindo essa área com seus usuais 512 bytes, terminando no byte anterior ao início de nossa rotina em código de máquina. Depois a chamada GOSUB 65000 efetivamente injeta os bytes na memória. (O GOSUB deve vir depois do CLEAR, ou será cancelado por este.)
+Para "instalar" esta rotina na memï¿½ria, ï¿½ necessï¿½rio aumentar o espaï¿½o para dados binï¿½rios do usuï¿½rio no final da RAM apï¿½s a ï¿½rea de strings. Por isso o comando CLEAR 512,15535 definindo essa ï¿½rea com seus usuais 512 bytes, terminando no byte anterior ao inï¿½cio de nossa rotina em cï¿½digo de mï¿½quina. Depois a chamada GOSUB 65000 efetivamente injeta os bytes na memï¿½ria. (O GOSUB deve vir depois do CLEAR, ou serï¿½ cancelado por este.)
 
 ==Uso== 
-* POKE 277,y define a linha do início da string (0–23).
-* POKE 278,x define a coluna do início da string (0–31).
-* Uma chamada à função USR(expr$) imprime a expressão string na posição especificada.
+* POKE 277,y define a linha do inï¿½cio da string (0ï¿½23).
+* POKE 278,x define a coluna do inï¿½cio da string (0ï¿½31).
+* Uma chamada ï¿½ funï¿½ï¿½o USR(expr$) imprime a expressï¿½o string na posiï¿½ï¿½o especificada.
 * A rotina reconhece os comandos NORMAL e INVERSE.
 
 ==Nota== 
-Esta rotina foi feita para ser o menor possível. Várias funcionalidades usuais do comando PRINT em texto não foram implementados.
+Esta rotina foi feita para ser o menor possï¿½vel. Vï¿½rias funcionalidades usuais do comando PRINT em texto nï¿½o foram implementados.
 
-* As coordenadas NÃO são atualizadas pela rotina. Duas chamadas seguidas à função USR() imprimirão as duas strings a partir da mesma coordenada inicial.
-* A rotina NÃO controla se as coordenadas têm valores válidos, NÃO trata o caso de a string ultrapassar a margem direita da tela, nem o canto inferior direito final da tela (não há rolagem da tela). Tudo isto fica por conta do programador.
+* As coordenadas Nï¿½O sï¿½o atualizadas pela rotina. Duas chamadas seguidas ï¿½ funï¿½ï¿½o USR() imprimirï¿½o as duas strings a partir da mesma coordenada inicial.
+* A rotina Nï¿½O controla se as coordenadas tï¿½m valores vï¿½lidos, Nï¿½O trata o caso de a string ultrapassar a margem direita da tela, nem o canto inferior direito final da tela (nï¿½o hï¿½ rolagem da tela). Tudo isto fica por conta do programador.
 
-Na listagem abaixo, as linhas 10 a 80 dão um exemplo de utilização da rotina, preenchendo a tela com todos os caracteres disponíveis, em versão NORMAL e INVERSE.
+Na listagem abaixo, as linhas 10 a 80 dï¿½o um exemplo de utilizaï¿½ï¿½o da rotina, preenchendo a tela com todos os caracteres disponï¿½veis, em versï¿½o NORMAL e INVERSE.
 
-As linhas DATA 65360–65430 contêm a definição de 32 caracteres com código ASCII 96–127 (`, a, b, c...). Esses caracteres não fazem parte do conjunto usual do MC1000 e podem ser redefinidos conforme a necessidade, ou eliminados para diminuir o tamanho do programa BASIC.
+As linhas DATA 65360ï¿½65430 contï¿½m a definiï¿½ï¿½o de 32 caracteres com cï¿½digo ASCII 96ï¿½127 (`, a, b, c...). Esses caracteres nï¿½o fazem parte do conjunto usual do MC1000 e podem ser redefinidos conforme a necessidade, ou eliminados para diminuir o tamanho do programa BASIC.
 
 A tabela de caracteres foi adaptada da listagem para Apple II do simulador de voo da revista INPUT, e tem as formas dos caracteres desse micro em modo texto. Mudando-se essas linhas DATA, pode-se utilizar "fontes" diferentes.
 
-Nas tabelas abaixo, caracteres foram substituídos por caracteres do código ASCII atual. (Por exemplo, a "seta para cima" foi substituída por circunflexo.)
+Nas tabelas abaixo, caracteres foram substituï¿½dos por caracteres do cï¿½digo ASCII atual. (Por exemplo, a "seta para cima" foi substituï¿½da por circunflexo.)
 
 ==Tabela de caracteres do Video Display Generator MC6847 (MC1000 & TRS-80 Color Computer (CP-400))== 
-Caracteres minúsculos provenientes do CoCo 3.
+Caracteres minï¿½sculos provenientes do CoCo 3.
 
 65180  REM TABELA DE CARACTERES
 65190  DATA 15616
@@ -206,7 +206,7 @@ Bem parecida com a tabela do Amstrad CPC.
 65430  DATA 24,24,24,24,24,24,24,,112,24,24,14,24,24,112,,118,220,,,,,,,16,56,108,198,198,198,254,
 65535  DATA -1,-1
 
-==Vídeo-games de 8 bits (Nintendo?)== 
+==Vï¿½deo-games de 8 bits (Nintendo?)== 
 
 65180  REM TABELA DE CARACTERES
 65190  DATA 15616
@@ -355,3 +355,8 @@ Bem parecida com a tabela do Amstrad CPC.
 65420  DATA ,,204,204,48,204,204,,,,204,204,204,60,12,240,,,252,12,48,192,252,,12,48,48,192,48,48,12,
 65430  DATA 48,48,48,,48,48,48,,192,48,48,12,48,48,192,,51,204,,,,,,,204,51,204,51,204,51,204,51
 65535  DATA -1,-1
+
+
+FONTES ADICIONAIS podem ser obtidas para uso gratuito aqui:
+https://damieng.com/typography/zx-origins/
+Solicita-se apenas que se deem os devidos crÃ©ditos.

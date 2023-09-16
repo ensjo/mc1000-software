@@ -46,3 +46,7 @@ configuração permanecerá para os programas seguintes.
 
 Ou, se quantidade de memória RAM não for um problema, podes combiná-lo com o
 teu próprio programa.
+
+FONTES ADICIONAIS podem ser obtidas para uso gratuito aqui:
+https://damieng.com/typography/zx-origins/
+Solicita-se apenas que se deem os devidos créditos.
