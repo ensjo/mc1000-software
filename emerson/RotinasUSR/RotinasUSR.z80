@@ -7,11 +7,13 @@
 ; A = USR(A) INPUT RUN
 ;   Ativa a fluidez de teclado do MC1000 (interpretador BASIC não para quando
 ;   uma tecla é pressionada).
-; A = USR(A) INPUT
+; T$ = USR(A) INPUT
 ;   Similar à função INKEY$: Retorna uma string com a tecla pressionada, ou "".
-; A = USR(A) INPUT WAIT
+;   (É necessário ativar antes a fluidez do teclado.)
+; T$ = USR(A) INPUT WAIT
 ;   Espera uma tecla ser pressionada e depois liberada. Retorna uma string com
 ;   a tecla que foi pressionada.
+;   (É necessário ativar antes a fluidez do teclado.)
 ; A = USR(A) INPUT STOP
 ;   Restaura o funcionamento normal do teclado do MC1000.
 
@@ -22,9 +24,10 @@
 ; A = USR(R) SOUND(V)
 ;   Similar à instrução SOUND R,V do MSX: Atribui o valor V ao registrador R do
 ;   AY-3-8910.
+;   (É necessário que as interrupções periódicas estejam desativadas.)
 ;   ATENÇÃO: Os dois bits mais significativos do registrador 7 devem estar
 ;   adequadamente configurados para o funcionamento do teclado do MC1000. Por
-;   isso, ao atribuir algum valor para o registrador 7, convém usar a expressão:
+;   isso, ao atribuir algum valor V para o registrador 7, convém usar a expressão:
 ;   A = USR(7) SOUND(64 OR (V AND 63))
 ; A = USR(A) SOUND STOP
 ;   Restaura o funcionamento normal do som do MC1000.
