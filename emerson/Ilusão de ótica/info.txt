@@ -1,0 +1,3 @@
+Programa que cria uma ilusão de ótica. O padrão xadrez parece distorcido graças à distribuição das cruzes vermelhas e amarelas nos cantos dos quadrados. O programa também desenha as cruzes todas vermelhas para anular a ilusão.
+
+O programa usa o modo gráfico de 128x192 pixels e 4 cores, definido pela instrução OUT na linha 20. Como os comandos gráficos do BASIC do MC1000 (PLOT etc.) não funcionam nesse modo, os desenhos são feitos manipulando a VRAM com POKEs.
