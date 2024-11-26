@@ -1,0 +1,19 @@
+Jogo "Campo minado" ("Minesweeper").
+
+Move-se o cursor pela tela com as teclas <W>, <A>, <S>, <D>.
+
+Apertando-se <M> sobre uma posição fechada, coloca-se uma marca de certeza (bandeira) indicando que o jogador tem certeza de que ali há uma mina. A marca de certeza impede que a posição seja aberta por engano.
+
+Apertando-se <M> sobre uma posição fechada com marca de certeza, ela é substituída por uma marca de incerteza (ponto de interrogação), indicando que o jogador tem apenas uma suspeita de que há uma mina na posição.
+
+Apertando-se <M> sobre uma posição fechada com marca de incerteza, a posição volta a ficar desmarcada.
+
+Uma posição fechada pode ser aberta com a tecla <SPACE>.
+
+Se o jogador abrir uma posição com mina, ela explode, a posição das minas restantes é revelada e o jogo termina com derrota.
+
+Se não houver mina, é revelada a quantidade de minas vizinhas à posição.
+
+Se não houver minas vizinhas, abrem-se outras posições vizinhas.
+
+Quando todas as posições sem minas são abertas, o jogo termina com sucesso.
