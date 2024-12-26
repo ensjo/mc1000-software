@@ -1,19 +1,164 @@
 A rotina entre as linhas 1-8 a imprime uma string na tela realizando a quebra
 automática de linha (word wrap).
 
-* M$: contém a string a imprimir. Ela é destruída no processo.
-* A: aponta para o caracter de M$ que, a partir da posição atual do cursor
-  cairá na última coluna da tela.
-* B: percorre a string a partir de A procurando o ponto onde quebrar a linha.
+* T$: contém o texto a imprimir. Ela não é modificada no processo.
+* A: aponta para o primeiro caracter de T$ que ainda não foi impresso.
+* B: localiza o ponto, depois de A, onde quebrar a linha.
+* SW: ("screen width") largura da tela (constante = 32).
+* PEEK(349): retorna a coordenada X do cursor (0 ~ SW-1).
 
-Basicamente:
+Modos de uso:
+* T$ = "TEXTO A IMPRIMIR": GOSUB 1
+* T$ = "TEXTO A IMPRIMIR": GOSUB 2
 
-1. Se o caracter na posição A e/ou o seguinte forem espaço, imprime-se M$ até
-   a posição A, pula-se os espaços seguintes, reduz-se M$ aos caracteres
-   restantes e reitera.
-2. Se o caracter na posição A e o seguinte não forem espaço, é preciso realizar
-   a quebra. Volta-se na linha em busca de um espaço.
-   2.1 Se um espaço for encontrado, imprime-se M$ até essa posição, reduz-se
-       M$ aos caracteres seguintes e reitera.
-   2.2 Se um espaço não for encontrado, imprime-se M$ até a posição A, reduz-se
-       M$ aos caracteres seguintes e reitera.
+A chamada com GOSUB 2 imprime a string e o cursor permanece no final da string.
+Corresponde a PRINT T$; (com ponto-e-vírgula no fim).
+
+A chamada com GOSUB 1 imprime a string e, se o cursor não terminar no início de
+uma linha da tela, emite um PRINT.
+
+O programa em BASIC estruturado abaixo explica o funcionamento da rotina:
+
+-------------------------------------------------------------------------------
+
+CONST ScreenWidth = 32 ' Largura máxima da tela.
+
+' Função que retorna a posição X do cursor no MC1000.
+FUNCTION CursorX
+    CursorX = PEEK(349)
+END FUNCTION
+
+' Sub-rotina para word wrap
+SUB WordWrap(Text$)
+    DIM TextLength AS INTEGER
+    DIM CurrentIndex AS INTEGER
+    DIM BreakIndex AS INTEGER
+    DIM Character$ AS STRING
+
+    ' Inicializa variáveis.
+    ' String: "ERA UMA VEZ(...)FELIZES PARA SEMPRE."
+    '          ^                                  ^- TextLength
+    '          +- CurrentIndex
+    TextLength = LEN(Text$)
+    CurrentIndex = 1
+
+    DO WHILE CurrentIndex <= TextLength
+        ' Calcula a posição de quebra com base na largura da tela e na posição
+        ' do cursor.
+        BreakIndex = CurrentIndex + ScreenWidth - CursorX()
+
+        IF BreakIndex > TextLength THEN
+            ' Se o resto da string cabe na linha de tela, imprime e termina.
+            ' (1)
+            ' Tela:   [(...)               ]
+            '               ^- CursorX()      ^- ScreenWidth
+            ' String: "(...)PARA SEMPRE."
+            '               ^          ^   ^- BreakIndex (além do fim da string)
+            '               |          +- TextLength
+            '               +- CurrentIndex
+            ' (2)
+            ' Tela:   [(...)PARA SEMPRE.   ]
+            '                           ^- CursorX()
+            PRINT MID$(Text$, CurrentIndex);
+            EXIT SUB
+        END IF
+
+        IF MID$(Text$, BreakIndex, 1) = " " THEN
+            ' Se o caractere na posição de quebra é um espaço, imprime os
+            ' caracteres anteriores e descarta o espaço na quebra e
+            ' quaisquer espaços subsequentes que houver.
+            ' (1)
+            ' Tela:   [(...)           ]
+            '               ^          ^- ScreenWidth
+            '               +- CursorX()
+            ' String: "(...)QUEBRA DE     LINHAS(...)"
+            '               ^          ^            ^- TextLength
+            '               |          +- BreakIndex (incidindo em espaço)
+            '               +- CurrentIndex
+            ' (2)
+            ' Tela:   [(...)QUEBRA DE  ]
+            '         [                ]
+            '          ^- CursorX()
+            ' String: "(...)QUEBRA DE     LINHAS(...)"
+            '                          ^- CurrentIndex
+            ' (3)
+            ' String: "(...)QUEBRA DE     LINHAS(...)"
+            '                             ^- CurrentIndex
+            PRINT MID$(Text$, CurrentIndex, BreakIndex - CurrentIndex);
+            ' Avança o índice ignorando espaços subsequentes.
+            CurrentIndex = BreakIndex + 1
+            DO WHILE CurrentIndex <= TextLength AND MID$(Text$, CurrentIndex, 1) = " "
+                CurrentIndex = CurrentIndex + 1
+            LOOP
+        ELSE
+            ' Caso contrário, recua a posição de quebra em busca de um
+            ' caracter que permita quebra de linha: espaço, vírgula, ponto,
+            ' ponto-e-vírgula. (Adicionar outros, se necessário.)
+            ' (1)
+            ' Tela:   [(...)               ]
+            '               ^- CursorX()   ^- ScreenWidth
+            ' String: "(...)ELE CHEGOU,FINALMENTE(...)"
+            '               ^              ^         ^- TextLength
+            '               |              +- BreakIndex
+            '               +- CurrentIndex
+            ' (2)
+            ' String: "(...)ELE CHEGOU,FINALMENTE(...)"
+            '                          ^- BreakIndex
+            ' (3)
+            ' Tela:   [(...)ELE CHEGOU,    ]
+            '                          ^- CursorX()
+            ' String: "(...)ELE CHEGOU,FINALMENTE(...)"
+            '                          ^- CurrenIndex
+            ' (4)
+            ' Tela:   [(...)ELE CHEGOU,    ]
+            '         [                    ]
+            '          ^- CursorX()
+            BreakIndex = BreakIndex - 1
+            DO WHILE BreakIndex >= CurrentIndex
+                Character$ = MID$(Text$, BreakIndex, 1)
+                IF Character$ = " " OR Character$ = "," OR Character$ = "." OR Character$ = ";" THEN
+                    BreakIndex = BreakIndex + 1
+                    PRINT MID$(Text$, CurrentIndex, BreakIndex - CurrentIndex);
+                    CurrentIndex = BreakIndex
+                    IF CursorX() <> 0 THEN
+                    	' Completa a linha da tela com espaços.
+                    	PRINT SPC(ScreenWidth - CursorX());
+                    END IF
+                    EXIT DO
+                END IF
+                BreakIndex = BreakIndex - 1
+            LOOP
+
+            ' Se nenhum delimitador for encontrado, volta a posição de quebra
+            ' ao valor inicial, de modo a preencher o restante da linha de tela
+            ' (como um PRINT normal).
+            ' (1)
+            ' Tela:   [(...)          ]
+            '               ^         ^- ScreenWidth
+            '               +- CursorX()
+            ' String: "(...)ININTERRUPTAMENTE(...)"
+            '               ^         ^          ^- TextLength
+            '               |         +- BreakIndex
+            '               +- CurrentIndex
+            ' (2)
+            ' String: "(...)ININTERRUPTAMENTE(...)"
+            '              ^^- CurrentIndex
+            '              +- BreakIndex
+            ' (3)
+            ' String: "(...)ININTERRUPTAMENTE(...)"
+            '               ^         ^- BreakIndex
+            '               +- CurrentIndex
+            ' (4)
+            ' Tela:   [(...)ININTERRUPT]
+            '         [                ]
+            '          ^- CursorX()
+            ' String: "(...)ININTERRUPTAMENTE(...)"
+            '                         ^- CurrentIndex
+            IF BreakIndex < CurrentIndex THEN
+                BreakIndex = CurrentIndex + ScreenWidth - CursorX()
+                PRINT MID$(Text$, CurrentIndex, BreakIndex - CurrentIndex);
+                CurrentIndex = BreakIndex
+            END IF
+        END IF
+    LOOP
+END SUB
