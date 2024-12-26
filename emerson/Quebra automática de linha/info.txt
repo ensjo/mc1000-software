@@ -149,8 +149,8 @@ SUB WordWrap(Text$)
             '               ^         ^- BreakIndex
             '               +- CurrentIndex
             ' (4)
-            ' Tela:   [(...)ININTERRUPT]
-            '         [                ]
+            ' Tela:   [(...)ININTERRUP]
+            '         [               ]
             '          ^- CursorX()
             ' String: "(...)ININTERRUPTAMENTE(...)"
             '                         ^- CurrentIndex
