@@ -1,0 +1,245 @@
+; Constantes
+#define V0      $8000    ; Endereço inicial da VRAM
+#define SW      32       ; Largura da tela (Screen Width)
+#define SH      16       ; Altura da tela (Screen Height)
+#define MX      SW-1     ; Máxima coordenada X
+#define MY      SH-1     ; Máxima coordenada Y
+
+#define BANK1   $C886    ; Ativa banco de VRAM
+#define BANK0   $C879    ; Desativa banco de VRAM
+
+
+    .org $3e00
+; Entry point da inicialização
+    JP INIT
+    
+; Início do programa
+MAIN:
+    CALL BANK1        ; Ativa banco de VRAM
+    LD IX, COLUMNS    ; IX -> dados da primeira coluna
+    LD IY, V0         ; IY -> topo da primeira coluna na VRAM
+    LD B, SW          ; Para cada coluna X da tela...
+    
+X_LOOP:
+    PUSH BC
+    
+    LD A, (IX+0)      ; Se temporizador da coluna = 0...
+    OR A
+    PUSH AF
+    CALL Z, MOD_COLUNA   ; ...modifica coluna
+    POP AF
+    
+    INC A             ; Incrementa temporizador
+
+    LD E, A           ; Se o temporizador ultrapassou o delay da coluna...
+    LD A, (IX+1)
+    CP E
+    JR NC, STORE_T
+    LD E, 0           ; ...zera o temporizador
+    
+STORE_T:
+    LD (IX+0), E      ; Armazena temporizador
+    
+    LD DE, 4          ; IX -> dados da próxima coluna
+    ADD IX, DE
+
+    INC IY            ; IY -> topo da próxima coluna na VRAM
+    
+    POP BC
+    DJNZ X_LOOP       ; Itera
+    
+    JP BANK0          ; Desativa banco de VRAM e retorna ao BASIC
+
+; Subrotina para modificar coluna
+MOD_COLUNA:
+    LD L, (IX+2)      ; HL -> cabeça da gota na VRAM
+    LD H, (IX+3)
+    LD C,L            ; (Copia HL em BC)
+    LD B,H
+    
+    LD DE, V0         ; Se cabeça da gota está antes da VRAM...
+    OR A
+    SBC HL, DE
+    LD L,C
+    LD H,B
+    JR C, AVANCA_GOTA ; ...desvia para apenas avançar endereço da cabeça da gota (nada na tela)
+    
+    LD DE, V0+SH*SW   ; Se cabeça da gota está depois da VRAM...
+    OR A
+    SBC HL, DE
+    LD L,C
+    LD H,B
+    JR NC, FIM_DA_GOTA    ; ...desvia para apagar último caracter do rastro da gota
+    
+    CALL RANDOM       ; Sorteia novo caracter para cabeça da gota
+    AND 63
+    ADD A, 32
+    SET 7, A          ; Inverte caracter (fundo claro)
+    LD L,C
+    LD H,B
+    LD (HL), A        ; Coloca novo caracter na VRAM
+    
+    LD DE, V0+SW      ; Se cabeça da gota está depois da primeira linha da VRAM...
+    OR A
+    SBC HL, DE
+    LD L,C
+    LD H,B
+    JR C, AVANCA_GOTA
+    
+    LD DE, -SW        ; ...retira inversão do caracter imediatamente acima
+    ADD HL, DE
+    RES 7, (HL)
+    LD L,C
+    LD H,B
+    
+    JR AVANCA_GOTA    ; Desvia para avançar endereço da cabeça da gota
+
+FIM_DA_GOTA:
+    LD DE, V0+(SH+1)*SW   ; Se cabeça da gota está 1 linha depois da VRAM...
+    OR A
+    SBC HL, DE
+    LD L,C
+    LD H,B
+    JR NC, CONTINUA_FIM
+    
+    LD DE, -SW        ; ...retira inversão do caracter imediatamete acima (na última linha da VRAM)
+    ADD HL, DE
+    RES 7, (HL)
+    LD L,C
+    LD H,B
+    
+CONTINUA_FIM:
+    LD DE, -SH*SW     ; À distância de 1 tela acima da cabeça da gota...
+    ADD HL, DE
+    LD (HL), 32       ; ...coloca espaço, apagando último caracter do rastro da gota
+    LD L,C
+    LD H,B
+
+AVANCA_GOTA:
+    LD DE, SW         ; Avança endereço da cabeça da gota para linha seguinte
+    ADD HL, DE
+    LD (IX+2), L      ; Armazena endereço da cabeça da gota
+    LD (IX+3), H
+    
+    LD DE, V0+(SH+SH)*SW  ; Se cabeça da gota está à distância de 1 tela depois da VRAM (todo o rastro já foi apagado)...
+    OR A
+    SBC HL, DE
+    CALL NC, INIC_GOTA    ; ...reinicializa dados da gota para próxima passagem
+    
+RET_MOD:
+    RET
+
+; Subrotina para inicializar gota
+INIC_GOTA:
+    LD (IX+0), 0      ; Zera temporizador
+    
+    CALL RANDOM       ; Sorteia delay para próxima passagem (1~128)
+    AND 127
+    INC A
+    LD (IX+1), A
+    
+    ; Linha 930: V(X) = VX - INT(RND(1)*16 + 1)*SW
+    CALL RANDOM       ; Sorteia endereço da cabeça da gota (1~16 linhas antes da VRAM)
+    AND 15
+    INC A
+    LD DE, SW
+    CALL MULT_A_X_DE
+    EX DE, HL
+    PUSH IY
+    POP HL
+    OR A
+    SBC HL, DE
+    LD (IX+2), L
+    LD (IX+3), H
+    
+    RET
+
+; Inicialização
+INIT:
+    LD IX, COLUMNS    ; IX -> dados da primeira coluna
+    LD IY, V0         ; IY -> topo da primeira coluna na VRAM
+    LD B, SW          ; Para cada coluna X da tela...
+    
+INIT_LOOP:
+    PUSH BC
+    
+    CALL INIC_GOTA    ; Inicializa gota
+
+    LD DE, 4          ; IX -> dados da próxima coluna
+    ADD IX, DE
+
+    INC IY            ; IY -> topo da próxima coluna na VRAM
+    
+    POP BC
+    DJNZ INIT_LOOP    ; Itera
+    
+    RET               ; Retorna ao BASIC
+
+
+; Funções auxiliares
+RANDOM:
+    ; Gera número aleatório
+; https://wikiti.brandonw.net/index.php?title=Z80_Routines:Math:Random
+; 16-bit xorshift pseudorandom number generator by John Metcalf
+; 20 bytes, 86 cycles (excluding ret)
+
+; returns   hl = pseudorandom number
+; corrupts   a
+
+; generates 16-bit pseudorandom numbers with a period of 65535
+; using the xorshift method:
+
+; hl ^= hl << 7
+; hl ^= hl >> 9
+; hl ^= hl << 8
+
+; some alternative shift triplets which also perform well are:
+; 6, 7, 13; 7, 9, 13; 9, 7, 13.
+
+xrnd:
+  ld hl,1       ; seed must not be 0
+
+  ld a,h
+  rra
+  ld a,l
+  rra
+  xor h
+  ld h,a
+  ld a,l
+  rra
+  ld a,h
+  rra
+  xor l
+  ld l,a
+  xor h
+  ld h,a
+
+  ld (xrnd+1),hl
+  
+  ret
+
+
+MULT_A_X_DE:
+	; Multiplica HL = A*DE
+    PUSH BC
+    LD HL, 0         ; Acumulador do resultado
+    LD B, 8          ; 8 bits para multiplicar
+MULT_LOOP:
+    RRCA             ; Bit menos significativo da constante -> carry
+    JR NC,MULT_SKIP  ; Se bit não está setado, pula soma
+    ADD HL,DE        ; Se bit está setado, soma DE ao acumulador
+MULT_SKIP:
+    EX DE, HL
+    ADD HL, HL
+    EX DE,HL         ; DE <<= 1 (shift para a proxima posição de bit)
+    DJNZ MULT_LOOP
+    POP BC
+    RET
+
+; Variáveis
+COLUMNS:
+    .DS SW*4        ; Dados de cada gota/coluna da tela (4 bytes):
+                    ; * 1 byte: Temporizador (contador)
+                    ; * 1 byte: Delay (valor a ser atingido pelo temporizador)
+                    ; * 2 bytes: Endereço da cabeça da gota na memória/VRAM
+
