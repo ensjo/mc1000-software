@@ -10,6 +10,9 @@
 ;    "reinventados" e comentários em inglês:
 ;    http://altairbasic.org/
 ;    Estes rotulos serão registrados entre sinais de maior e menor <>.
+; 1.1. Listagem do interpretador do Altair BASIC 4K liberado por Bill Gates
+;    em 02/04/2025:
+;    https://www.gatesnotes.com/microsoft-original-source-code
 ; 2. Listagem de um interpretador HC-BASIC (8KB), de 1988,
 ;    aparentemente com rótulos originais, e comentários em alemão:
 ;    http://www.iee.et.tu-dresden.de/~kc-club/DOWNLOAD/DISK283/HCBASIC.MAC
@@ -10224,4 +10227,5 @@ F55C  23        INC     HL
 F55D  15        DEC     D
 F55E  20EF      JR      NZ,#F54F        ; (-17)
 F560  C32AF2    JP      #F22A
+
 
