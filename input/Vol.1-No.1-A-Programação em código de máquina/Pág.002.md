@@ -10,6 +10,4 @@ Código de máquina na linha 170:
   ld bc,#0x01e0 ; 512-32=480 bytes.
   ldir ; Copia.
   ret
-
  ```
- 
