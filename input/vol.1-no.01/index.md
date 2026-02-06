@@ -1,25 +1,23 @@
-# INPUT (BR) vol. 1, no. 1
+# INPUT (BR), vol. 1, no. 1
 
-## Código de máquina 1  
-## Programação em código da máquina
+## Código de máquina 1 <br> Programação em código da máquina
 
-### [Pág.002.bas](Pág.002.bas)
+### [pag.002.bas](pag.002.bas)
 
 Comparação entre a velocidade do BASIC e do código de máquina em preencher a memória de vídeo com caracteres aleatórios (dados quaisquer obtidos da ROM).
 
-![Captura de tela](Pág.002.png)
+![Captura de tela](pag.002.png)
 
-### [Pág.003.bas]
+### [pag.003.bas](pag.003.bas)
 
 Demonstração da velocidade do código de máquina em preencher da tela com blocos coloridos aleatórios (dados quaisquer obtidos da ROM).
 
 ![Captura de tela](Pág.003.png)
 
-## Programação de jogos 1  
-## Animação e sinais gráficos
+## Programação de jogos 1  <br> Animação e sinais gráficos
 
-### (Pág.005-1.bas)
+### [pag.005-1.bas](pag.005-1.bas)
 
 Animação em dois quadros de um satélite desenhado com caracteres de blocos.
 
-![Captura de tela](Pág.005-1.png)
+![Captura de tela](pag.005-1.png)
