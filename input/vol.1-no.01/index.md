@@ -3,13 +3,13 @@
 ## Código de máquina 1  
 ## Programação em código da máquina
 
-### [](Pág.002.bas)
+### [Pág.002.bas](Pág.002.bas)
 
 Comparação entre a velocidade do BASIC e do código de máquina em preencher a memória de vídeo com caracteres aleatórios (dados quaisquer obtidos da ROM).
 
 ![Captura de tela](Pág.002.png)
 
-### [](Pág.003.bas)
+### [Pág.003.bas]
 
 Demonstração da velocidade do código de máquina em preencher da tela com blocos coloridos aleatórios (dados quaisquer obtidos da ROM).
 
@@ -17,6 +17,8 @@ Demonstração da velocidade do código de máquina em preencher da tela com blo
 
 ## Programação de jogos 1  
 ## Animação e sinais gráficos
+
+### (Pág.005-1.bas)
 
 Animação em dois quadros de um satélite desenhado com caracteres de blocos.
 
