@@ -28,6 +28,12 @@ Animação de um inseto desenhado com caracteres ASCII atravessando a tela e mov
 
 ![Captura de tela](pag.005-2.png)
 
+### [pag.006.bas](pag.006.bas)
+
+Animação de um corredor desenhado com caracteres de bloco atravessando a tela. (Não existe programa original, apenas os desenhos do corredor e a sugestão de que o leitor fizesse o programa.)
+
+![Captura de tela](pag.006.png)
+
 ### [pag.010.bas](pag.010.bas)
 
 Animação em dois quadros de um helicóptero desenhado com caracteres de blocos. (O programa original usava caracteres gráficos.)
