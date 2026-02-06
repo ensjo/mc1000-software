@@ -51,3 +51,12 @@ Animação em dois quadros de um dançarino desenhado com caracteres de bloco.
 Animação em dois quadros de um helicóptero desenhado com caracteres de blocos. (O programa original usava caracteres gráficos.)
 
 ![Captura de tela](pag.010.png)
+
+
+## Programação BASIC 1:  <br> Números ao acaso
+
+### [pag.013.bas](pag.013.bas)
+
+Jogo de adivinhação de um número (0–5) sorteado pelo computador.
+
+![Captura de tela](pag.013.png)
