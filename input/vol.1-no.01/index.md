@@ -60,3 +60,11 @@ Animação em dois quadros de um helicóptero desenhado com caracteres de blocos
 Jogo de adivinhação de um número (0–5) sorteado pelo computador.
 
 ![Captura de tela](pag.013.png)
+
+
+### [pag.015.bas](pag.015.bas)
+
+Teste de conhecimento de tabuada de multiplicação por 9.
+
+![Captura de tela](pag.015.png)
+
