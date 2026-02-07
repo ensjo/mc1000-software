@@ -68,3 +68,17 @@ Teste de conhecimento de tabuada de multiplicação por 9.
 
 ![Captura de tela](pag.015.png)
 
+
+## Aplicações 1 <br> Escreva cartas sem esforço
+
+### [pag.019.bas](pag.019.bas)
+
+Programa que formata e imprime na tela ou impressora uma carta a partir de linhas DATA.
+
+Muda a instrução PR# na linha 10 conforme o resultado desejado:
+
+- PR#0 imprime na tela.
+- PR#1 imprime na impressora.
+- PR#2 imprime na tela e na impressora.
+
+![Captura de tela](pag.019.png)
