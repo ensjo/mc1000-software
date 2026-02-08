@@ -33,3 +33,14 @@ Desenho de padrão caleidoscópico.
 
 ![Captura de tela](pag.025-2.png)
 
+
+## Programação de jogos 2 <br> Apontar... fogo!
+
+Demonstrações de captura de teclas com `INKEY$` e movimentações.
+
+
+### [pag.032.bas](pag.032.bas)
+
+Jogo de tiro ao alvo.
+
+![Captura de tela](pag.032.png)
