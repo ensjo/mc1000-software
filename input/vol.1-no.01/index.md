@@ -55,6 +55,9 @@ Animação em dois quadros de um helicóptero desenhado com caracteres de blocos
 
 ## Programação BASIC 1:  <br> Números ao acaso
 
+Demonstrações do uso de `RND`.
+
+
 ### [pag.0013.bas](pag.0013.bas)
 
 Jogo de adivinhação de um número (0–5) sorteado pelo computador.
@@ -73,12 +76,6 @@ Teste de conhecimento de tabuada de multiplicação por 9.
 
 ### [pag.0019.bas](pag.0019.bas)
 
-Programa que formata e imprime na tela ou impressora uma carta a partir de linhas DATA.
-
-Muda a instrução PR# na linha 10 conforme o resultado desejado:
-
-- PR#0 imprime na tela.
-- PR#1 imprime na impressora.
-- PR#2 imprime na tela e na impressora.
+Programa que formata e imprime na tela e/ou impressora uma carta a partir de linhas DATA.
 
 ![Captura de tela](pag.0019.png)
