@@ -56,3 +56,9 @@ Jogo de tiro ao alvo.
 
 ![Captura de tela](pag.035.png)
 
+
+### [pag.038.bas](pag.038.bas)
+
+Conversão de números fracionários (0 a 1, exclusive) para binário.
+
+![Captura de tela](pag.038.png)
