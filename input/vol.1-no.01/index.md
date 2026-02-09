@@ -2,6 +2,9 @@
 
 ## Código de máquina 1: <br> Programação em código da máquina
 
+(🔗📖🇬🇧 [vol. 1, no. 3, pag. 0065](https://archive.org/details/Input_Vol_1_No_03_1997_Marshall_Cavendish_GB/page/n2/mode/1up))
+
+
 ### [pag.0002.bas](pag.0002.bas)
 
 Comparação entre a velocidade do BASIC e do código de máquina em preencher a memória de vídeo com caracteres aleatórios (dados quaisquer obtidos da ROM).
@@ -17,6 +20,9 @@ Demonstração da velocidade do código de máquina em preencher a memória de v
 
 
 ## Programação de jogos 1:  <br> Animação e sinais gráficos
+
+(🔗📖🇬🇧 [vol. 1, no. 1, pag. 0026](https://archive.org/details/Input_Vol_1_No_01_1997_Marshall_Cavendish_GB/page/n27/mode/1up))
+
 
 ### [pag.0005-1.bas](pag.0005-1.bas)
 
@@ -55,6 +61,8 @@ Animação em dois quadros de um helicóptero desenhado com caracteres de blocos
 
 ## Programação BASIC 1:  <br> Números ao acaso
 
+(🔗📖🇬🇧 [vol. 1, no. 1, pag. 0002](https://archive.org/details/Input_Vol_1_No_01_1997_Marshall_Cavendish_GB/page/n3/mode/1up))
+
 Demonstrações do uso de `RND`.
 
 
@@ -73,6 +81,9 @@ Teste de conhecimento de tabuada de multiplicação por 9.
 
 
 ## Aplicações 1 <br> Escreva cartas sem esforço
+
+(🔗📖🇬🇧 [vol. 1, no. 4, pag. 0124](https://archive.org/details/Input_Vol_1_No_04_1997_Marshall_Cavendish_GB/page/n29/mode/1up))
+
 
 ### [pag.0019.bas](pag.0019.bas)
 

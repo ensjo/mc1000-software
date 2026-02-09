@@ -2,7 +2,10 @@
 
 ## Programação BASIC 2: <br> A arte de fazer laços
 
-Demonstração de usos de laços `FOR`.
+(🔗📖🇬🇧 [vol. 1, no. 1, pag. 0016](https://archive.org/details/Input_Vol_1_No_01_1997_Marshall_Cavendish_GB/page/n17/mode/1up))
+
+Demonstrações do uso de laços `FOR`.
+
 
 ### [pag.0022.bas](pag.0022.bas)
 
@@ -36,6 +39,8 @@ Desenho de padrão caleidoscópico.
 
 ## Programação de jogos 2 <br> Apontar... fogo!
 
+(🔗📖🇬🇧 [vol. 1, no. 2, pag. 0054](https://archive.org/details/Input_Vol_1_No_02_1997_Marshall_Cavendish_GB/page/n23/mode/1up))
+
 Demonstrações de captura de teclas com `INKEY$` e movimentações.
 
 
@@ -49,6 +54,9 @@ Jogo de tiro ao alvo.
 
 
 ## Código de máquina 2 <br> Aprenda a contar com um dedo só
+
+(🔗📖🇬🇧 [vol. 1, no. 4, pag. 0110](https://archive.org/details/Input_Vol_1_No_04_1997_Marshall_Cavendish_GB/page/n15/mode/1up))
+
 
 ### [pag.0035.bas](pag.0035.bas)
 
