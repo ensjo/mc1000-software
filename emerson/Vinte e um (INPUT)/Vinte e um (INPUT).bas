@@ -1,7 +1,7 @@
 0  CLEAR 512,15535: GOSUB 65000
 10  HGR
 15 SP$ = "                                ":V$ =  CHR$ (113):V$ = V$ + V$ + V$ + V$ + V$
-20 W =  RND ( - 65536 -  PEEK (264) * 256 -  PEEK (263)): REM RANDOMIZE
+20 W =  RND ( -  PEEK (264) * 256 -  PEEK (263) - .5): REM RANDOMIZE
 30  DIM C(52): FOR N = 1 TO 52:C(N) = N: NEXT N
 40  DIM A(13)
 50  RESTORE 60: FOR N = 1 TO 13: READ A(N): NEXT N
