@@ -21,13 +21,13 @@ Máquina caça-níqueis.
 Jogo de “come-come” em labirinto.
 
 
-### [pag.0032.bas](pag.0032.bas)
+### [pag.046.bas](pag.046.bas)
 
-Jogo de tiro ao alvo.
+🕹️ MOVIMENTO: Teclas WASD.
 
 ⚙️ CÓDIGO DE MÁQUINA ADICIONADO: A versão para MC-1000 usa o pacote [RotinasUSR](https://github.com/ensjo/mc1000-software/tree/master/emerson/RotinasUSR) para superar o bloqueio do interpretador BASIC quando uma tecla é pressionada e para disponibilizar uma função semenhante à `INKEY$`.
 
-![Captura de tela](pag.0032.png)
+![Captura de tela](pag.0046.png)
 
 
 ## Periféricos <br> Como descomplicar `SAVE`s e `LOAD`s
