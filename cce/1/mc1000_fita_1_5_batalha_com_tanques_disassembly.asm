@@ -3,7 +3,8 @@
 ; Created with dZ80 v1.31
 ;
 ; on Wednesday, 18 of April 2007 at 04:52 PM
-;
+
+; Variáveis do sistema.
 0100  ffffff    db      #ff, #ff, #ff
 0103  ff        db      #ff ; PGM/PGN/MUSIC.
 0104  01        db      #01 ; PLAY: Tópico (modo) de jogo atual.
@@ -28,7 +29,8 @@
 012e  ffff      db      #ff, #ff
 0130  c9        ret     ; JOBM: 2º hook de leitura do teclado.
 0131  ffffffff  db      #ff, #ff, #ff, #ff
-0135  ffff      db      #ff, #ff ; TABLE/NSA.
+; TABLE:
+0135  ffff      db      #ff, #ff ; NSA.
 0137  ffff      db      #ff, #ff ; NAA.
 0139  00        db      #00 ; AVALUE.
 013a  ff        db      #ff ; VOICEA.
@@ -727,16 +729,27 @@
 044f  40        db      #40 ; +64: +2 linhas.
 0450  ff        db      #ff
  
-; Inicializa música.
-0451  212b0f    ld      hl,#0f2b ; Notas para o canal A.
+; Inicializa música nos canais A e B.
+0451  212b0f    ld      hl,#0f2b ; Notas para o canal A (melodia principal).
 0454  223701    ld      (#0137),hl ; NAA.
-0457  216010    ld      hl,#1060 ; Notas para o canal B.
+0457  216010    ld      hl,#1060 ; Notas para o canal B (acompanhamento).
 045a  224001    ld      (#0140),hl ; NBB.
-045d  3e7d      ld      a,#7d ; %01.11.11.0.1: Produzir tom; INTRPA=4; VOICEA=3 (envoltória); inicializar; tocar.
+045d  3e7d      ld      a,#7d ; %01.11.11.0.1:
+                              ; 01 = produzir tom apenas;
+                              ; 11 = INTRPA=3+1=4 (duração do tick 4*1/60s, 1 semínima=4 ticks);
+                              ; 11 = VOICEA=3 (envoltória);
+                              ;  0 = inicializar;
+                              ;  1 = canal ativo.
 045f  323901    ld      (#0139),a ; AVALUE.
-0462  3e79      ld      a,#79 ; %01.11.10.0.1: Produzir tom; INTRPB=4; VOICEB=2 (decrescente); inicializar; tocar.
+0462  3e79      ld      a,#79 ; %01.11.10.0.1:
+                              ; 01 = Produzir tom apenas;
+                              ; 11 = INTRPB=3+1=4 (duração do tick 4*1/60s, 1 semínima=4 ticks, sincronizado com A);
+                              ; 10 = VOICEB=2 (decrescente: efeito staccato);
+                              ;  0 = inicializar;
+                              ;  1 = canal ativo.
 0464  324201    ld      (#0142),a ; BVALUE.
-0467  af        xor     a ; %00.00.00.0.0: ...; não tocar.
+; Canal C fica em silêncio, reservado para efeitos sonoros (tiros, explosões).
+0467  af        xor     a ; %00.00.00.0.0: ...; canal inativo.
 0468  324b01    ld      (#014b),a ; CVALUE.
 046b  c9        ret
  
@@ -1634,7 +1647,12 @@
 0a84  e5        push    hl
 0a85  214911    ld      hl,#1149 ; Som do tiro.
 0a88  224901    ld      (#0149),hl ; NCC.
-0a8b  3e79      ld      a,#79 ; VOICEC=2, INTRPC=4, produção de tom.
+0a8b  3e79      ld      a,#79 ; %01.11.10.0.1:
+                              ; 01 = Produzir tom apenas;
+                              ; 11 = INTRPB=3+1=4 (duração do tick=4*(1/60)s);
+                              ; 10 = VOICEB=2 (decrescente);
+                              ;  0 = inicializar;
+                              ;  1 = canal ativo.
 0a8d  324b01    ld      (#014b),a ; CVALUE.
 0a90  e1        pop     hl
 0a91  c9        ret
@@ -2270,7 +2288,7 @@
  
 0e88  00        db      #00 ; SHAPE0', indicador de colisão
                             ; para a rotina SHAPOF'.
-0e89  00        db      #00
+0e89  00        db      #00 ; Indica se #0038 já foi iniciado com um JP INTRUP.
 
 0e8a  ff        db      #ff ; Contador de ciclos de espera para jogador 1.
 0e8b  ff        db      #ff ; Contador de ciclos de espera para jogador 2.
@@ -2449,6 +2467,7 @@
 0f2a  c9        ret
 
 ; BGM: MARCHA TURCA (MOZART). (Canal A.)
+; NAA é configurado para apontar para cá.
 0f2b  0f        db      #0f ; Forma da envoltória = 0 (\___).
 0f2c  8020      dw      #2080 ; Período da envoltória = 8320.
 0f2d  00        db      #00 ; Valor para registrador de controle do gerador de ruído = 0.
@@ -2610,6 +2629,7 @@
 105f  ee        db      #ee ; Repetir.
  
 ; BGM: MARCHA TURCA (MOZART). (Canal B.)
+; NBB é configurado para apontar para cá.
 1060  0c        db      #0c ; Forma da envoltória = 0 (\___).
 1061  8020      dw      #2080 ; Período da envoltória = 8320.
 1063  00        db      #00 ; Valor para registrador de controle do gerador de ruído = 0.
@@ -2733,10 +2753,12 @@
 1148  ee        db      #ee ; Repetir.
 
 ; SFX: Tiro. (Canal C.)
+; NCC é configurado para apontar para cá.
 1149  0f        db      #0f ; Amplitude fixa = 15.
 114a  8020      dw      #2080 ; Período da envoltória = 8320.
 114c  00        db      #00 ; Valor para registrador de controle do gerador de ruído = 0.
-;
+; Sequência de notas decrescentes em rápida sucessão (glissando).
+; Efeito de "piu" durando cerca de 1,5s.
 114d  7b01      db      #7b, #01 ; 7ª oitava, nota B, duração 1.
 114f  7a01      db      #7a, #01 ; 7ª oitava, nota A#, duração 1.
 1151  7901      db      #79, #01 ; 7ª oitava, nota A, duração 1.
@@ -2760,9 +2782,10 @@
 1175  6301      db      #63, #01 ; 6ª oitava, nota D#, duração 1.
 1177  6201      db      #62, #01 ; 6ª oitava, nota D, duração 1.
 ;
-1179  ff        db      #ff ; Fim.
+1179  ff        db      #ff ; Fim (não repete).
 
 ; SFX: Explosão. (Canal C.)
+; NCC é configurado para apontar para cá.
 117a  0f        db      #0f ; Amplitude fixa = 15.
 117b  0000      dw      #0000 ; Período da envoltória = 0.
 117d  1f        db      #1f ; Valor para registrador de controle do gerador de ruído = 31.
@@ -2797,7 +2820,7 @@
 11b4  0220      db      #02, #20 ; Amplitude 2, duração 32.
 11b6  0120      db      #01, #20 ; Amplitude 1, duração 32.
 ;
-11b8  ff        db      #ff ; Fim.
+11b8  ff        db      #ff ; Fim (não repete).
 
 11b9  ff        rst     #38
 11ba  ff        rst     #38
