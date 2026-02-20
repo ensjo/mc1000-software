@@ -780,8 +780,8 @@
 ; Início propriamente dito.
 0494  cd5104    call    #0451 ; Inicializa música.
 0497  210000    ld      hl,#0000
-049a  225f0e    ld      (#0e5f),hl
-049d  227e0e    ld      (#0e7e),hl
+049a  225f0e    ld      (#0e5f),hl ; Zera velocidade do jogador atual.
+049d  227e0e    ld      (#0e7e),hl ; Zera velocidade do outro jogador.
 04a0  222301    ld      (#0123),hl ; SCOREA & SCOREB
 04a3  3e88      ld      a,#88 ; Tela em modo GR (128x64, verde/amarelo/azul/vermelho).
 04a5  d380      out     (#80),a ; COL32.
@@ -1046,7 +1046,7 @@
 ;
 05d1  af        xor     a
 05d2  32870e    ld      (#0e87),a
-05d5  32610e    ld      (#0e61),a
+05d5  32610e    ld      (#0e61),a ; Controle de velocidade do jogo.
 05d8  3a5c0e    ld      a,(#0e5c) ; Placar atual do jogador atual.
 05db  110d80    ld      de,#800d ; Posição na VRAM do placar do jogador 1.
 05de  cd900d    call    #0d90 ; Exibe valor de A alinhado à esquerda.
@@ -1063,8 +1063,8 @@
 ; if (m[0x0e5f] >= m[0x0e61]) {
 ;   // ...
 ; }
-05fa  3a5f0e    ld      a,(#0e5f)
-05fd  21610e    ld      hl,#0e61
+05fa  3a5f0e    ld      a,(#0e5f) ; Velocidade do jogador atual.
+05fd  21610e    ld      hl,#0e61 ; Controle de velocidade do jogo.
 0600  be        cp      (hl)
 0601  da2e06    jp      c,#062e
 0604  21b302    ld      hl,#02b3 ; Animação: Tanque azul para a direita.
@@ -1084,8 +1084,8 @@
 ; if (m[0x0e7e] >= m[0x0e61]) {
 ;   // ...
 ; }
-062e  3a7e0e    ld      a,(#0e7e)
-0631  21610e    ld      hl,#0e61
+062e  3a7e0e    ld      a,(#0e7e) ; Velocidade do outro jogador.
+0631  21610e    ld      hl,#0e61 ; Controle de velocidade do jogo.
 0634  be        cp      (hl)
 0635  da8508    jp      c,#0885
 0638  3a750e    ld      a,(#0e75) ; Direção do outro tanque.
@@ -1390,7 +1390,7 @@
 087c  cdfb0c    call    #0cfb ; Alterna tanques.
 087f  cda40a    call    #0aa4
 0882  cdfb0c    call    #0cfb ; Alterna tanques.
-0885  21610e    ld      hl,#0e61
+0885  21610e    ld      hl,#0e61 ; Controle de velocidade do jogo.
 0888  34        inc     (hl)
 0889  3a750e    ld      a,(#0e75) ; Direção do outro tanque.
 088c  fe05      cp      #05 ; Tanque destruído?
@@ -1612,7 +1612,7 @@
 0a52  010600    ld      bc,#0006 ; PLAY=8,9,15,16: 6ms.
 0a55  cd48c0    call    #c048 ; DELAYB.
 
-0a58  3a610e    ld      a,(#0e61)
+0a58  3a610e    ld      a,(#0e61) ; Controle de velocidade do jogo.
 0a5b  fe03      cp      #03
 0a5d  cad105    jp      z,#05d1
 0a60  c3ea05    jp      #05ea
@@ -1785,14 +1785,15 @@
 0b90  c3c80b    jp      #0bc8
 ;
 0b93  cdf30d    call    #0df3 ; SHAPON'.
+
 ; Desacelera tanque impedido de se mover.
 ; if (m[0x0e5f] != 0) {
 ;   --m[0x0e5f];
 ; }
-0b96  3a5f0e    ld      a,(#0e5f)
-0b99  a7        and     a
-0b9a  c8        ret     z
-0b9b  3d        dec     a
+0b96  3a5f0e    ld      a,(#0e5f) ; Velocidade do jogador atual.
+0b99  a7        and     a ; Parado?
+0b9a  c8        ret     z ; Sim: retorna.
+0b9b  3d        dec     a ; Diminui velocidade.
 0b9c  325f0e    ld      (#0e5f),a
 0b9f  c9        ret
 
@@ -1822,7 +1823,7 @@
 
 ; Direção já definida.
 
-; Acelera tanque(?)
+; Acelera tanque se o contador passou de 16.
 ; if (++mem[0x0e60] > 16) {
 ;   if (mem[0x0e5f] != 3) {
 ;     ++mem[0x0e5f];
@@ -1830,17 +1831,17 @@
 ;   }
 ; }
 
-0bc8  21600e    ld      hl,#0e60
-0bcb  34        inc     (hl)
-0bcc  3e10      ld      a,#10
+0bc8  21600e    ld      hl,#0e60 ; Contador de tempo para aumentar velocidade.
+0bcb  34        inc     (hl) ; Incrementa.
+0bcc  3e10      ld      a,#10 ; > 16?
 0bce  be        cp      (hl)
-0bcf  d2e00b    jp      nc,#0be0
-0bd2  3a5f0e    ld      a,(#0e5f)
-0bd5  fe03      cp      #03
-0bd7  cae00b    jp      z,#0be0
-0bda  3c        inc     a
+0bcf  d2e00b    jp      nc,#0be0 ; Não: desvia.
+0bd2  3a5f0e    ld      a,(#0e5f) ; Velocidade do jogador atual.
+0bd5  fe03      cp      #03 ; = 3?
+0bd7  cae00b    jp      z,#0be0 ; Sim: desvia.
+0bda  3c        inc     a ; Incrementa.
 0bdb  325f0e    ld      (#0e5f),a
-0bde  3600      ld      (hl),#00
+0bde  3600      ld      (hl),#00 ; Zera contador.
 ;
 0be0  cde20d    call    #0de2 ; Apaga tanque atual.
 0be3  caf40b    jp      z,#0bf4 ; Desvia se não houve colisão.
@@ -2242,10 +2243,10 @@
 0e5c  ff        db      #ff ; Placar atual do jogador atual.
 0e5d  00        db      #00 ; Identificador do jogador atual (0 = jogador 1, 1 = jogador 2).
 0e5e  00        db      #00 ; Contador de invulnerabilidade do jogador atual.
-0e5f  ff        db      #ff
-0e60  ff        db      #ff
+0e5f  ff        db      #ff ; Velocidade do jogador atual (0~3).
+0e60  ff        db      #ff ; Contador de tempo para aumentar a velocidade (0~15).
 ;
-0e61  ff        db      #ff
+0e61  ff        db      #ff ; Controle de velocidade do jogo.
 0e62  c702      dw      #02c7 ; Animação: Tanque para a esquerda.
 0e64  b302      dw      #02b3 ; Animação: Tanque para a direita.
 0e66  bf02      dw      #02bf ; Animação: Tanque para cima.
@@ -2271,8 +2272,8 @@
 0e7b  ff        db      #ff ; Placar atual do outro jogador.
 0e7c  01        db      #01 ; Identificador do jogador atual (0 = jogador 1, 1 = jogador 2).
 0e7d  00        db      #00 ; Contador de invulnerabilidade do outro jogador.
-0e7e  ff        db      #ff
-0e7f  ff        db      #ff
+0e7e  ff        db      #ff ; Velocidade do outro jogador (0~3).
+0e7f  ff        db      #ff ; Contador de tempo para aumentar a velocidade (0~15).
 
 ; Teclas do jogador 2.
 0e80  58        db      #58 ; 'X' (esquerda).
