@@ -15,7 +15,7 @@
 ;    https://www.gatesnotes.com/microsoft-original-source-code
 ; 2. Listagem de um interpretador HC-BASIC (8KB), de 1988,
 ;    aparentemente com rótulos originais, e comentários em alemão:
-;    http://www.iee.et.tu-dresden.de/~kc-club/DOWNLOAD/DISK283/HCBASIC.MAC
+;    https://web.archive.org/web/20221129160440/http://www.iee.et.tu-dresden.de/~kc-club/DOWNLOAD/DISK283/HCBASIC.MAC
 ;    Estes serão indicados entre chaves {}.
 ; 3. Listagem do interpretador NASCOM ROM BASIC (8KB), de 1978:
 ;    http://www.nascomhomepage.com/lang/8kbasic.asm
