@@ -39,20 +39,20 @@ function hexParaBas(textoHex) {
 	
 	if (resultado.length) {
 		bloco = resultado[0];
-		let textoBas = `1  CLEAR 512,${bloco.enderecoIni - 1}: GOSUB 65000: CLEAR 
-64999  STOP 
-65000  REM INSTALADOR
-65010  POKE 836,0: TEXT : HOME : PRINT "INSTALANDO ROTINAS USR. AGUARDE.";
-65020  RESTORE 65100
-65030  READ E: IF E =  - 1 THEN  PRINT "OK.": RETURN 
-65040  READ B: IF B =  - 1 THEN 65030
-65050  POKE E,B:E = E + 1: GOTO 65040
-65100  REM CONFIGURA USR()
-65110  DATA 771
-65120  DATA 195,${bloco.enderecoIni & 0xff},${(bloco.enderecoIni & 0xff00) >> 8},-1
-65130  REM PACOTE DE ROTINAS USR
+		let textoBas = `1  CLEAR 512,${bloco.enderecoIni - 1}: GOSUB 64000: CLEAR 
+63999  STOP 
+64000  REM INSTALA ROTINAS USR
+64010  POKE 836,0: TEXT : HOME : PRINT "INSTALANDO ROTINAS USR. AGUARDE.";
+64020  RESTORE 64100
+64030  READ E: IF E =  - 1 THEN  PRINT "OK.": RETURN 
+64040  READ B: IF B =  - 1 THEN 64030
+64050  POKE E,B:E = E + 1: GOTO 64040
+64100  REM CONFIGURA ENDERECO USR()
+64110  DATA 771
+64120  DATA 195,${bloco.enderecoIni & 0xff},${(bloco.enderecoIni & 0xff00) >> 8},-1
+64130  REM PACOTE DE ROTINAS USR
 `;
-		let numeroLinha = 65140;
+		let numeroLinha = 64140;
 		let tamanhoMaxDados = 246; // 255 - 5 (número de linha) - 4 ("DATA").
 
 		// Para cada bloco...
@@ -105,12 +105,12 @@ https://www.asm80.com/</a> em um programa BASIC do MC1000 que:</p>
 
 <ol>
 <li>reserva espaço no topo da RAM para os dados (linha 1);</li>
-<li>chama uma subrotina para injetar dados na memória (linhas 65000–65050),
+<li>chama uma subrotina para injetar dados na memória (linhas 64000–64050),
 a saber:
 <ol>
-<li>configura a função <code>USR()</code> (linhas 65100–65120) para chamar
+<li>configura a função <code>USR()</code> (linhas 64100–64120) para chamar
 o endereço inicial dos dados;</li>
-<li>o restante dos dados (linhas 65130–).</li>
+<li>o restante dos dados (linhas 64130–).</li>
 </ol>
 </li>
 </ol>
