@@ -37,7 +37,7 @@ Desenho de padrão caleidoscópico.
 ![Captura de tela](pag.0025-2.png)
 
 
-## Programação de jogos 2 <br> Apontar... fogo!
+## Programação de jogos 2: <br> Apontar... fogo!
 
 (🔗📖🇬🇧 [vol. 1, no. 2, pag. 0054](https://archive.org/details/Input_Vol_1_No_02_1997_Marshall_Cavendish_GB/page/n23/mode/1up))
 
@@ -48,12 +48,14 @@ Demonstrações de captura de teclas com `INKEY$` e movimentações.
 
 Jogo de tiro ao alvo.
 
-⚙️ CÓDIGO DE MÁQUINA ADICIONADO: A versão para MC-1000 usa o pacote [RotinasUSR](https://github.com/ensjo/mc1000-software/tree/master/emerson/RotinasUSR) para superar o bloqueio do interpretador BASIC quando uma tecla é pressionada e para disponibilizar uma função semenhante à `INKEY$`.
-
 ![Captura de tela](pag.0032.png)
 
+🕹️ CONTROLES: &lt;A> = esquerda, &lt;D> = direita, &lt;.> = tiro.
 
-## Código de máquina 2 <br> Aprenda a contar com um dedo só
+⚙️ CÓDIGO DE MÁQUINA ADICIONADO: A versão para MC-1000 usa o pacote [RotinasUSR](https://github.com/ensjo/mc1000-software/tree/master/emerson/RotinasUSR) para superar o bloqueio do interpretador BASIC quando uma tecla é pressionada e para disponibilizar uma função semenhante à `INKEY$`.
+
+## Código de máquina 2: <br> Aprenda a contar com um dedo só
+
 
 (🔗📖🇬🇧 [vol. 1, no. 4, pag. 0110](https://archive.org/details/Input_Vol_1_No_04_1997_Marshall_Cavendish_GB/page/n15/mode/1up))
 

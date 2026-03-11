@@ -59,7 +59,7 @@ Animação em dois quadros de um helicóptero desenhado com caracteres de blocos
 ![Captura de tela](pag.0010.png)
 
 
-## Programação BASIC 1:  <br> Números ao acaso
+## Programação BASIC 1: <br> Números ao acaso
 
 (🔗📖🇬🇧 [vol. 1, no. 1, pag. 0002](https://archive.org/details/Input_Vol_1_No_01_1997_Marshall_Cavendish_GB/page/n3/mode/1up))
 
@@ -80,7 +80,7 @@ Teste de conhecimento de tabuada de multiplicação por 9.
 ![Captura de tela](pag.0015.png)
 
 
-## Aplicações 1 <br> Escreva cartas sem esforço
+## Aplicações 1: <br> Escreva cartas sem esforço
 
 (🔗📖🇬🇧 [vol. 1, no. 4, pag. 0124](https://archive.org/details/Input_Vol_1_No_04_1997_Marshall_Cavendish_GB/page/n29/mode/1up))
 
